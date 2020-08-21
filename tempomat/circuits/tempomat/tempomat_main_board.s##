@@ -14219,6 +14219,7 @@ Source: www.kingbright.com</description>
 <text x="53.34" y="50.8" size="1.778" layer="91">off</text>
 <text x="53.34" y="40.64" size="1.778" layer="91">on</text>
 <text x="149.86" y="35.56" size="1.778" layer="91">on-off indicator light</text>
+<text x="17.78" y="30.48" size="2.54" layer="91">what for this pnp ?</text>
 </plain>
 <instances>
 <instance part="SUPPLY5" gate="+12V" x="-12.7" y="48.26"/>
