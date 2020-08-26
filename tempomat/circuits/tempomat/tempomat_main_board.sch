@@ -16106,7 +16106,6 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <part name="SUPPLY9" library="supply2" deviceset="+5V" device=""/>
 <part name="SUPPLY11" library="supply2" deviceset="+5V" device=""/>
 <part name="VR1" library="resistor" deviceset="R-TRIMM" device="3202" value="100k"/>
-<part name="R19" library="resistor" deviceset="R-EU_" device="0204/2V" value="???"/>
 <part name="J_ACTUATOR" library="con-amp" deviceset="794623-4" device=""/>
 <part name="C2" library="resistor" deviceset="C-EU" device="025-060X050" value="100n"/>
 <part name="SUPPLY10" library="supply2" deviceset="AGND" device=""/>
@@ -16119,6 +16118,7 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <part name="D1" library="diode" deviceset="1N4004" device=""/>
 <part name="R2" library="resistor" deviceset="R-EU_" device="0204/2V" value="2.7k"/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="0204/2V" value="7.4k"/>
+<part name="SUPPLY16" library="supply2" deviceset="AGND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -16145,6 +16145,7 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <text x="378.46" y="20.32" size="1.778" layer="91" rot="MR90">A7753DB</text>
 <text x="375.92" y="119.38" size="1.778" layer="91">Brd</text>
 <text x="381" y="116.84" size="1.778" layer="91">12V if hmi ON</text>
+<text x="142.24" y="45.72" size="1.778" layer="91">8</text>
 </plain>
 <instances>
 <instance part="SV1" gate="-1" x="-20.32" y="96.52"/>
@@ -16166,7 +16167,7 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <instance part="C17" gate="G$1" x="162.56" y="93.98"/>
 <instance part="C18" gate="G$1" x="152.4" y="81.28"/>
 <instance part="C25" gate="G$1" x="132.08" y="-20.32"/>
-<instance part="C11" gate="G$1" x="165.1" y="81.28"/>
+<instance part="C11" gate="G$1" x="99.06" y="22.86" rot="R180"/>
 <instance part="C5" gate="G$1" x="60.96" y="88.9"/>
 <instance part="C6" gate="G$1" x="91.44" y="88.9"/>
 <instance part="C15" gate="G$1" x="170.18" y="60.96"/>
@@ -16207,7 +16208,6 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <instance part="SUPPLY9" gate="+5V" x="91.44" y="93.98"/>
 <instance part="SUPPLY11" gate="+5V" x="220.98" y="27.94"/>
 <instance part="VR1" gate="G$1" x="259.08" y="27.94"/>
-<instance part="R19" gate="G$1" x="172.72" y="2.54" rot="R90"/>
 <instance part="J_ACTUATOR" gate="G$1" x="370.84" y="17.78"/>
 <instance part="C2" gate="G$1" x="73.66" y="111.76"/>
 <instance part="SUPPLY10" gate="G$1" x="73.66" y="104.14"/>
@@ -16220,6 +16220,7 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <instance part="D1" gate="1" x="375.92" y="104.14" rot="R270"/>
 <instance part="R2" gate="G$1" x="381" y="91.44" rot="R180"/>
 <instance part="R1" gate="G$1" x="381" y="78.74" rot="R180"/>
+<instance part="SUPPLY16" gate="G$1" x="104.14" y="17.78"/>
 </instances>
 <busses>
 <bus name="B$1">
@@ -16302,6 +16303,14 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <pinref part="D12" gate="1" pin="A"/>
 <pinref part="SUPPLY15" gate="G$1" pin="AGND"/>
 <wire x1="391.16" y1="58.42" x2="396.24" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C37" gate="G$1" pin="1"/>
+<pinref part="C11" gate="G$1" pin="+"/>
+<wire x1="114.3" y1="20.32" x2="104.14" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="SUPPLY16" gate="G$1" pin="AGND"/>
+<wire x1="104.14" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
+<junction x="104.14" y="20.32"/>
 </segment>
 </net>
 <net name="+12V" class="0">
@@ -16503,12 +16512,9 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <segment>
 <pinref part="Q2" gate="G$1" pin="C"/>
 <pinref part="R32" gate="G$1" pin="1"/>
-<wire x1="144.78" y1="7.62" x2="172.72" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="U4_XOR-" gate="D" pin="I1"/>
-<wire x1="172.72" y1="7.62" x2="200.66" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="7.62" x2="200.66" y2="7.62" width="0.1524" layer="91"/>
 <wire x1="200.66" y1="7.62" x2="200.66" y2="15.24" width="0.1524" layer="91"/>
-<pinref part="R19" gate="G$1" pin="2"/>
-<junction x="172.72" y="7.62"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -16540,22 +16546,8 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <wire x1="200.66" y1="22.86" x2="200.66" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="U4_XOR-" gate="D" pin="O"/>
-<wire x1="215.9" y1="17.78" x2="228.6" y2="17.78" width="0.1524" layer="91"/>
-<wire x1="228.6" y1="17.78" x2="228.6" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="228.6" y1="40.64" x2="129.54" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="129.54" y1="40.64" x2="129.54" y2="48.26" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$32" class="0">
 <segment>
-<pinref part="U4_XOR-" gate="B" pin="O"/>
-<wire x1="215.9" y1="30.48" x2="215.9" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="215.9" y1="35.56" x2="226.06" y2="35.56" width="0.1524" layer="91"/>
-<wire x1="226.06" y1="35.56" x2="231.14" y2="35.56" width="0.1524" layer="91" curve="-180"/>
-<wire x1="231.14" y1="35.56" x2="241.3" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="241.3" y1="35.56" x2="246.38" y2="35.56" width="0.1524" layer="91" curve="-180"/>
 <wire x1="246.38" y1="35.56" x2="259.08" y2="35.56" width="0.1524" layer="91"/>
 <pinref part="VR1" gate="G$1" pin="E"/>
@@ -16563,6 +16555,12 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <pinref part="VR1" gate="G$1" pin="S"/>
 <wire x1="259.08" y1="35.56" x2="264.16" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="264.16" y1="35.56" x2="264.16" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="129.54" y1="40.64" x2="129.54" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="129.54" y1="40.64" x2="215.9" y2="40.64" width="0.1524" layer="91"/>
+<pinref part="U4_XOR-" gate="B" pin="O"/>
+<wire x1="215.9" y1="40.64" x2="215.9" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="215.9" y1="35.56" x2="215.9" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="241.3" y1="35.56" x2="215.9" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$31" class="0">
@@ -16634,6 +16632,26 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <segment>
 <wire x1="375.92" y1="109.22" x2="375.92" y2="114.3" width="0.1524" layer="91" style="longdash"/>
 <wire x1="375.92" y1="114.3" x2="370.84" y2="121.92" width="0.1524" layer="91" style="longdash"/>
+</segment>
+</net>
+<net name="N$38" class="0">
+<segment>
+<pinref part="R32" gate="G$1" pin="2"/>
+<wire x1="144.78" y1="17.78" x2="144.78" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="38.1" x2="144.78" y2="43.18" width="0.1524" layer="91" curve="-180"/>
+<wire x1="144.78" y1="43.18" x2="144.78" y2="48.26" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$39" class="0">
+<segment>
+<pinref part="U4_XOR-" gate="D" pin="O"/>
+<wire x1="215.9" y1="17.78" x2="223.52" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="223.52" y1="17.78" x2="223.52" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="223.52" y1="2.54" x2="177.8" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="2.54" x2="177.8" y2="5.08" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="5.08" x2="177.8" y2="10.16" width="0.1524" layer="91" curve="-180"/>
+<wire x1="177.8" y1="10.16" x2="177.8" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="20.32" x2="185.42" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
