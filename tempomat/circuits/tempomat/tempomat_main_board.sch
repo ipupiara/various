@@ -14198,6 +14198,23 @@ Distributor: &lt;a href ="https://www.buerklin.com/default.asp?event=ShowArtikel
 <hole x="2.54" y="0" drill="1.2192"/>
 <hole x="-2.54" y="0" drill="1.2192"/>
 </package>
+<package name="Q">
+<description>&lt;B&gt;CRYSTAL&lt;/B&gt;</description>
+<wire x1="5.08" y1="6.985" x2="-5.08" y2="6.985" width="0.1524" layer="21"/>
+<wire x1="5.715" y1="-6.35" x2="5.08" y2="-6.35" width="0.4064" layer="21"/>
+<wire x1="5.08" y1="-6.35" x2="5.08" y2="6.985" width="0.1524" layer="21"/>
+<wire x1="5.08" y1="-6.35" x2="2.54" y2="-6.35" width="0.4064" layer="21"/>
+<wire x1="-5.08" y1="-6.35" x2="-5.08" y2="6.985" width="0.1524" layer="21"/>
+<wire x1="-5.08" y1="-6.35" x2="-5.715" y2="-6.35" width="0.4064" layer="21"/>
+<wire x1="2.54" y1="-6.35" x2="2.54" y2="-6.985" width="0.1524" layer="21"/>
+<wire x1="-2.54" y1="-6.35" x2="-2.54" y2="-6.985" width="0.1524" layer="21"/>
+<wire x1="2.54" y1="-6.35" x2="-2.54" y2="-6.35" width="0.4064" layer="21"/>
+<wire x1="-2.54" y1="-6.35" x2="-5.08" y2="-6.35" width="0.4064" layer="21"/>
+<pad name="1" x="-2.54" y="-7.62" drill="0.6096" shape="long" rot="R90"/>
+<pad name="2" x="2.54" y="-7.62" drill="0.6096" shape="long" rot="R90"/>
+<text x="-2.6162" y="1.1938" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-3.2512" y="-1.3462" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
+</package>
 </packages>
 <symbols>
 <symbol name="LAMP">
@@ -14217,6 +14234,18 @@ Distributor: &lt;a href ="https://www.buerklin.com/default.asp?event=ShowArtikel
 <pin name="1" x="0" y="-5.08" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
 <pin name="2" x="2.54" y="-5.08" visible="off" length="short" direction="pas" swaplevel="1" rot="R90"/>
 </symbol>
+<symbol name="XTAL">
+<wire x1="-1.27" y1="2.54" x2="1.397" y2="2.54" width="0.4064" layer="94"/>
+<wire x1="1.397" y1="2.54" x2="1.397" y2="-2.54" width="0.4064" layer="94"/>
+<wire x1="1.397" y1="-2.54" x2="-1.27" y2="-2.54" width="0.4064" layer="94"/>
+<wire x1="-1.27" y1="2.54" x2="-1.27" y2="-2.54" width="0.4064" layer="94"/>
+<wire x1="2.3368" y1="2.54" x2="2.3368" y2="-2.54" width="0.4064" layer="94"/>
+<wire x1="-2.286" y1="2.54" x2="-2.286" y2="-2.54" width="0.4064" layer="94"/>
+<text x="-5.08" y="3.81" size="1.778" layer="95">&gt;NAME</text>
+<text x="-5.08" y="-5.08" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="2" x="5.08" y="0" visible="pad" length="short" direction="pas" swaplevel="1" rot="R180"/>
+<pin name="1" x="-5.08" y="0" visible="pad" length="short" direction="pas" swaplevel="1"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="LAMP" prefix="LMP" uservalue="yes">
@@ -14226,6 +14255,23 @@ Distributor: &lt;a href ="https://www.buerklin.com/default.asp?event=ShowArtikel
 </gates>
 <devices>
 <device name="" package="LDH-5R">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="XTAL" prefix="Q" uservalue="yes">
+<description>&lt;B&gt;CRYSTAL&lt;/B&gt;</description>
+<gates>
+<gate name="G$1" symbol="XTAL" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="Q">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -16412,6 +16458,17 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <part name="R5" library="resistor" deviceset="R-EU_" device="0204/2V" value="180k"/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="0204/2V" value="10k"/>
 <part name="SUPPLY19" library="supply2" deviceset="AGND" device=""/>
+<part name="Q2" library="special" deviceset="XTAL" device=""/>
+<part name="SUPPLY20" library="supply2" deviceset="AGND" device=""/>
+<part name="C4" library="resistor" deviceset="C-EU" device="025-060X050" value="100n"/>
+<part name="C9" library="resistor" deviceset="C-EU" device="025-060X050" value="100n"/>
+<part name="R42" library="resistor" deviceset="R-EU_" device="0204/2V" value="39k"/>
+<part name="R43" library="resistor" deviceset="R-EU_" device="0204/2V" value="39k"/>
+<part name="SUPPLY21" library="supply2" deviceset="AGND" device=""/>
+<part name="D8" library="diode" deviceset="1N4004" device=""/>
+<part name="R13" library="resistor" deviceset="R-EU_" device="0204/2V" value="100k"/>
+<part name="R6" library="resistor" deviceset="R-EU_" device="0204/2V" value="2k"/>
+<part name="SUPPLY22" library="supply2" deviceset="AGND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -16444,11 +16501,13 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <text x="-20.32" y="81.28" size="1.778" layer="91">br/we</text>
 <text x="2.54" y="81.28" size="1.778" layer="91">br</text>
 <text x="-48.26" y="-99.06" size="1.778" layer="91">br</text>
-<text x="91.44" y="45.72" size="1.778" layer="91">1</text>
 <text x="121.92" y="45.72" size="1.778" layer="91">11</text>
 <text x="134.62" y="45.72" size="1.778" layer="91">5</text>
-<text x="63.5" y="45.72" size="1.778" layer="91">10</text>
+<text x="60.96" y="43.18" size="1.778" layer="91">10</text>
 <text x="58.42" y="68.58" size="1.778" layer="91">11</text>
+<text x="68.58" y="45.72" size="1.778" layer="91">2</text>
+<text x="81.28" y="45.72" size="1.778" layer="91">1</text>
+<text x="88.9" y="45.72" size="1.778" layer="91">2</text>
 </plain>
 <instances>
 <instance part="SV1" gate="-1" x="-20.32" y="96.52"/>
@@ -16501,7 +16560,7 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <instance part="R17" gate="G$1" x="22.86" y="-35.56" rot="R90"/>
 <instance part="SUPPLY7" gate="G$1" x="10.16" y="-33.02"/>
 <instance part="R14-R15_BETWEEN" gate="G$1" x="35.56" y="-33.02" rot="R90"/>
-<instance part="C35" gate="G$1" x="58.42" y="40.64" rot="R90"/>
+<instance part="C35" gate="G$1" x="55.88" y="38.1" rot="R90"/>
 <instance part="SUPPLY8" gate="G$1" x="58.42" y="-43.18"/>
 <instance part="R30" gate="G$1" x="132.08" y="-7.62" rot="R90"/>
 <instance part="D10" gate="1" x="114.3" y="2.54"/>
@@ -16544,7 +16603,18 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <instance part="D6" gate="1" x="88.9" y="-58.42" rot="R90"/>
 <instance part="R5" gate="G$1" x="96.52" y="-58.42" rot="R90"/>
 <instance part="R4" gate="G$1" x="96.52" y="-43.18" rot="R90"/>
-<instance part="SUPPLY19" gate="G$1" x="91.44" y="0"/>
+<instance part="SUPPLY19" gate="G$1" x="93.98" y="0"/>
+<instance part="Q2" gate="G$1" x="76.2" y="38.1"/>
+<instance part="SUPPLY20" gate="G$1" x="81.28" y="27.94"/>
+<instance part="C4" gate="G$1" x="68.58" y="33.02" rot="R180"/>
+<instance part="C9" gate="G$1" x="81.28" y="33.02" rot="R180"/>
+<instance part="R42" gate="G$1" x="81.28" y="43.18" rot="R90"/>
+<instance part="R43" gate="G$1" x="88.9" y="43.18" rot="R90"/>
+<instance part="SUPPLY21" gate="G$1" x="53.34" y="35.56"/>
+<instance part="D8" gate="1" x="78.74" y="12.7" rot="R180"/>
+<instance part="R13" gate="G$1" x="78.74" y="20.32" rot="R180"/>
+<instance part="R6" gate="G$1" x="93.98" y="15.24" rot="R180"/>
+<instance part="SUPPLY22" gate="G$1" x="99.06" y="12.7"/>
 </instances>
 <busses>
 <bus name="B$1">
@@ -16666,10 +16736,37 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <wire x1="129.54" y1="-2.54" x2="134.62" y2="-2.54" width="0.1524" layer="91" curve="-180"/>
 <pinref part="Q3" gate="G$1" pin="E"/>
 <wire x1="134.62" y1="-2.54" x2="144.78" y2="-2.54" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="2.54" x2="91.44" y2="2.54" width="0.1524" layer="91"/>
-<wire x1="91.44" y1="2.54" x2="91.44" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="2.54" x2="93.98" y2="2.54" width="0.1524" layer="91"/>
 <pinref part="SUPPLY19" gate="G$1" pin="AGND"/>
-<junction x="91.44" y="2.54"/>
+<pinref part="R14-R15_BETWEEN" gate="G$1" pin="2"/>
+<wire x1="35.56" y1="-27.94" x2="35.56" y2="-10.16" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="-10.16" x2="35.56" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="25.4" x2="55.88" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="25.4" x2="60.96" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="-10.16" x2="45.72" y2="-10.16" width="0.4064" layer="91"/>
+<wire x1="93.98" y1="2.54" x2="60.96" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="2.54" x2="60.96" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="25.4" x2="55.88" y2="38.1" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<wire x1="68.58" y1="30.48" x2="81.28" y2="30.48" width="0.1524" layer="91"/>
+<pinref part="SUPPLY20" gate="G$1" pin="AGND"/>
+<pinref part="C4" gate="G$1" pin="1"/>
+<pinref part="C9" gate="G$1" pin="1"/>
+<junction x="81.28" y="30.48"/>
+<junction x="68.58" y="30.48"/>
+</segment>
+<segment>
+<pinref part="C35" gate="G$1" pin="1"/>
+<wire x1="53.34" y1="38.1" x2="53.34" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="73.66" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="58.42" y1="73.66" x2="58.42" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="SUPPLY21" gate="G$1" pin="AGND"/>
+<junction x="53.34" y="38.1"/>
+</segment>
+<segment>
+<pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="SUPPLY22" gate="G$1" pin="AGND"/>
 </segment>
 </net>
 <net name="+12V" class="0">
@@ -16783,28 +16880,6 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <segment>
 <pinref part="R14-R15_BETWEEN" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="-38.1" x2="35.56" y2="-38.1" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$25" class="0">
-<segment>
-<pinref part="C35" gate="G$1" pin="2"/>
-<wire x1="63.5" y1="40.64" x2="63.5" y2="48.26" width="0.1524" layer="91"/>
-<junction x="63.5" y="40.64"/>
-<pinref part="R14-R15_BETWEEN" gate="G$1" pin="2"/>
-<wire x1="35.56" y1="-27.94" x2="35.56" y2="-10.16" width="0.1524" layer="91"/>
-<wire x1="35.56" y1="-10.16" x2="35.56" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="35.56" y1="25.4" x2="63.5" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="63.5" y1="25.4" x2="63.5" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="35.56" y1="-10.16" x2="45.72" y2="-10.16" width="0.4064" layer="91"/>
-</segment>
-</net>
-<net name="N$24" class="0">
-<segment>
-<pinref part="C35" gate="G$1" pin="1"/>
-<wire x1="55.88" y1="40.64" x2="53.34" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="40.64" x2="53.34" y2="73.66" width="0.1524" layer="91"/>
-<wire x1="53.34" y1="73.66" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
-<wire x1="58.42" y1="73.66" x2="58.42" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$18" class="0">
@@ -17203,6 +17278,49 @@ Source: http://catalog.tycoelectronics.com .. ENG_CD_794623_F.pdf</description>
 <wire x1="96.52" y1="-53.34" x2="88.9" y2="-53.34" width="0.1524" layer="91"/>
 <pinref part="D6" gate="1" pin="C"/>
 <wire x1="88.9" y1="-53.34" x2="88.9" y2="-55.88" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$29" class="0">
+<segment>
+<pinref part="Q2" gate="G$1" pin="1"/>
+<wire x1="71.12" y1="38.1" x2="68.58" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="C4" gate="G$1" pin="2"/>
+<wire x1="68.58" y1="38.1" x2="68.58" y2="48.26" width="0.1524" layer="91"/>
+<junction x="68.58" y="38.1"/>
+</segment>
+</net>
+<net name="N$56" class="0">
+<segment>
+<pinref part="Q2" gate="G$1" pin="2"/>
+<pinref part="C9" gate="G$1" pin="2"/>
+<wire x1="81.28" y1="38.1" x2="88.9" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="R42" gate="G$1" pin="1"/>
+<junction x="81.28" y="38.1"/>
+<pinref part="R43" gate="G$1" pin="1"/>
+</segment>
+</net>
+<net name="N$24" class="0">
+<segment>
+<pinref part="C35" gate="G$1" pin="2"/>
+<wire x1="60.96" y1="38.1" x2="60.96" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="38.1" x2="60.96" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="27.94" x2="71.12" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="27.94" x2="71.12" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="D8" gate="1" pin="A"/>
+<pinref part="D8" gate="1" pin="C"/>
+<wire x1="71.12" y1="20.32" x2="71.12" y2="12.7" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="12.7" x2="81.28" y2="12.7" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="12.7" x2="71.12" y2="12.7" width="0.1524" layer="91"/>
+<pinref part="R13" gate="G$1" pin="2"/>
+<wire x1="71.12" y1="20.32" x2="73.66" y2="20.32" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$25" class="0">
+<segment>
+<pinref part="R13" gate="G$1" pin="1"/>
+<wire x1="83.82" y1="20.32" x2="88.9" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="20.32" x2="88.9" y2="15.24" width="0.1524" layer="91"/>
+<pinref part="R6" gate="G$1" pin="2"/>
 </segment>
 </net>
 </nets>
