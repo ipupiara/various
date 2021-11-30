@@ -11300,6 +11300,10 @@ In this library the device names are the same as the pin names of the symbols, t
 <plain>
 <rectangle x1="-35.56" y1="-22.86" x2="-2.54" y2="22.86" layer="91"/>
 <text x="-33.02" y="25.4" size="2.54" layer="91">receiverboard</text>
+<text x="-27.94" y="91.44" size="2.54" layer="91">green</text>
+<text x="-17.78" y="71.12" size="2.54" layer="91">grey</text>
+<text x="106.68" y="10.16" size="2.54" layer="91">red</text>
+<text x="111.76" y="38.1" size="2.54" layer="91">white</text>
 </plain>
 <instances>
 <instance part="T1" gate="G1" x="66.04" y="68.58"/>
@@ -11319,11 +11323,11 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="IC2" gate="C" x="195.58" y="81.28"/>
 <instance part="IC2" gate="D" x="195.58" y="66.04"/>
 <instance part="IC3" gate="A" x="20.32" y="88.9"/>
-<instance part="IC3" gate="B" x="20.32" y="78.74"/>
-<instance part="IC3" gate="C" x="20.32" y="68.58"/>
-<instance part="IC3" gate="D" x="20.32" y="58.42"/>
-<instance part="IC3" gate="E" x="20.32" y="48.26"/>
-<instance part="IC3" gate="F" x="20.32" y="38.1"/>
+<instance part="IC3" gate="B" x="20.32" y="68.58"/>
+<instance part="IC3" gate="C" x="93.98" y="66.04"/>
+<instance part="IC3" gate="D" x="114.3" y="66.04"/>
+<instance part="IC3" gate="E" x="38.1" y="68.58"/>
+<instance part="IC3" gate="F" x="60.96" y="88.9"/>
 <instance part="X1" gate="G$1" x="33.02" y="-25.4" rot="R270"/>
 <instance part="X2" gate="G$1" x="162.56" y="-25.4" rot="R270"/>
 <instance part="CON" gate="G$1" x="5.08" y="12.7"/>
@@ -11518,12 +11522,6 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="C2" gate="G$1" pin="+"/>
 </segment>
 </net>
-<net name="N$12" class="0">
-<segment>
-<pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="68.58" y1="66.04" x2="86.36" y2="66.04" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$13" class="0">
 <segment>
 <wire x1="5.08" y1="12.7" x2="38.1" y2="12.7" width="0.1524" layer="91"/>
@@ -11542,6 +11540,85 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="35.56" y1="40.64" x2="111.76" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="K1" gate="_" pin="+"/>
 <wire x1="111.76" y1="40.64" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$15" class="0">
+<segment>
+<wire x1="5.08" y1="17.78" x2="10.16" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="17.78" x2="10.16" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="30.48" x2="-30.48" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="30.48" x2="-30.48" y2="88.9" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="A" pin="I"/>
+<wire x1="-30.48" y1="88.9" x2="10.16" y2="88.9" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$16" class="0">
+<segment>
+<pinref part="X2" gate="G$1" pin="B-6"/>
+<wire x1="157.48" y1="-17.78" x2="157.48" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="157.48" y1="43.18" x2="33.02" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="43.18" x2="33.02" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="30.48" x2="12.7" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="30.48" x2="12.7" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="33.02" x2="-27.94" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="-27.94" y1="33.02" x2="-27.94" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="B" pin="I"/>
+<wire x1="-27.94" y1="68.58" x2="10.16" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$19" class="0">
+<segment>
+<pinref part="IC3" gate="E" pin="O"/>
+<pinref part="T1" gate="G1" pin="B"/>
+<wire x1="48.26" y1="68.58" x2="63.5" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$12" class="0">
+<segment>
+<pinref part="R3" gate="G$1" pin="2"/>
+<wire x1="68.58" y1="66.04" x2="83.82" y2="66.04" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="C" pin="I"/>
+<wire x1="83.82" y1="66.04" x2="86.36" y2="66.04" width="0.1524" layer="91"/>
+<junction x="83.82" y="66.04"/>
+</segment>
+</net>
+<net name="N$21" class="0">
+<segment>
+<pinref part="IC2" gate="A" pin="I1"/>
+<wire x1="132.08" y1="78.74" x2="165.1" y2="78.74" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="66.04" x2="132.08" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="D" pin="O"/>
+<wire x1="124.46" y1="66.04" x2="132.08" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$23" class="0">
+<segment>
+<pinref part="IC3" gate="F" pin="O"/>
+<wire x1="71.12" y1="88.9" x2="134.62" y2="88.9" width="0.1524" layer="91"/>
+<wire x1="167.64" y1="83.82" x2="167.64" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="83.82" x2="167.64" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="88.9" x2="134.62" y2="83.82" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$22" class="0">
+<segment>
+<pinref part="IC2" gate="A" pin="O"/>
+<wire x1="180.34" y1="81.28" x2="182.88" y2="81.28" width="0.1524" layer="91"/>
+<pinref part="R1" gate="G$1" pin="1"/>
+<wire x1="182.88" y1="81.28" x2="182.88" y2="-2.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$24" class="0">
+<segment>
+<pinref part="IC3" gate="A" pin="O"/>
+<wire x1="30.48" y1="88.9" x2="50.8" y2="88.9" width="0.1524" layer="91"/>
+<pinref part="IC3" gate="F" pin="I"/>
+</segment>
+</net>
+<net name="N$17" class="0">
+<segment>
+<pinref part="IC3" gate="C" pin="O"/>
+<pinref part="IC3" gate="D" pin="I"/>
 </segment>
 </net>
 </nets>
