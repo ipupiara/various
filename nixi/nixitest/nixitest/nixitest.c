@@ -39,6 +39,10 @@ void initADC()
 
 void initPWM()
 {
+	OCR0A  = 0x14;
+	OCR0B  = 0x0d;
+	TCCR0A = ((1<<WGM00) | (1<<WGM01) | (1 << COM0B1));      // use pb1 as oc0b
+	TCCR0B = (1 << WGM02) ; // don't start.. | (1 << CS01);					// prescaler 8  ( 1uSec per clock)
 	
 }
 
@@ -46,6 +50,7 @@ void startPWM()
 {
 	cli();
 	adcState = adcRunning;
+	TCCR0B |= (1 << CS01);	//  prescaler 8
 	sei();
 }
 
@@ -53,6 +58,7 @@ void stopPWM()
 {
 	cli();
 	adcState = adcIdle;
+	TCCR0B &= ~((1 << CS00)|(1 << CS01)|(1 << CS02));	//  prescaler 0
 	sei();
 }
 
