@@ -12,22 +12,23 @@
 
 #include <avr/io.h>
 
+#define adcLowValue  0x1df
+#define adcHighValue 0x21f
+
 enum {
-	none,
-	overUp,
-	underLow
+	adcIdle,
+	adcRunning,
+	adcOverUpNeedsStop,
+	adcUnderLowNeedsRunning
 };
 
 int16_t lastADCVal;
 
-uint8_t  overUpper;
-uint8_t  underLower;
-
+uint8_t  adcState;
 
 void initADC()
 {
-	overUpper = none;
-	underLower = none;
+	adcState = adcIdle;
 	lastADCVal = 0;
 	ADMUX = (1 <<  MUX0) ;   //  pb2 port (= ADC1), Vcc ref, right adjust
 	ADCSRB = 0x00;  //  free running mode, unipolar, default polarity
@@ -44,34 +45,26 @@ void initPWM()
 void startPWM()
 {
 	cli();
-	underLower = none;
+	adcState = adcRunning;
 	sei();
 }
 
 void stopPWM()
 {
 	cli();
-	overUpper = none;
+	adcState = adcIdle;
 	sei();
 }
 
-uint8_t  getUnderLower()
+uint8_t  getAdcState()
 {
 	uint8_t res;
 	cli();
-	res = underLower;
+	res = adcState;
 	sei();
 	return res;
 }
 
-uint8_t  getOverUpper()
-{
-	uint8_t res;
-	cli();
-	res = overUpper;
-	sei();
-	return res;
-}
 
 void initHW()
 {
@@ -85,6 +78,11 @@ ISR (ADC_vect)
 {
 	cli();
 	lastADCVal = ADC;
+	if ((lastADCVal > adcHighValue) && (adcState != adcIdle))  {
+		adcState = adcOverUpNeedsStop;
+	} else if ((lastADCVal < adcLowValue) & (adcState != adcRunning))  {
+		adcState = adcUnderLowNeedsRunning;
+	}
 	sei();
 }
 
@@ -94,10 +92,10 @@ int main(void)
 	initHW();
     while(1)
     {
-        if (getOverUpper() == overUp)  {     // atomic access due to 8-bit value access in single cycle 
+        if (getAdcState() == adcOverUpNeedsStop)  {     // atomic access due to 8-bit value access in single cycle 
 			stopPWM();
 		}
-		if (getUnderLower() == underLow)  {
+		if (getAdcState() == adcUnderLowNeedsRunning)  {
 			startPWM();
 		}
 			
