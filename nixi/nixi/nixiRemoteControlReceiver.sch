@@ -11304,6 +11304,12 @@ In this library the device names are the same as the pin names of the symbols, t
 <text x="-17.78" y="71.12" size="2.54" layer="91">grey</text>
 <text x="106.68" y="10.16" size="2.54" layer="91">red</text>
 <text x="111.76" y="38.1" size="2.54" layer="91">white</text>
+<text x="139.7" y="45.72" size="2.54" layer="91">alarm state</text>
+<text x="165.1" y="40.64" size="2.54" layer="91">alarm reset</text>
+<text x="127" y="38.1" size="2.54" layer="91">170 V pwm</text>
+<text x="124.46" y="-7.62" size="2.54" layer="91">blue leds</text>
+<text x="73.66" y="78.74" size="1.778" layer="91">prevent multiple events by delaying</text>
+<text x="73.66" y="73.66" size="1.778" layer="91">(maybe not needed at all)</text>
 </plain>
 <instances>
 <instance part="T1" gate="G1" x="66.04" y="68.58"/>
@@ -11447,9 +11453,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="27.94" y1="-12.7" x2="40.64" y2="-12.7" width="0.1524" layer="91" curve="-157.380135"/>
 <wire x1="40.64" y1="-12.7" x2="96.52" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="96.52" y1="-12.7" x2="96.52" y2="0" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="0" x2="121.92" y2="0" width="0.1524" layer="91"/>
-<wire x1="121.92" y1="0" x2="121.92" y2="17.78" width="0.1524" layer="91"/>
-<wire x1="121.92" y1="17.78" x2="127" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="96.52" y1="0" x2="129.54" y2="0" width="0.1524" layer="91"/>
+<pinref part="K1" gate="G$2" pin="P"/>
+<wire x1="129.54" y1="0" x2="129.54" y2="10.16" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -11463,14 +11469,14 @@ In this library the device names are the same as the pin names of the symbols, t
 </net>
 <net name="N$4" class="0">
 <segment>
-<pinref part="K1" gate="G$1" pin="S"/>
-<wire x1="124.46" y1="30.48" x2="121.92" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="121.92" y1="30.48" x2="121.92" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="121.92" y1="35.56" x2="147.32" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="35.56" x2="147.32" y2="-15.24" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="-15.24" x2="154.94" y2="-15.24" width="0.1524" layer="91"/>
 <pinref part="X2" gate="G$1" pin="B-7"/>
 <wire x1="154.94" y1="-15.24" x2="154.94" y2="-17.78" width="0.1524" layer="91"/>
+<wire x1="121.92" y1="35.56" x2="121.92" y2="22.86" width="0.1524" layer="91"/>
+<pinref part="K1" gate="G$1" pin="P"/>
+<wire x1="121.92" y1="22.86" x2="129.54" y2="22.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -11481,12 +11487,13 @@ In this library the device names are the same as the pin names of the symbols, t
 </net>
 <net name="N$7" class="0">
 <segment>
-<pinref part="K2" gate="G$1" pin="O"/>
-<wire x1="175.26" y1="33.02" x2="177.8" y2="33.02" width="0.1524" layer="91"/>
-<wire x1="177.8" y1="33.02" x2="177.8" y2="-10.16" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="38.1" x2="177.8" y2="-10.16" width="0.1524" layer="91"/>
 <wire x1="177.8" y1="-10.16" x2="162.56" y2="-10.16" width="0.1524" layer="91"/>
 <pinref part="X2" gate="G$1" pin="B-4"/>
 <wire x1="162.56" y1="-10.16" x2="162.56" y2="-17.78" width="0.1524" layer="91"/>
+<wire x1="177.8" y1="38.1" x2="165.1" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="K2" gate="G$1" pin="S"/>
+<wire x1="165.1" y1="38.1" x2="165.1" y2="33.02" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">
