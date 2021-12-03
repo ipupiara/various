@@ -98,7 +98,7 @@ int main(void)
 	initHW();
     while(1)
     {
-        if (getAdcState() == adcOverUpNeedsStop)  {     // atomic access due to 8-bit value access in single cycle 
+        if (getAdcState() == adcOverUpNeedsStop)  {   
 			stopPWM();
 		}
 		if (getAdcState() == adcUnderLowNeedsRunning)  {
