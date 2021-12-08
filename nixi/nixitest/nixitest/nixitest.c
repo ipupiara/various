@@ -84,9 +84,9 @@ ISR (ADC_vect)
 {
 	cli();
 	lastADCVal = ADC;
-	if ((lastADCVal > adcHighValue) && (adcState != adcIdle))  {
+	if ((lastADCVal > adcHighValue) && (adcState == adcRunning))  {
 		adcState = adcOverUpNeedsStop;
-	} else if ((lastADCVal < adcLowValue) & (adcState != adcRunning))  {
+	} else if ((lastADCVal < adcLowValue) & (adcState == adcIdle))  {
 		adcState = adcUnderLowNeedsRunning;
 	}
 	sei();
