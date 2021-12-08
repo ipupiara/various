@@ -11184,7 +11184,7 @@ Sopurce: http://www.macom.com/data/datasheet/MRF136.pdf</description>
 <sheets>
 <sheet>
 <plain>
-<text x="142.24" y="33.02" size="2.1844" layer="91">sense</text>
+<text x="144.78" y="27.94" size="2.1844" layer="91">sense</text>
 <text x="134.62" y="45.72" size="1.9304" layer="91">HV 100-400 V</text>
 </plain>
 <instances>
