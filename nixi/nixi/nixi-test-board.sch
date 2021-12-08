@@ -11186,6 +11186,7 @@ Sopurce: http://www.macom.com/data/datasheet/MRF136.pdf</description>
 <plain>
 <text x="144.78" y="27.94" size="2.1844" layer="91">sense</text>
 <text x="134.62" y="45.72" size="1.9304" layer="91">HV 100-400 V</text>
+<text x="48.26" y="96.52" size="5.08" layer="91">Nixi  Test</text>
 </plain>
 <instances>
 <instance part="IC2-ATTINY85" gate="G$1" x="22.86" y="48.26"/>
