@@ -6,5 +6,6 @@ git add michisLamps/*
 git add tempomat/*
 git add nixi/*
 git add nixi/nixitest/
+git add nixi/tubeVoltageRegulator/*
 git add moskitoPlate/*
 git status
