@@ -212,8 +212,7 @@ static void MX_ADC1_Init(void)
 
   SET_BIT(hadc1.Instance->CR2, ADC_CR2_ADON);
 
-  SET_BIT(hadc1.Instance->CR1,ADC_CR1_AWDSGL);
-  SET_BIT(hadc1.Instance->CR1,ADC_CR1_AWDEN);
+ // SET_BIT(hadc1.Instance->CR1,
 
   SET_BIT(hadc1.Instance->CR2, ADC_CR2_ADON);
 
