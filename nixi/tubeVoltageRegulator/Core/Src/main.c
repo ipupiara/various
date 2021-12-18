@@ -59,6 +59,20 @@ static void MX_TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void startHvPwm()
+{
+
+	hvPwmState = hvPwmRunning;
+}
+
+void stopHvPwm()
+{
+
+	hvPwmState = hvPwmIdle;
+}
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -68,7 +82,8 @@ static void MX_TIM2_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	lastADCResult = 0;
+	hvPwmState = hvPwmIdle;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -90,7 +105,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  MX_TIM2_Init();
+ // MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

@@ -203,16 +203,35 @@ void SysTick_Handler(void)
   */
 void ADC1_2_IRQHandler(void)
 {
-  /* USER CODE BEGIN ADC1_2_IRQn 0 */
+	  if(__HAL_ADC_GET_IT_SOURCE(&hadc1, ADC_IT_EOC))
+	  {
+	    if(__HAL_ADC_GET_FLAG(&hadc1, ADC_FLAG_EOC) )
+	    {
+	      __HAL_ADC_CLEAR_FLAG(&hadc1, ADC_FLAG_EOC);
 
-  /* USER CODE END ADC1_2_IRQn 0 */
-  HAL_ADC_IRQHandler(&hadc1);
-  /* USER CODE BEGIN ADC1_2_IRQn 1 */
+	      lastADCResult = (uint16_t)  (hadc1.Instance->DR & 0x0000FFFF);
 
-  /* USER CODE END ADC1_2_IRQn 1 */
+	    }
+	  }
+
+	  if(__HAL_ADC_GET_IT_SOURCE(&hadc1, ADC_IT_AWD))
+	  {
+	    if(__HAL_ADC_GET_FLAG(&hadc1, ADC_FLAG_AWD))
+	    {
+	      __HAL_ADC_CLEAR_FLAG(&hadc1, ADC_FLAG_AWD);
+
+	      if ( lastADCResult   > hadc1.Instance->HTR ) {
+	    	  if (hvPwmState == hvPwmRunning)  {
+	    		  stopHvPwm();
+	    	  }
+	      }  else if (lastADCResult < hadc1.Instance->LTR) {
+	    	  if (hvPwmState == hvPwmIdle)  {
+				  startHvPwm();
+			  }
+	      }
+	    }
+	  }
 }
 
-/* USER CODE BEGIN 1 */
 
-/* USER CODE END 1 */
 

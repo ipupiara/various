@@ -55,6 +55,17 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+uint16_t lastADCResult;
+
+void startHvPwm();
+void stopHvPwm();
+
+enum {
+	hvPwmRunning,
+	hvPwmIdle
+};
+
+uint8_t  hvPwmState;
 
 /* USER CODE END EFP */
 
