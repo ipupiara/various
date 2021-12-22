@@ -1,3 +1,4 @@
+#! /bin/sh
 git diff --name-status master origin/master
 echo "--->"
 echo "git local HEAD commit ID to be checked with github.com below from SSH connection"

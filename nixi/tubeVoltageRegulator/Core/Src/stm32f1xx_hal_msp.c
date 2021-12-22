@@ -184,7 +184,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     */
     GPIO_InitStruct.Pin = GPIO_PIN_15;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     __HAL_AFIO_REMAP_TIM2_PARTIAL_1();

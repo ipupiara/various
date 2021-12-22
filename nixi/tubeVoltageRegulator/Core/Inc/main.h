@@ -28,6 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,6 +42,9 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+
+#define debugPin1_Pin GPIO_PIN_13
+#define debugPin1_GPIO_Port GPIOC
 
 /* USER CODE END EC */
 
@@ -64,6 +68,8 @@ enum {
 	hvPwmRunning,
 	hvPwmIdle
 };
+
+
 
 uint8_t  hvPwmState;
 

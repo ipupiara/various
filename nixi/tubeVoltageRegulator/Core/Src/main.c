@@ -62,12 +62,13 @@ static void MX_TIM2_Init(void);
 void startHvPwm()
 {
 
+//	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	hvPwmState = hvPwmRunning;
 }
 
 void stopHvPwm()
 {
-
+//	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
 	hvPwmState = hvPwmIdle;
 }
 
@@ -104,8 +105,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+//  MX_TIM2_Init();
   MX_ADC1_Init();
- // MX_TIM2_Init();
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -146,6 +148,8 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB buses clocks
+   *
+   *
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -166,6 +170,21 @@ void SystemClock_Config(void)
   }
 }
 
+
+
+void setDebugOneOn()
+{
+	HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
+}
+
+void setDebugOneOff()
+{
+	HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_SET);
+}
+
+
+
+
 /**
   * @brief ADC1 Initialization Function
   * @param None
@@ -175,6 +194,8 @@ static void MX_ADC1_Init(void)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
+
+	//   adc input pin is PA0
 
   /* USER CODE END ADC1_Init 0 */
 
@@ -244,9 +265,7 @@ static void MX_ADC1_Init(void)
 static void MX_TIM2_Init(void)
 {
 
-  /* USER CODE BEGIN TIM2_Init 0 */
-
-  /* USER CODE END TIM2_Init 0 */
+   //  PWM  on PA15
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -306,6 +325,21 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+   /* GPIO Ports Clock Enable */
+   __HAL_RCC_GPIOC_CLK_ENABLE();
+   __HAL_RCC_GPIOD_CLK_ENABLE();
+
+   /*Configure GPIO pin Output Level */
+   HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
+
+   /*Configure GPIO pin : debugPin1_Pin     is PC13 */
+   GPIO_InitStruct.Pin = debugPin1_Pin;
+   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+   GPIO_InitStruct.Pull = GPIO_NOPULL;
+   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+   HAL_GPIO_Init(debugPin1_GPIO_Port, &GPIO_InitStruct);
 
 }
 

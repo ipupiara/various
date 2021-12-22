@@ -324,14 +324,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-/** @addtogroup STM32F1xx_HAL_Driver
-  * @{
-  */
 
-/** @defgroup ADC ADC
-  * @brief ADC HAL module driver
-  * @{
-  */
 
 #ifdef HAL_ADC_MODULE_ENABLED
 
