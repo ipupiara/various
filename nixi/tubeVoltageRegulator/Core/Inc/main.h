@@ -43,8 +43,11 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 
-#define debugPin1_Pin GPIO_PIN_13
-#define debugPin1_GPIO_Port GPIOC
+void setDebugOneOn();
+void setDebugOneOff();
+void toggleDebugOne();
+
+
 
 /* USER CODE END EC */
 

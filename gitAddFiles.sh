@@ -12,6 +12,5 @@ git add nixi/*
 git add nixi/nixitest/
 git add nixi/tubeVoltageRegulator/*
 git add moskitoPlate/*
-git checkout .metadata/
-git checkout testStm103/
+git checkout -f .metadata/
 git status

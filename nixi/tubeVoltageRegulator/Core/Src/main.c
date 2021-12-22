@@ -44,7 +44,8 @@ ADC_HandleTypeDef hadc1;
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
-
+#define debugPin1_Pin GPIO_PIN_13
+#define debugPin1_GPIO_Port GPIOC
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,13 +63,13 @@ static void MX_TIM2_Init(void);
 void startHvPwm()
 {
 
-//	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	hvPwmState = hvPwmRunning;
 }
 
 void stopHvPwm()
 {
-//	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
 	hvPwmState = hvPwmIdle;
 }
 
@@ -105,7 +106,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-//  MX_TIM2_Init();
+  MX_TIM2_Init();
   MX_ADC1_Init();
 
   /* USER CODE BEGIN 2 */
@@ -182,6 +183,11 @@ void setDebugOneOff()
 	HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_SET);
 }
 
+void toggleDebugOne()
+{
+	HAL_GPIO_TogglePin(debugPin1_GPIO_Port, debugPin1_Pin);
+}
+
 
 
 
@@ -223,7 +229,7 @@ static void MX_ADC1_Init(void)
   AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
   AnalogWDGConfig.HighThreshold = 0xb00;
   AnalogWDGConfig.LowThreshold = 0x800;
-  AnalogWDGConfig.Channel = ADC_CHANNEL_0;
+  AnalogWDGConfig.Channel = ADC_CHANNEL_1;
   AnalogWDGConfig.ITMode = ENABLE;
   if (HAL_ADC_AnalogWDGConfig(&hadc1, &AnalogWDGConfig) != HAL_OK)
   {
@@ -231,9 +237,9 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_13CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -302,7 +308,7 @@ static void MX_TIM2_Init(void)
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 1000;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
@@ -338,7 +344,7 @@ static void MX_GPIO_Init(void)
    GPIO_InitStruct.Pin = debugPin1_Pin;
    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
    GPIO_InitStruct.Pull = GPIO_NOPULL;
-   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
    HAL_GPIO_Init(debugPin1_GPIO_Port, &GPIO_InitStruct);
 
 }
