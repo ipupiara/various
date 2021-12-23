@@ -57,6 +57,7 @@
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
 <layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
 <layer number="51" name="tDocu" color="6" fill="9" visible="no" active="no"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
@@ -69,6 +70,13 @@
 <layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="99" name="SpiceOrder" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="100" name="Muster" color="7" fill="1" visible="no" active="no"/>
+<layer number="101" name="Patch_Top" color="12" fill="4" visible="yes" active="yes"/>
+<layer number="116" name="Patch_BOT" color="9" fill="4" visible="yes" active="yes"/>
+<layer number="200" name="200bmp" color="1" fill="10" visible="no" active="no"/>
+<layer number="250" name="Descript" color="3" fill="1" visible="no" active="no"/>
+<layer number="251" name="SMDround" color="12" fill="11" visible="no" active="no"/>
+<layer number="254" name="cooling" color="7" fill="1" visible="yes" active="yes"/>
 </layers>
 <schematic xreflabel="%F%N/%S.%C%R" xrefpart="/%S.%C%R">
 <libraries>
@@ -11314,7 +11322,7 @@ grid 2.54 mm, horinzontal</description>
 </class>
 </classes>
 <parts>
-<part name="IC2-ATTINY85" library="atmel" deviceset="TINY15L" device="P"/>
+<part name="STM32F103C8" library="atmel" deviceset="TINY15L" device="P"/>
 <part name="NIXI-SOCKET" library="belton-engineering" deviceset="VT9" device="-PT"/>
 <part name="IC1" library="linear" deviceset="78*" device="T" technology="05"/>
 <part name="12V" library="con-amp-mt" deviceset="L02P" device=""/>
@@ -11346,9 +11354,10 @@ grid 2.54 mm, horinzontal</description>
 <text x="180.34" y="27.94" size="2.1844" layer="91">sense</text>
 <text x="170.18" y="45.72" size="1.9304" layer="91">HV 100-400 V</text>
 <text x="48.26" y="96.52" size="5.08" layer="91">Nixi  Test</text>
+<frame x1="-45.72" y1="-5.08" x2="193.04" y2="109.22" columns="8" rows="5" layer="116" border-left="no" border-top="no" border-right="no" border-bottom="no"/>
 </plain>
 <instances>
-<instance part="IC2-ATTINY85" gate="G$1" x="22.86" y="48.26"/>
+<instance part="STM32F103C8" gate="G$1" x="22.86" y="48.26"/>
 <instance part="NIXI-SOCKET" gate="G$1" x="152.4" y="68.58"/>
 <instance part="IC1" gate="A1" x="17.78" y="81.28"/>
 <instance part="12V" gate="-1" x="-33.02" y="88.9"/>
@@ -11449,6 +11458,7 @@ grid 2.54 mm, horinzontal</description>
 <wire x1="114.3" y1="50.8" x2="99.06" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="1"/>
 <wire x1="99.06" y1="50.8" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
+<junction x="114.3" y="50.8"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -11468,7 +11478,7 @@ grid 2.54 mm, horinzontal</description>
 <net name="N$1" class="0">
 <segment>
 <pinref part="DEBUG" gate="-2" pin="S"/>
-<pinref part="IC2-ATTINY85" gate="G$1" pin="(ADC0)PB5"/>
+<pinref part="STM32F103C8" gate="G$1" pin="(ADC0)PB5"/>
 <wire x1="45.72" y1="53.34" x2="40.64" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -11514,11 +11524,12 @@ grid 2.54 mm, horinzontal</description>
 <pinref part="NIXI-SOCKET" gate="G$1" pin="7"/>
 <pinref part="NIXI-SOCKET" gate="G$1" pin="8"/>
 <pinref part="NIXI-SOCKET" gate="G$1" pin="9"/>
+<junction x="149.86" y="43.18"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
-<pinref part="IC2-ATTINY85" gate="G$1" pin="(ADC1)PB2"/>
+<pinref part="STM32F103C8" gate="G$1" pin="(ADC1)PB2"/>
 <wire x1="40.64" y1="45.72" x2="48.26" y2="45.72" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="45.72" x2="48.26" y2="40.64" width="0.1524" layer="91" curve="-180"/>
 <wire x1="48.26" y1="40.64" x2="48.26" y2="7.62" width="0.1524" layer="91"/>
@@ -11555,7 +11566,7 @@ grid 2.54 mm, horinzontal</description>
 </net>
 <net name="N$7" class="0">
 <segment>
-<pinref part="IC2-ATTINY85" gate="G$1" pin="(OCP)PB1"/>
+<pinref part="STM32F103C8" gate="G$1" pin="(OCP)PB1"/>
 <pinref part="R2" gate="G$1" pin="1"/>
 <wire x1="40.64" y1="43.18" x2="71.12" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="43.18" x2="71.12" y2="35.56" width="0.1524" layer="91"/>
