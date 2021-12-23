@@ -201,7 +201,7 @@ static void MX_ADC1_Init(void)
 
   /* USER CODE BEGIN ADC1_Init 0 */
 
-	//   adc input pin is PA0
+	//   adc input pin is PA1
 
   /* USER CODE END ADC1_Init 0 */
 
@@ -271,7 +271,7 @@ static void MX_ADC1_Init(void)
 static void MX_TIM2_Init(void)
 {
 
-   //  PWM  on PA15
+   //  PWM  on PA0
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};

@@ -11336,8 +11336,8 @@ grid 2.54 mm, horinzontal</description>
 <part name="GND" library="con-amp-mt" deviceset="L02P" device=""/>
 <part name="RV1" library="resistor" deviceset="R-TRIMM" device="4G/J"/>
 <part name="Q2" library="transistor-pnp" deviceset="2N6107" device=""/>
-<part name="R1" library="resistor" deviceset="R-EU_" device="0207/5V"/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="0207/5V"/>
+<part name="R1" library="resistor" deviceset="R-EU_" device="0207/5V" value="3.3k"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="0207/5V" value="1k"/>
 <part name="Q3" library="transistor-npn" deviceset="BC238" device=""/>
 </parts>
 <sheets>
@@ -11371,7 +11371,7 @@ grid 2.54 mm, horinzontal</description>
 <instance part="GND" gate="-1" x="-33.02" y="83.82"/>
 <instance part="RV1" gate="G$1" x="170.18" y="25.4"/>
 <instance part="Q2" gate="G$1" x="96.52" y="22.86"/>
-<instance part="R1" gate="G$1" x="99.06" y="58.42" rot="R270"/>
+<instance part="R1" gate="G$1" x="99.06" y="40.64" rot="R270"/>
 <instance part="R2" gate="G$1" x="71.12" y="30.48" rot="R270"/>
 <instance part="Q3" gate="G$1" x="91.44" y="15.24"/>
 </instances>
@@ -11387,8 +11387,7 @@ grid 2.54 mm, horinzontal</description>
 <wire x1="2.54" y1="71.12" x2="17.78" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="17.78" y1="71.12" x2="17.78" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="17.78" y1="71.12" x2="33.02" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="33.02" y1="71.12" x2="99.06" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="99.06" y1="71.12" x2="132.08" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="71.12" x2="132.08" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="71.12" x2="132.08" y2="78.74" width="0.1524" layer="91"/>
 <pinref part="NIXI-SOCKET" gate="G$1" pin="1"/>
 <wire x1="132.08" y1="78.74" x2="144.78" y2="78.74" width="0.1524" layer="91"/>
@@ -11400,8 +11399,6 @@ grid 2.54 mm, horinzontal</description>
 <pinref part="C2" gate="G$1" pin="-"/>
 <pinref part="C3" gate="G$1" pin="-"/>
 <pinref part="GND" gate="-1" pin="S"/>
-<pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="99.06" y1="71.12" x2="99.06" y2="63.5" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="DEBUG" gate="-1" pin="S"/>
@@ -11449,6 +11446,9 @@ grid 2.54 mm, horinzontal</description>
 <wire x1="132.08" y1="50.8" x2="132.08" y2="43.18" width="0.1524" layer="91"/>
 <pinref part="D1" gate="1" pin="A"/>
 <wire x1="132.08" y1="43.18" x2="134.62" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="50.8" x2="99.06" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="R1" gate="G$1" pin="1"/>
+<wire x1="99.06" y1="50.8" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -11541,7 +11541,7 @@ grid 2.54 mm, horinzontal</description>
 <junction x="106.68" y="27.94"/>
 <wire x1="99.06" y1="27.94" x2="106.68" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="99.06" y1="53.34" x2="99.06" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="35.56" x2="99.06" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="Q2" gate="G$1" pin="E"/>
 <junction x="99.06" y="27.94"/>
 </segment>

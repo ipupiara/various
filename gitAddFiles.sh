@@ -2,6 +2,8 @@
 
 git add gitAddFiles.bat
 git add gitAddFiles.sh
+git add checkOriginMaster.bat
+git add checkOriginMaster.sh
 
 git add *
 git add plasticWelder/*

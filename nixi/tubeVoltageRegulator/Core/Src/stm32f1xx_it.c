@@ -210,7 +210,7 @@ void ADC1_2_IRQHandler(void)
 	      __HAL_ADC_CLEAR_FLAG(&hadc1, ADC_FLAG_EOC);
 
 	      lastADCResult = (uint16_t)  (hadc1.Instance->DR & 0x0000FFFF);
-//	      toggleDebugOne();
+	      toggleDebugOne();
 	    }
 	  }
 

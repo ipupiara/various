@@ -68,8 +68,8 @@ void startHvPwm();
 void stopHvPwm();
 
 enum {
-	hvPwmRunning,
-	hvPwmIdle
+	hvPwmIdle,
+	hvPwmRunning
 };
 
 
