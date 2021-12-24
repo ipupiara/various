@@ -33,20 +33,17 @@
 /* USER CODE BEGIN PD */
 /* USER CODE END PD */
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
+//#define useDebugPort
 
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
 TIM_HandleTypeDef htim2;
 
-/* USER CODE BEGIN PV */
+#ifdef useDebugPort
 #define debugPin1_Pin GPIO_PIN_13
 #define debugPin1_GPIO_Port GPIOC
-/* USER CODE END PV */
+#endif
+
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -175,17 +172,23 @@ void SystemClock_Config(void)
 
 void setDebugOneOn()
 {
+#ifdef useDebugPort
 	HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
+#endif
 }
 
 void setDebugOneOff()
 {
-	HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_SET);
+	#ifdef useDebugPort
+		HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_SET);
+	#endif
 }
 
 void toggleDebugOne()
 {
-	HAL_GPIO_TogglePin(debugPin1_GPIO_Port, debugPin1_Pin);
+	#ifdef useDebugPort
+		HAL_GPIO_TogglePin(debugPin1_GPIO_Port, debugPin1_Pin);
+	#endif
 }
 
 
@@ -305,7 +308,7 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.OCMode = TIM_OCMODE_PWM2;
   sConfigOC.Pulse = 600;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
@@ -331,22 +334,26 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+#ifdef useDebugPort
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+#endif
 
    /* GPIO Ports Clock Enable */
    __HAL_RCC_GPIOC_CLK_ENABLE();
    __HAL_RCC_GPIOD_CLK_ENABLE();
 
+#ifdef useDebugPort
    /*Configure GPIO pin Output Level */
    HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
 
    /*Configure GPIO pin : debugPin1_Pin     is PC13 */
+
    GPIO_InitStruct.Pin = debugPin1_Pin;
    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
    GPIO_InitStruct.Pull = GPIO_NOPULL;
    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
    HAL_GPIO_Init(debugPin1_GPIO_Port, &GPIO_InitStruct);
-
+#endif
 }
 
 /* USER CODE BEGIN 4 */
