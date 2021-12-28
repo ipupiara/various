@@ -56,6 +56,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern ADC_HandleTypeDef hadc1;
+extern uint16_t lastADCResult;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */

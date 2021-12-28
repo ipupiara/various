@@ -36,6 +36,7 @@
 //#define useDebugPort
 
 ADC_HandleTypeDef hadc1;
+uint16_t lastADCResult;
 
 TIM_HandleTypeDef htim2;
 

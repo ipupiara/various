@@ -8,4 +8,7 @@ git add nixi/*
 git add nixi/nixitest/
 git add nixi/tubeVoltageRegulator/*
 git add moskitoPlate/*
+git add nixi/nixitest_circuit_schematic/
+git add nixi/nixitest-AtTiny-code/
+git checkout -f .metadata/
 git status
