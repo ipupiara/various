@@ -47,6 +47,8 @@ void setDebugOneOn();
 void setDebugOneOff();
 void toggleDebugOne();
 
+void Error_Handler(void);
+
 
 
 /* USER CODE END EC */
@@ -56,7 +58,7 @@ void toggleDebugOne();
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+//void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
