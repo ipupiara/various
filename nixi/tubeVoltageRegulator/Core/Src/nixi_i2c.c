@@ -7,12 +7,34 @@
 
 #include <main.h>
 
+#define i2cUseDma
 
 I2C_HandleTypeDef hi2c1;
+
+#ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
+#endif
 
-#define i2cUseDma
+
+
+typedef enum  {
+	sendI2c = 0,
+	receiveI2c,
+} jobTypes;
+
+
+typedef struct
+{
+	jobTypes  jobType;
+	uint8_t*  buffer;
+	uint8_t	amtChars;
+	uint8_t   bufferCnt;
+	uint8_t   address;
+} i2cJobDataType;
+
+i2cJobDataType i2cJobData;
+
 
 void i2cFinishedOk()
 {
@@ -50,6 +72,8 @@ void i2cError(uint8_t err)
 //	return res;
 //  todo find a solution for this for stm32F103
 //}
+
+#ifdef i2cUseDma
 
 void DMA1_Stream7_IRQHandler(void)
 {
@@ -114,33 +138,86 @@ void DMA1_Stream6_IRQHandler(void)
 //	 OSIntExit();
 }
 
+void HAL_I2C_DmaInit(I2C_HandleTypeDef* hi2c)
+{
+	/**
+	* Enable DMA controller clock
+	*/
+	/* DMA controller clock enable */
+	__HAL_RCC_DMA1_CLK_ENABLE();
 
 
+    hdma_i2c1_rx.Instance = DMA1_Channel7;
+    hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_i2c1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_i2c1_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_i2c1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_i2c1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_i2c1_rx.Init.Mode = DMA_NORMAL;
+    hdma_i2c1_rx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_i2c1_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
-//void DMA1_Channel6_IRQHandler(void)
-//{
-//  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
-//
-//  /* USER CODE END DMA1_Channel6_IRQn 0 */
-//  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
-//  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
-//
-//  /* USER CODE END DMA1_Channel6_IRQn 1 */
-//}
-//
-///**
-//  * @brief This function handles DMA1 channel7 global interrupt.
-//  */
-//void DMA1_Channel7_IRQHandler(void)
-//{
-//  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
-//
-//  /* USER CODE END DMA1_Channel7_IRQn 0 */
-//  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
-//  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
-//
-//  /* USER CODE END DMA1_Channel7_IRQn 1 */
-//}
+    __HAL_LINKDMA(hi2c,hdmarx,hdma_i2c1_rx);
+
+    /* I2C1_TX Init */
+    hdma_i2c1_tx.Instance = DMA1_Channel6;
+    hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_i2c1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_i2c1_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_i2c1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_i2c1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_i2c1_tx.Init.Mode = DMA_NORMAL;
+    hdma_i2c1_tx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_i2c1_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+
+    __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
+
+    /* I2C1 interrupt Init */
+	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+
+
+	/* DMA interrupt init */
+	/* DMA1_Channel6_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+	/* DMA1_Channel7_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+
+
+}
+
+
+#else
+
+void sendNextI2CByte()
+{
+	if (i2cJobData.bufferCnt < i2cJobData.amtChars) {
+		hi2c1.Instance->DR = i2cJobData.buffer[i2cJobData.bufferCnt];
+		++i2cJobData.bufferCnt;
+	}
+}
+
+void receiveNextI2CByte()
+{
+	if (i2cJobData.bufferCnt < i2cJobData.amtChars) {
+			i2cJobData.buffer[i2cJobData.bufferCnt] = hi2c1.Instance->DR ;
+			++i2cJobData.bufferCnt;
+	}
+}
+
+#endif
+
 
 /**
   * @brief This function handles I2C1 event interrupt.
@@ -204,7 +281,8 @@ void I2C1_ER_IRQHandler(void)
 
 }
 
-void HAL_I2C_GpioDmaInit(I2C_HandleTypeDef* hi2c)
+
+void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hi2c->Instance==I2C1)
@@ -226,63 +304,6 @@ void HAL_I2C_GpioDmaInit(I2C_HandleTypeDef* hi2c)
 
     /* Peripheral clock enable */
     __HAL_RCC_I2C1_CLK_ENABLE();
-
-    /* I2C1 DMA Init */
-    /* I2C1_RX Init */
-
-	/**
-	* Enable DMA controller clock
-	*/
-	/* DMA controller clock enable */
-	__HAL_RCC_DMA1_CLK_ENABLE();
-
-
-    hdma_i2c1_rx.Instance = DMA1_Channel7;
-    hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_i2c1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_i2c1_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_i2c1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_i2c1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_i2c1_rx.Init.Mode = DMA_NORMAL;
-    hdma_i2c1_rx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_i2c1_rx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(hi2c,hdmarx,hdma_i2c1_rx);
-
-    /* I2C1_TX Init */
-    hdma_i2c1_tx.Instance = DMA1_Channel6;
-    hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_i2c1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_i2c1_tx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_i2c1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_i2c1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_i2c1_tx.Init.Mode = DMA_NORMAL;
-    hdma_i2c1_tx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_i2c1_tx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-
-    __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
-
-    /* I2C1 interrupt Init */
-	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
-
-
-	/* DMA interrupt init */
-	/* DMA1_Channel6_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
-	/* DMA1_Channel7_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
   }
 
@@ -314,10 +335,17 @@ void MX_I2C1_Init(void)
     Error_Handler();
   }
 
-  HAL_I2C_GpioDmaInit(&hi2c1);
-  /* USER CODE BEGIN I2C1_Init 2 */
+  HAL_I2C_GpioInit(&hi2c1);
 
-  /* USER CODE END I2C1_Init 2 */
+  /* I2C1 interrupt Init */
+	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+
+#ifdef i2cUseDma
+	HAL_I2C_DmaInit(&hi2c1);
+#endif
 
 }
 
