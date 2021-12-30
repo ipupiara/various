@@ -6,10 +6,14 @@
  */
 
 #include <main.h>
+#include <string.h>
 
 #define i2cUseDma
 
 I2C_HandleTypeDef hi2c1;
+
+uint8_t  transmitErrorCollectorInt8u;
+uint8_t  jobSemSet;
 
 #ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
@@ -41,6 +45,171 @@ void i2cFinishedOk()
 //	setI2cJobSema();
 }
 
+void enableI2c()
+{
+//	 __HAL_I2C_ENABLE(&hi2c1);
+}
+
+void disableI2c()
+{
+//	__HAL_I2C_DISABLE(&hi2c1);
+}
+
+// structure copied from stm32f7xx_hal_dma.c
+typedef struct
+{
+  __IO uint32_t ISR;   /*!< DMA interrupt status register */
+  __IO uint32_t Reserved0;
+  __IO uint32_t IFCR;  /*!< DMA interrupt flag clear register */
+} DMA_Base_Registers;
+
+
+void clearDmaInterruptFlags(DMA_HandleTypeDef *hdma)
+{
+//	DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
+//	regs->IFCR = 0x3FU << ((DMA_HandleTypeDef *)hdma)->StreamIndex;
+
+}
+
+
+// structure copied from stm32f7xx_hal_dma.c
+void DMA_SetTransferConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength)
+{
+  /* Clear DBM bit */
+//  hdma->Instance->CR &= (uint32_t)(~DMA_SxCR_DBM);
+//
+//  /* Configure DMA Stream data length */
+//  hdma->Instance->NDTR = DataLength;
+//
+//  /* Memory to Peripheral */
+//  if((hdma->Init.Direction) == DMA_MEMORY_TO_PERIPH)
+//  {
+//    /* Configure DMA Stream destination address */
+//    hdma->Instance->PAR = DstAddress;
+//
+//    /* Configure DMA Stream source address */
+//    hdma->Instance->M0AR = SrcAddress;
+//  }
+//  /* Peripheral to Memory */
+//  else
+//  {
+//    /* Configure DMA Stream source address */
+//    hdma->Instance->PAR = SrcAddress;
+//
+//    /* Configure DMA Stream destination address */
+//    hdma->Instance->M0AR = DstAddress;
+//  }
+}
+
+void i2cSendStart(I2C_HandleTypeDef *hi2c)
+{
+//	WRITE_REG(hi2c->Instance->CR2, ((uint32_t)1U << I2C_CR2_START_Pos));
+}
+
+void i2cSendStop(I2C_HandleTypeDef *hi2c)
+{
+//	WRITE_REG(hi2c->Instance->CR2, ((uint32_t)1U << I2C_CR2_STOP_Pos));
+}
+
+
+void establishContactAndRun()
+{
+#ifdef i2cUseDma
+	if (i2cJobData.jobType == sendI2c) {
+		DMA_SetTransferConfig(&hdma_i2c1_tx,(uint32_t)i2cJobData.buffer,(uint32_t)&hi2c1.Instance->TXDR,i2cJobData.amtChars);
+		clearDmaInterruptFlags(&hdma_i2c1_tx);
+		__HAL_DMA_ENABLE(&hdma_i2c1_tx);
+	} else {
+		DMA_SetTransferConfig(&hdma_i2c1_rx,(uint32_t)&hi2c1.Instance->RXDR,(uint32_t)i2cJobData.buffer,i2cJobData.amtChars);
+		clearDmaInterruptFlags(&hdma_i2c1_rx);
+		__HAL_DMA_ENABLE(&hdma_i2c1_rx);
+	}
+#endif
+
+	i2cTransferConfig(&hi2c1,i2cJobData.address,i2cJobData.amtChars,(i2cJobData.jobType == receiveI2c ? 1:0));
+	hi2c1.Instance->TXDR = (i2cJobData.address << 1);
+//	if (i2cJobData.jobType == receiveI2c) {
+//		hi2c1.Instance->TXDR |= 0x01;
+//	}  // did also not work ..... ???????
+	i2cSendStart(&hi2c1);
+}
+
+uint8_t pollForReady(uint8_t adr, uint8_t delay)
+{
+	int8_t res = 0xFF;
+//	int8_t resOnErrStack = resetOnError;
+//	resetOnError = 0;
+	uint8_t dummyBuffer [1];
+
+	while (res != 0) {
+		sendI2cByteArray(adr,&dummyBuffer[0],0, delay);  // do just a very short delay if desired
+//		resetOnError = resOnErrStack;
+	}
+    return res;
+}
+
+
+
+uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars, uint8_t doSend, uint8_t delayMs)
+{
+	uint8_t res = 0xFF;
+
+	if ((i2cInitialized == 1) ) {          //&& (OSIntNesting > 0u))
+		uint8_t semErr;
+//		OSSemPend(i2cResourceSem, 2803, &semErr);
+//		if (semErr == OS_ERR_NONE) {
+			transmitErrorCollectoruint8_t = OS_ERR_NONE;
+//			OSSemSet(i2cJobSem,0,&semErr);  // debug: be sure it was not set multiple times at last end of transfer..
+			jobSemSet = 0;
+			i2cJobData.buffer = pResultString;
+			i2cJobData.amtChars = amtChars;
+			i2cJobData.bufferCnt = 0;
+			i2cJobData.address = adr;
+			if (doSend == 1) {
+				i2cJobData.jobType = sendI2c;
+			} else {
+				i2cJobData.jobType = receiveI2c;
+				if (pResultString != 0) {
+				memset(pResultString,0,amtChars);  // todo check if this work correct (not content of pointer variable is changed)
+				}
+			}
+
+			establishContactAndRun();
+
+	//		OSSemPend(i2cJobSem, 0, &semErr);
+			if (semErr != OS_ERR_NONE) {
+				transmitErrorCollectoruint8_t = semErr;
+			}
+			if (delayMs > 0) {
+//				OSTimeDlyHMSM(0, 0, 0, delayMs);
+			}
+			//  todo wait until data written into eeprom memory
+//			OSSemSet(i2cResourceSem, 1, &semErr);
+			res = transmitErrorCollectoruint8_t;
+		//}  else {
+		//	res = semErr;
+
+	}
+	return res;
+}
+
+//  todo delay should not be done on transmit level on i2c side,
+//  but on client side that needs the delay
+//  else traffic will be blocked for all
+uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars, uint8_t delayMs)
+{
+	return transmitI2cByteArray(adr, pString, amtChars, 1, delayMs);
+}
+
+uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars, uint8_t delayMs)
+{
+	return transmitI2cByteArray(adr, pString, amtChars, 0, delayMs);
+}
+
+
+
+
+
 void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 {
 //	if (__HAL_DMA_GET_FLAG(hdma,__HAL_DMA_GET_TE_FLAG_INDEX(hdma))) {
@@ -58,17 +227,17 @@ void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 void i2cError(uint8_t err)
 {
 	 //log error
-//	 transmitErrorCollectorInt8u = err;
+//	 transmitErrorCollectoruint8_t = err;
 //	 setI2cJobSema();
 
 }
 
 
-//INT8U  dmaIsr(DMA_HandleTypeDef *hdma)
+//uint8_t  dmaIsr(DMA_HandleTypeDef *hdma)
 //{
-//	INT8U res = 0x00;
+//	uint8_t res = 0x00;
 //	DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
-//	res = (INT8U)((regs->ISR >> ((DMA_HandleTypeDef *)hdma)->StreamIndex) & 0x3FU);
+//	res = (uint8_t)((regs->ISR >> ((DMA_HandleTypeDef *)hdma)->StreamIndex) & 0x3FU);
 //	return res;
 //  todo find a solution for this for stm32F103
 //}
@@ -107,7 +276,7 @@ void DMA1_Stream7_IRQHandler(void)
 void DMA1_Stream6_IRQHandler(void)
 {
 //	CPU_SR_ALLOC();
-////	INT8U err = OS_ERR_NONE;
+////	uint8_t err = OS_ERR_NONE;
 //
 //	CPU_CRITICAL_ENTER();
 //	OSIntEnter();           /* Tell OS that we are starting an ISR           */
