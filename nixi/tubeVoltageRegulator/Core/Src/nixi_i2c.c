@@ -7,6 +7,7 @@
 
 #include <main.h>
 #include <string.h>
+#include <nixi_i2c.h>
 
 #define i2cUseDma
 
@@ -111,23 +112,28 @@ void i2cSendStop(I2C_HandleTypeDef *hi2c)
 //	WRITE_REG(hi2c->Instance->CR2, ((uint32_t)1U << I2C_CR2_STOP_Pos));
 }
 
+void i2cTransferConfig(I2C_HandleTypeDef *hi2c,  uint16_t DevAddress, uint8_t Size,  uint8_t Request)
+{
+
+//  todo write the address into the message , read status register and handle dr empty event
+}
 
 void establishContactAndRun()
 {
 #ifdef i2cUseDma
 	if (i2cJobData.jobType == sendI2c) {
-		DMA_SetTransferConfig(&hdma_i2c1_tx,(uint32_t)i2cJobData.buffer,(uint32_t)&hi2c1.Instance->TXDR,i2cJobData.amtChars);
+		DMA_SetTransferConfig(&hdma_i2c1_tx,(uint32_t)i2cJobData.buffer,(uint32_t)&hi2c1.Instance->DR,i2cJobData.amtChars);
 		clearDmaInterruptFlags(&hdma_i2c1_tx);
 		__HAL_DMA_ENABLE(&hdma_i2c1_tx);
 	} else {
-		DMA_SetTransferConfig(&hdma_i2c1_rx,(uint32_t)&hi2c1.Instance->RXDR,(uint32_t)i2cJobData.buffer,i2cJobData.amtChars);
+		DMA_SetTransferConfig(&hdma_i2c1_rx,(uint32_t)&hi2c1.Instance->DR,(uint32_t)i2cJobData.buffer,i2cJobData.amtChars);
 		clearDmaInterruptFlags(&hdma_i2c1_rx);
 		__HAL_DMA_ENABLE(&hdma_i2c1_rx);
 	}
 #endif
 
 	i2cTransferConfig(&hi2c1,i2cJobData.address,i2cJobData.amtChars,(i2cJobData.jobType == receiveI2c ? 1:0));
-	hi2c1.Instance->TXDR = (i2cJobData.address << 1);
+	hi2c1.Instance->DR = (i2cJobData.address << 1);
 //	if (i2cJobData.jobType == receiveI2c) {
 //		hi2c1.Instance->TXDR |= 0x01;
 //	}  // did also not work ..... ???????
@@ -155,10 +161,10 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 	uint8_t res = 0xFF;
 
 	if ((i2cInitialized == 1) ) {          //&& (OSIntNesting > 0u))
-		uint8_t semErr;
+//		uint8_t semErr;
 //		OSSemPend(i2cResourceSem, 2803, &semErr);
 //		if (semErr == OS_ERR_NONE) {
-			transmitErrorCollectoruint8_t = OS_ERR_NONE;
+		transmitErrorCollectorInt8u = 0;
 //			OSSemSet(i2cJobSem,0,&semErr);  // debug: be sure it was not set multiple times at last end of transfer..
 			jobSemSet = 0;
 			i2cJobData.buffer = pResultString;
@@ -177,15 +183,15 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 			establishContactAndRun();
 
 	//		OSSemPend(i2cJobSem, 0, &semErr);
-			if (semErr != OS_ERR_NONE) {
-				transmitErrorCollectoruint8_t = semErr;
-			}
+//			if (semErr != OS_ERR_NONE) {
+//				transmitErrorCollectoruint8_t = semErr;
+//			}
 			if (delayMs > 0) {
 //				OSTimeDlyHMSM(0, 0, 0, delayMs);
 			}
 			//  todo wait until data written into eeprom memory
 //			OSSemSet(i2cResourceSem, 1, &semErr);
-			res = transmitErrorCollectoruint8_t;
+			res = transmitErrorCollectorInt8u;
 		//}  else {
 		//	res = semErr;
 
@@ -483,13 +489,10 @@ void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
 void MX_I2C1_Init(void)
 {
 
-  /* USER CODE BEGIN I2C1_Init 0 */
+	i2cFinished = 0;
+	i2cMsgPending = 0;
+	i2cInitialized = 0;
 
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -516,6 +519,7 @@ void MX_I2C1_Init(void)
 	HAL_I2C_DmaInit(&hi2c1);
 #endif
 
+	i2cInitialized = 1;
 }
 
 

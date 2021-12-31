@@ -30,18 +30,8 @@ extern "C" {
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_gpio.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+uint8_t i2cFinished;
+uint8_t i2cMsgPending;
 
 void setDebugOneOn();
 void setDebugOneOff();
