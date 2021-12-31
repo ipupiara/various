@@ -9,7 +9,8 @@
 #include <string.h>
 #include <nixi_i2c.h>
 
-#define i2cUseDma
+//#define i2cUseDma
+#define I2C_FLAG_NACKF  I2C_FLAG_AF
 
 I2C_HandleTypeDef hi2c1;
 
@@ -26,6 +27,7 @@ DMA_HandleTypeDef hdma_i2c1_tx;
 typedef enum  {
 	sendI2c = 0,
 	receiveI2c,
+	idleI2c
 } jobTypes;
 
 
@@ -40,13 +42,44 @@ typedef struct
 
 i2cJobDataType i2cJobData;
 
+void i2cSetDataIdle()
+{
+	i2cJobData.jobType = idleI2c;
+	i2cFinished = 1;   // todo change to express the event character
+	jobSemSet = 1;
+}
 
 void i2cFinishedOk()
 {
+	i2cSetDataIdle();
 //	setI2cJobSema();
 }
 
-void enableI2c()
+void i2cError(uint8_t err)
+{
+	i2cSetDataIdle();
+	 //log error
+//	 transmitErrorCollectoruint8_t = err;
+//	 setI2cJobSema();
+
+}
+
+uint8_t isI2cIdle()
+{
+	return i2cJobData.jobType == idleI2c;
+}
+
+uint8_t isI2cReceiving()
+{
+	return i2cJobData.jobType == receiveI2c;
+}
+
+uint8_t isI2cSending()
+{
+	return i2cJobData.jobType == sendI2c;
+}
+
+void enableI2c())
 {
 //	 __HAL_I2C_ENABLE(&hi2c1);
 }
@@ -230,14 +263,6 @@ void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 }
 
 
-void i2cError(uint8_t err)
-{
-	 //log error
-//	 transmitErrorCollectoruint8_t = err;
-//	 setI2cJobSema();
-
-}
-
 
 //uint8_t  dmaIsr(DMA_HandleTypeDef *hdma)
 //{
@@ -398,7 +423,7 @@ void receiveNextI2CByte()
   * @brief This function handles I2C1 event interrupt.
   */
 
-#define I2C_FLAG_NACKF  I2C_FLAG_AF
+
 
 void I2C1_EV_IRQHandler(void)
 {
@@ -492,6 +517,7 @@ void MX_I2C1_Init(void)
 	i2cFinished = 0;
 	i2cMsgPending = 0;
 	i2cInitialized = 0;
+	i2cSetDataIdle();
 
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
@@ -517,7 +543,14 @@ void MX_I2C1_Init(void)
 
 #ifdef i2cUseDma
 	HAL_I2C_DmaInit(&hi2c1);
+#else
+
 #endif
+
+
+
+
+
 
 	i2cInitialized = 1;
 }
