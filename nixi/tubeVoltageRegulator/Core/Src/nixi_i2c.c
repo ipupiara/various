@@ -79,7 +79,7 @@ uint8_t isI2cSending()
 	return i2cJobData.jobType == sendI2c;
 }
 
-void enableI2c())
+void enableI2c()
 {
 //	 __HAL_I2C_ENABLE(&hi2c1);
 }
@@ -427,19 +427,31 @@ void receiveNextI2CByte()
 
 void I2C1_EV_IRQHandler(void)
 {
-	uint32_t itflags   = READ_REG(hi2c1.Instance->SR1);
+
 #ifndef i2cUseDma
-	if ((itflags & I2C_FLAG_TXE) != 0)   {
+	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&(__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF) == 0))   {
 		sendNextI2CByte();
 	}
-	if ((itflags & I2C_FLAG_RXNE) != 0)   {
+	if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
 		receiveNextI2CByte();
 	}
 #endif
-	if ((itflags & I2C_FLAG_TRA) != 0)  {      //  todo check if  tra is the right flag....
+	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
+		// send address
+	}
+	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
+		__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
+			// send receive bytes
+	}
+	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&(__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF) != 0))  {
+		// send stop condition
 		i2cFinishedOk();
 	}
-	if (((itflags & I2C_FLAG_STOPF) != 0)| ((itflags & I2C_FLAG_NACKF) != 0) )  {
+
+//	if ((itflags & I2C_FLAG_TRA) != 0)  {      //  todo check if  tra is the right flag....
+//		i2cFinishedOk();
+//	}
+	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)|| (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_NACKF) != 0) )  {
 		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
 		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
 		  i2cError(0x77);
