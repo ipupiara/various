@@ -81,12 +81,12 @@ uint8_t isI2cSending()
 
 void enableI2c()
 {
-//	 __HAL_I2C_ENABLE(&hi2c1);
+	 __HAL_I2C_ENABLE(&hi2c1);
 }
 
 void disableI2c()
 {
-//	__HAL_I2C_DISABLE(&hi2c1);
+	__HAL_I2C_DISABLE(&hi2c1);
 }
 
 // structure copied from stm32f7xx_hal_dma.c
@@ -151,6 +151,14 @@ void i2cTransferConfig(I2C_HandleTypeDef *hi2c,  uint16_t DevAddress, uint8_t Si
 //  todo write the address into the message , read status register and handle dr empty event
 }
 
+void writeAddressToDR()
+{
+	hi2c1.Instance->DR = (i2cJobData.address << 1);
+	if (i2cJobData.jobType == receiveI2c) {
+		hi2c1.Instance->DR |= 0x01;
+	}
+}
+
 void establishContactAndRun()
 {
 #ifdef i2cUseDma
@@ -166,10 +174,7 @@ void establishContactAndRun()
 #endif
 
 	i2cTransferConfig(&hi2c1,i2cJobData.address,i2cJobData.amtChars,(i2cJobData.jobType == receiveI2c ? 1:0));
-	hi2c1.Instance->DR = (i2cJobData.address << 1);
-//	if (i2cJobData.jobType == receiveI2c) {
-//		hi2c1.Instance->TXDR |= 0x01;
-//	}  // did also not work ..... ???????
+
 	i2cSendStart(&hi2c1);
 }
 
@@ -186,7 +191,7 @@ uint8_t pollForReady(uint8_t adr, uint8_t delay)
 	}
     return res;
 }
-
+//  todo should eventually better be transferred into eeprom code
 
 
 uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars, uint8_t doSend, uint8_t delayMs)
@@ -227,7 +232,6 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 			res = transmitErrorCollectorInt8u;
 		//}  else {
 		//	res = semErr;
-
 	}
 	return res;
 }
@@ -416,6 +420,11 @@ void receiveNextI2CByte()
 	}
 }
 
+uint8_t isMessageTransferred()
+{
+	return  (i2cJobData.bufferCnt >= i2cJobData.amtChars);
+}
+
 #endif
 
 
@@ -429,21 +438,26 @@ void I2C1_EV_IRQHandler(void)
 {
 
 #ifndef i2cUseDma
-	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&(__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF) == 0))   {
-		sendNextI2CByte();
-	}
-	if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
-		receiveNextI2CByte();
+	if (! isMessageTransferred())  {
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
+			__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
+		}
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
+			sendNextI2CByte();
+		} else
+		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
+			receiveNextI2CByte();
+		}
 	}
 #endif
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
-		// send address
+		writeAddressToDR();
 	}
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 		__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			// send receive bytes
 	}
-	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&(__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF) != 0))  {
+	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&( isMessageTransferred()))  {
 		// send stop condition
 		i2cFinishedOk();
 	}
@@ -461,33 +475,24 @@ void I2C1_EV_IRQHandler(void)
 void I2C1_ER_IRQHandler(void)
 {
 
-	// copied from stm32f7xx_hal_i2d.c
-	uint32_t itflags   = READ_REG(hi2c1.Instance->SR1);
-//	uint32_t itsources = READ_REG(hi2c1.Instance->CR1);
-	  /* I2C Bus error interrupt occurred ------------------------------------*/
-	  if ((itflags & I2C_FLAG_BERR) != RESET)
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
 	  }
-
-	  /* I2C Over-Run/Under-Run interrupt occurred ----------------------------------------*/
-	  if ((itflags & I2C_FLAG_OVR) != RESET)
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
 	  }
-
-	  /* I2C Arbitration Loss error interrupt occurred -------------------------------------*/
-	  if ((itflags & I2C_FLAG_ARLO) != RESET)
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
 	  }
-	  i2cError(0x82);  //  todo implement refined error message with above details....
+	  //  todo implement refined error message with above details....
 
-	  // next two ifs are just for debugging reasons
-	  if ((itflags & I2C_FLAG_AF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
 		  i2cError(0x69);
 	  }
-	  if ((itflags & I2C_FLAG_STOPF) != 0) {
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
 		  i2cError(0x96);
 	  }
 
