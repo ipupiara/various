@@ -59,6 +59,11 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 
+void sec100Tick()
+{
+	SET_BIT(hadc1.Instance->CR2, ADC_CR2_SWSTART);
+	i2cMsgPending = 1;
+}
 
 
 void startHvPwm()
@@ -101,10 +106,11 @@ int main(void)
    while (1)
   {
 	   if (i2cMsgPending != 0){
-
+		   i2cMsgPending = 0;
+		   sendI2cByteArray(0xaa,(uint8_t*) "",0, 0);
 	   }
 	   if (i2cFinished != 0) {
-
+		   i2cFinished = 0;
 	   }
   }
 
@@ -206,7 +212,7 @@ static void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;

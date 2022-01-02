@@ -14,7 +14,7 @@
 
 I2C_HandleTypeDef hi2c1;
 
-uint8_t  transmitErrorCollectorInt8u;
+
 uint8_t  jobSemSet;
 
 #ifdef i2cUseDma
@@ -59,7 +59,8 @@ void i2cError(uint8_t err)
 {
 	i2cSetDataIdle();
 	 //log error
-//	 transmitErrorCollectoruint8_t = err;
+	i2cTransmitErrorCollectorInt8u = err;
+	 SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
 //	 setI2cJobSema();
 
 }
@@ -178,7 +179,7 @@ void establishContactAndRun()
 	i2cSendStart(&hi2c1);
 }
 
-uint8_t pollForReady(uint8_t adr, uint8_t delay)
+uint8_t pollForI2cReady(uint8_t adr, uint8_t delay)
 {
 	int8_t res = 0xFF;
 //	int8_t resOnErrStack = resetOnError;
@@ -202,7 +203,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 //		uint8_t semErr;
 //		OSSemPend(i2cResourceSem, 2803, &semErr);
 //		if (semErr == OS_ERR_NONE) {
-		transmitErrorCollectorInt8u = 0;
+		i2cTransmitErrorCollectorInt8u = 0;
 //			OSSemSet(i2cJobSem,0,&semErr);  // debug: be sure it was not set multiple times at last end of transfer..
 			jobSemSet = 0;
 			i2cJobData.buffer = pResultString;
@@ -229,7 +230,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 			}
 			//  todo wait until data written into eeprom memory
 //			OSSemSet(i2cResourceSem, 1, &semErr);
-			res = transmitErrorCollectorInt8u;
+//			res = transmitErrorCollectorInt8u;
 		//}  else {
 		//	res = semErr;
 	}
@@ -456,7 +457,7 @@ void I2C1_EV_IRQHandler(void)
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 		__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			// send receive bytes
-	}
+	}  //  else nack
 	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&( isMessageTransferred()))  {
 		// send stop condition
 		i2cFinishedOk();
@@ -557,6 +558,10 @@ void MX_I2C1_Init(void)
 	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
 
 #ifdef i2cUseDma
 	HAL_I2C_DmaInit(&hi2c1);

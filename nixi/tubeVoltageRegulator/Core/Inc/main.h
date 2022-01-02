@@ -39,6 +39,8 @@ void toggleDebugOne();
 
 void Error_Handler(void);
 
+void sec100Tick();
+
 
 
 /* USER CODE END EC */
