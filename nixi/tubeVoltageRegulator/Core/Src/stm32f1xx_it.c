@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
+#include <cpu.h>
 
 
 extern ADC_HandleTypeDef hadc1;
@@ -201,13 +202,15 @@ void ADC1_2_IRQHandler(void)
 	  }
 }
 
+
+
 void cli()
 {
-
+//	 CPU_CRITICAL_ENTER();
 }
 
 void sei()
 {
-
+//	 CPU_CRITICAL_EXIT();
 }
 

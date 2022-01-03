@@ -21,6 +21,7 @@
 #include <nixi_i2c.h>
 #include <stm32f1xx_it.h>
 #include <screen.h>
+#include <cpu.h>
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -183,9 +184,12 @@ void setDebugOneOff()
 
 void toggleDebugOne()
 {
+	CPU_SR_ALLOC();           //   critcal - methods used for debuging  reasons only  todo needs tobe tested
+	  CPU_CRITICAL_ENTER();
 	#ifdef useDebugPort
 		HAL_GPIO_TogglePin(debugPin1_GPIO_Port, debugPin1_Pin);
 	#endif
+	CPU_CRITICAL_ENTER();
 }
 
 

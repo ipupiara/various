@@ -268,16 +268,6 @@ void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 }
 
 
-
-//uint8_t  dmaIsr(DMA_HandleTypeDef *hdma)
-//{
-//	uint8_t res = 0x00;
-//	DMA_Base_Registers *regs = (DMA_Base_Registers *)hdma->StreamBaseAddress;
-//	res = (uint8_t)((regs->ISR >> ((DMA_HandleTypeDef *)hdma)->StreamIndex) & 0x3FU);
-//	return res;
-//  todo find a solution for this for stm32F103
-//}
-
 #ifdef i2cUseDma
 
 void DMA1_Stream7_IRQHandler(void)
