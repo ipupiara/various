@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <nixi_i2c.h>
+#include <stm32f1xx_it.h>
 #include <screen.h>
 
 
@@ -94,7 +95,6 @@ int main(void)
 	hvPwmState = hvPwmIdle;
 
 	HAL_Init();
-
 
   SystemClock_Config();
 

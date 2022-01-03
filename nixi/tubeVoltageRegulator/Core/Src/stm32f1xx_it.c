@@ -201,4 +201,13 @@ void ADC1_2_IRQHandler(void)
 	  }
 }
 
+void cli()
+{
+
+}
+
+void sei()
+{
+
+}
 
