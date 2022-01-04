@@ -29,7 +29,7 @@ extern uint16_t lastADCResult;
 extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern I2C_HandleTypeDef hi2c1;
-
+extern TIM_HandleTypeDef htim3;
 
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
@@ -202,7 +202,12 @@ void ADC1_2_IRQHandler(void)
 	  }
 }
 
+void TIM3_IRQHandler(void)
+{
 
+//  HAL_TIM_IRQHandler(&htim3);
+
+}
 
 void cli()
 {
