@@ -37,6 +37,7 @@ uint8_t i2cMsgPending;
 
 void setDebugOneOn();
 void setDebugOneOff();
+void toggleDebugOne();
 
 void Error_Handler(void);
 
