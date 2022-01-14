@@ -23,22 +23,31 @@
 #include <screen.h>
 #include <cpu.h>
 
+#define useDebugPort
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/*
+*********************************************************************************************************
+*                                          SYS TICK DEFINES
+*********************************************************************************************************
+*/
 
-/* USER CODE END Includes */
+#define  OS_CPU_CM_NVIC_ST_CTRL    (*((volatile uint32_t *)0xE000E010uL)) /* SysTick Ctrl & Status Reg.                  */
+#define  OS_CPU_CM_NVIC_ST_RELOAD  (*((volatile uint32_t *)0xE000E014uL)) /* SysTick Reload  Value Reg.                  */
+#define  OS_CPU_CM_NVIC_ST_CURRENT (*((volatile uint32_t *)0xE000E018uL)) /* SysTick Current Value Reg.                  */
+#define  OS_CPU_CM_NVIC_ST_CAL     (*((volatile uint32_t *)0xE000E01CuL)) /* SysTick Cal     Value Reg.                  */
+#define  OS_CPU_CM_NVIC_SHPRI1     (*((volatile uint32_t *)0xE000ED18uL)) /* System Handlers  4 to  7 Prio.              */
+#define  OS_CPU_CM_NVIC_SHPRI2     (*((volatile uint32_t *)0xE000ED1CuL)) /* System Handlers  8 to 11 Prio.              */
+#define  OS_CPU_CM_NVIC_SHPRI3     (*((volatile uint32_t *)0xE000ED20uL)) /* System Handlers 12 to 15 Prio.              */
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
 
-/* USER CODE END PTD */
+#define  OS_CPU_CM_NVIC_ST_CTRL_COUNT                    0x00010000uL   /* Count flag.                                 */
+#define  OS_CPU_CM_NVIC_ST_CTRL_CLK_SRC                  0x00000004uL   /* Clock Source.                               */
+#define  OS_CPU_CM_NVIC_ST_CTRL_INTEN                    0x00000002uL   /* Interrupt enable.                           */
+#define  OS_CPU_CM_NVIC_ST_CTRL_ENABLE                   0x00000001uL   /* Counter mode.                               */
+#define  OS_CPU_CM_NVIC_PRIO_MIN                               0xFFu    /* Min handler prio.                           */
 
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
+#define  OS_CPU_CFG_SYSTICK_PRIO           0u
 
-//#define useDebugPort
 
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 
@@ -58,16 +67,61 @@ TIM_HandleTypeDef htim3;
 
 
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_ADC1_Init(void);
-static void MX_TIM2_Init(void);
+void MX_GPIO_Init(void);
+void MX_ADC1_Init(void);
+void MX_TIM2_Init(void);
 
 void sec100Tick()
 {
-	SET_BIT(hadc1.Instance->CR2, ADC_CR2_SWSTART);
-	i2cMsgPending = 1;
+	triggerAdc1();
+//	i2cMsgPending = 1;
 }
 
+void  OS_CPU_SysTickInit (uint32_t  cnts)
+{
+    uint32_t  prio;
+
+
+    OS_CPU_CM_NVIC_ST_RELOAD = cnts - 1u;
+
+                                                                /* Set SysTick handler prio.                            */
+    prio  =  OS_CPU_CM_NVIC_SHPRI3;
+    prio &=  0x00FFFFFFu;
+    prio |= (OS_CPU_CFG_SYSTICK_PRIO << 24u);
+
+    OS_CPU_CM_NVIC_SHPRI3 = prio;
+
+                                                                // Enable timer.
+    OS_CPU_CM_NVIC_ST_CTRL |= OS_CPU_CM_NVIC_ST_CTRL_CLK_SRC |
+                              OS_CPU_CM_NVIC_ST_CTRL_ENABLE;
+                                                                // Enable timer interrupt.
+    OS_CPU_CM_NVIC_ST_CTRL |= OS_CPU_CM_NVIC_ST_CTRL_INTEN;
+}
+
+void  BSP_OS_TickEnable (void)
+{
+    CPU_REG_SYST_CSR |= (CPU_REG_SYST_CSR_TICKINT |             // Enables SysTick exception request
+                         CPU_REG_SYST_CSR_ENABLE);              // Enables SysTick counter
+}
+
+void  BSP_OS_TickDisable (void)
+{
+    CPU_REG_SYST_CSR &= ~(CPU_REG_SYST_CSR_TICKINT |            //Disables SysTick exception request
+                          CPU_REG_SYST_CSR_ENABLE);             // Disables SysTick counter
+}
+
+
+void startSystemTimer()
+{
+	 uint32_t  cpu_freq;
+
+	 uint32_t  cnts;
+	 cpu_freq = HAL_RCC_GetSysClockFreq();
+	 cnts = (cpu_freq / 1000);               /* Determine nbr SysTick cnts between two OS tick intr. */
+
+	 OS_CPU_SysTickInit(cnts);
+	 BSP_OS_TickDisable();
+}
 
 void startHvPwm()
 {
@@ -83,13 +137,6 @@ void stopHvPwm()
 }
 
 
-
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
 	lastADCResult = 0;
@@ -104,8 +151,9 @@ int main(void)
   MX_TIM2_Init();
   MX_ADC1_Init();
 //  MX_I2C1_Init();
-  initScreen();
-
+//  initScreen();
+  startSystemTimer();
+  BSP_OS_TickEnable();
    while (1)
   {
 	   if (i2cMsgPending != 0){
@@ -184,7 +232,7 @@ void setDebugOneOff()
 
 void toggleDebugOne()
 {
-	CPU_SR_ALLOC();           //   critcal - methods used for debuging  reasons only  todo needs tobe tested
+	CPU_SR_ALLOC();           //   critcal - methods used for debuging  reasons only
 	  CPU_CRITICAL_ENTER();
 	#ifdef useDebugPort
 		HAL_GPIO_TogglePin(debugPin1_GPIO_Port, debugPin1_Pin);
@@ -199,7 +247,7 @@ void toggleDebugOne()
   * @param None
   * @retval None
   */
-static void MX_ADC1_Init(void)
+void MX_ADC1_Init(void)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
@@ -230,7 +278,7 @@ static void MX_ADC1_Init(void)
   /** Configure Analog WatchDog 1
   */
   AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
-  AnalogWDGConfig.HighThreshold = 0xb00;
+  AnalogWDGConfig.HighThreshold = 0xa00;
   AnalogWDGConfig.LowThreshold = 0x800;
   AnalogWDGConfig.Channel = ADC_CHANNEL_1;
   AnalogWDGConfig.ITMode = ENABLE;
@@ -266,12 +314,19 @@ static void MX_ADC1_Init(void)
 
 }
 
+void triggerAdc1()
+{
+//	SET_BIT(hadc1.Instance->CR2, ADC_CR2_SWSTART);
+	SET_BIT(hadc1.Instance->CR2, ADC_CR2_ADON);
+
+}
+
 /**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_TIM2_Init(void)
+void MX_TIM2_Init(void)
 {
 
    //  PWM  on PA0
@@ -286,7 +341,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 2000;
+  htim2.Init.Period = 3000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -309,60 +364,68 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 600;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.Pulse = 1000;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM2_Init 2 */
 
-  /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
 
 }
 
-
+/*
 
 static void MX_TIM3_Init(void)
 {
+	  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	  TIM_MasterConfigTypeDef sMasterConfig = {0};
+	  TIM_OC_InitTypeDef sConfigOC = {0};
 
+	  __HAL_RCC_TIM3_CLK_ENABLE();
 
+	  htim3.Instance = TIM3;
+	  htim3.Init.Prescaler = 0;
+	  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+	  htim3.Init.Period = 12345;
+	  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  if (HAL_TIM_OC_Init(&htim3) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+	  sConfigOC.Pulse = 0;
+	  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	  if (HAL_TIM_OC_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	 HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
+	 HAL_NVIC_EnableIRQ(TIM3_IRQn);
 
-  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_EXTERNAL1;
-  sSlaveConfig.InputTrigger = TIM_TS_TI1F_ED;
-  sSlaveConfig.TriggerFilter = 0;
-  if (HAL_TIM_SlaveConfigSynchro(&htim3, &sSlaveConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_ENABLE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(TIM3_IRQn);
-
+	 __HAL_TIM_ENABLE_IT(&htim3,TIM_IT_CC1);
 }
 
-
+*/
 
 
 /**
@@ -370,7 +433,7 @@ static void MX_TIM3_Init(void)
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
+void MX_GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
