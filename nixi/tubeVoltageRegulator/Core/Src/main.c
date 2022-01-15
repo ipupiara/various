@@ -250,20 +250,15 @@ void toggleDebugOne()
 void MX_ADC1_Init(void)
 {
 
-  /* USER CODE BEGIN ADC1_Init 0 */
 
-	//   adc input pin is PA1
-
-  /* USER CODE END ADC1_Init 0 */
-
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
   ADC_AnalogWDGConfTypeDef AnalogWDGConfig = {0};
   ADC_ChannelConfTypeDef sConfig = {0};
 
-  /* USER CODE BEGIN ADC1_Init 1 */
+  __HAL_RCC_ADC1_CLK_ENABLE();
 
-  /* USER CODE END ADC1_Init 1 */
-  /** Common config
-  */
+   __HAL_RCC_GPIOA_CLK_ENABLE();
+
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
@@ -275,8 +270,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Analog WatchDog 1
-  */
+
   AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
   AnalogWDGConfig.HighThreshold = 0xa00;
   AnalogWDGConfig.LowThreshold = 0x800;
@@ -286,8 +280,7 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Regular Channel
-  */
+
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
@@ -295,7 +288,11 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN ADC1_Init 2 */
+
+    GPIO_InitStruct.Pin = GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   HAL_NVIC_SetPriority(ADC1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(ADC1_IRQn);
 
@@ -309,9 +306,6 @@ void MX_ADC1_Init(void)
   SET_BIT(hadc1.Instance->CR1,ADC_CR1_AWDEN);
 
   SET_BIT(hadc1.Instance->CR2, ADC_CR2_ADON);
-
-  /* USER CODE END ADC1_Init 2 */
-
 }
 
 void triggerAdc1()
@@ -334,10 +328,11 @@ void MX_TIM2_Init(void)
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  /* USER CODE BEGIN TIM2_Init 1 */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_TIM2_CLK_ENABLE();
 
-  /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -372,7 +367,11 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
 
-  HAL_TIM_MspPostInit(&htim2);
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 
 }
 
@@ -436,22 +435,19 @@ static void MX_TIM3_Init(void)
 void MX_GPIO_Init(void)
 {
 
-  /* GPIO Ports Clock Enable */
+
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 #ifdef useDebugPort
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 #endif
 
-   /* GPIO Ports Clock Enable */
    __HAL_RCC_GPIOC_CLK_ENABLE();
    __HAL_RCC_GPIOD_CLK_ENABLE();
 
 #ifdef useDebugPort
-   /*Configure GPIO pin Output Level */
-   HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
 
-   /*Configure GPIO pin : debugPin1_Pin     is PC13 */
+   HAL_GPIO_WritePin(debugPin1_GPIO_Port, debugPin1_Pin, GPIO_PIN_RESET);
 
    GPIO_InitStruct.Pin = debugPin1_Pin;
    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
