@@ -25,37 +25,12 @@
 
 #define useDebugPort
 
-/*
-*********************************************************************************************************
-*                                          SYS TICK DEFINES
-*********************************************************************************************************
-*/
-
-#define  OS_CPU_CM_NVIC_ST_CTRL    (*((volatile uint32_t *)0xE000E010uL)) /* SysTick Ctrl & Status Reg.                  */
-#define  OS_CPU_CM_NVIC_ST_RELOAD  (*((volatile uint32_t *)0xE000E014uL)) /* SysTick Reload  Value Reg.                  */
-#define  OS_CPU_CM_NVIC_ST_CURRENT (*((volatile uint32_t *)0xE000E018uL)) /* SysTick Current Value Reg.                  */
-#define  OS_CPU_CM_NVIC_ST_CAL     (*((volatile uint32_t *)0xE000E01CuL)) /* SysTick Cal     Value Reg.                  */
-#define  OS_CPU_CM_NVIC_SHPRI1     (*((volatile uint32_t *)0xE000ED18uL)) /* System Handlers  4 to  7 Prio.              */
-#define  OS_CPU_CM_NVIC_SHPRI2     (*((volatile uint32_t *)0xE000ED1CuL)) /* System Handlers  8 to 11 Prio.              */
-#define  OS_CPU_CM_NVIC_SHPRI3     (*((volatile uint32_t *)0xE000ED20uL)) /* System Handlers 12 to 15 Prio.              */
-
-
-#define  OS_CPU_CM_NVIC_ST_CTRL_COUNT                    0x00010000uL   /* Count flag.                                 */
-#define  OS_CPU_CM_NVIC_ST_CTRL_CLK_SRC                  0x00000004uL   /* Clock Source.                               */
-#define  OS_CPU_CM_NVIC_ST_CTRL_INTEN                    0x00000002uL   /* Interrupt enable.                           */
-#define  OS_CPU_CM_NVIC_ST_CTRL_ENABLE                   0x00000001uL   /* Counter mode.                               */
-#define  OS_CPU_CM_NVIC_PRIO_MIN                               0xFFu    /* Min handler prio.                           */
-
-#define  OS_CPU_CFG_SYSTICK_PRIO           0u
-
-
-extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 
 ADC_HandleTypeDef hadc1;
 uint16_t lastADCResult;
 
 TIM_HandleTypeDef htim2;
-TIM_HandleTypeDef htim3;
+//TIM_HandleTypeDef htim3;
 
 
 #ifdef useDebugPort
@@ -77,51 +52,6 @@ void sec100Tick()
 //	i2cMsgPending = 1;
 }
 
-void  OS_CPU_SysTickInit (uint32_t  cnts)
-{
-    uint32_t  prio;
-
-
-    OS_CPU_CM_NVIC_ST_RELOAD = cnts - 1u;
-
-                                                                /* Set SysTick handler prio.                            */
-    prio  =  OS_CPU_CM_NVIC_SHPRI3;
-    prio &=  0x00FFFFFFu;
-    prio |= (OS_CPU_CFG_SYSTICK_PRIO << 24u);
-
-    OS_CPU_CM_NVIC_SHPRI3 = prio;
-
-                                                                // Enable timer.
-    OS_CPU_CM_NVIC_ST_CTRL |= OS_CPU_CM_NVIC_ST_CTRL_CLK_SRC |
-                              OS_CPU_CM_NVIC_ST_CTRL_ENABLE;
-                                                                // Enable timer interrupt.
-    OS_CPU_CM_NVIC_ST_CTRL |= OS_CPU_CM_NVIC_ST_CTRL_INTEN;
-}
-
-void  BSP_OS_TickEnable (void)
-{
-    CPU_REG_SYST_CSR |= (CPU_REG_SYST_CSR_TICKINT |             // Enables SysTick exception request
-                         CPU_REG_SYST_CSR_ENABLE);              // Enables SysTick counter
-}
-
-void  BSP_OS_TickDisable (void)
-{
-    CPU_REG_SYST_CSR &= ~(CPU_REG_SYST_CSR_TICKINT |            //Disables SysTick exception request
-                          CPU_REG_SYST_CSR_ENABLE);             // Disables SysTick counter
-}
-
-
-void startSystemTimer()
-{
-	 uint32_t  cpu_freq;
-
-	 uint32_t  cnts;
-	 cpu_freq = HAL_RCC_GetSysClockFreq();
-	 cnts = (cpu_freq / 1000);               /* Determine nbr SysTick cnts between two OS tick intr. */
-
-	 OS_CPU_SysTickInit(cnts);
-	 BSP_OS_TickDisable();
-}
 
 void startHvPwm()
 {
@@ -272,7 +202,7 @@ void MX_ADC1_Init(void)
   }
 
   AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
-  AnalogWDGConfig.HighThreshold = 0xa00;
+  AnalogWDGConfig.HighThreshold = 0x850;
   AnalogWDGConfig.LowThreshold = 0x800;
   AnalogWDGConfig.Channel = ADC_CHANNEL_1;
   AnalogWDGConfig.ITMode = ENABLE;
@@ -359,7 +289,7 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 1000;
+  sConfigOC.Pulse = 1300;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)

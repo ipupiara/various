@@ -44,7 +44,9 @@ void Error_Handler(void);
 void sec100Tick();
 void triggerAdc1();
 
-
+void startSystemTimer(void);
+void BSP_OS_TickEnable(void);
+void  BSP_OS_TickDisable (void);
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

@@ -202,21 +202,21 @@ void ADC1_2_IRQHandler(void)
 	  }
 }
 
-void TIM3_IRQHandler(void)
-{
-	  if (__HAL_TIM_GET_FLAG(&htim3, TIM_FLAG_CC1) != RESET)
-	  {
-	    if (__HAL_TIM_GET_IT_SOURCE(&htim3, TIM_IT_CC1) != RESET)
-	    {
-	      {
-	        __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_CC1);
-	        toggleDebugOne();
-//	        triggerAdc1();
-	      }
-	    }
-	  }
-
-}
+//void TIM3_IRQHandler(void)
+//{
+//	  if (__HAL_TIM_GET_FLAG(&htim3, TIM_FLAG_CC1) != RESET)
+//	  {
+//	    if (__HAL_TIM_GET_IT_SOURCE(&htim3, TIM_IT_CC1) != RESET)
+//	    {
+//	      {
+//	        __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_CC1);
+//	        toggleDebugOne();
+////	        triggerAdc1();
+//	      }
+//	    }
+//	  }
+//
+//}
 
 void cli()
 {
