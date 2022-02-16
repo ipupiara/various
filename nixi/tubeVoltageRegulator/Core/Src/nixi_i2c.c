@@ -469,14 +469,17 @@ void I2C1_ER_IRQHandler(void)
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
+	    i2cError(0x51);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
+	    i2cError(0x52);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
+	    i2cError(0x53);
 	  }
 	  //  todo implement refined error message with above details....
 
@@ -565,6 +568,11 @@ void MX_I2C1_Init(void)
 
 
 	i2cInitialized = 1;
+}
+
+void initI2c()
+{
+	MX_I2C1_Init();
 }
 
 

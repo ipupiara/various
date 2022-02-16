@@ -17,11 +17,12 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <stm32f1xx_it.h>
+#include <cpu.h>
 #include "main.h"
 #include <nixi_i2c.h>
-#include <stm32f1xx_it.h>
 #include <screen.h>
-#include <cpu.h>
+
 
 #define useDebugPort
 
@@ -80,8 +81,8 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
-//  MX_I2C1_Init();
-//  initScreen();
+  initI2c();
+  initScreen();
   startSystemTimer();
   BSP_OS_TickEnable();
    while (1)
@@ -289,7 +290,7 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 800;
+  sConfigOC.Pulse = 600;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
