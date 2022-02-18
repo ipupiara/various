@@ -54,6 +54,23 @@ void sec100Tick()
 }
 
 
+uint16_t clockRelValueVsMaxClk(uint16_t valAtMax)
+{
+	uint16_t res = 0;
+	double dValAtMax = (double) valAtMax;
+
+	double dMaxF = 72000000.0;
+	double dActF = (double) HAL_RCC_GetHCLKFreq();
+
+
+	double dValAtAct = dValAtMax / dMaxF;
+	dValAtAct = dValAtAct *  dActF;
+	res = (uint16_t) dValAtAct;
+
+	return res;
+}
+
+
 void startHvPwm()
 {
 
@@ -267,7 +284,8 @@ void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 3000;
+//  htim2.Init.Period = 3000;
+  htim2.Init.Period = clockRelValueVsMaxClk(3000);
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -290,7 +308,9 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 600;
+
+//  sConfigOC.Pulse = 600;
+  sConfigOC.Pulse = clockRelValueVsMaxClk(600);
   sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
