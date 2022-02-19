@@ -148,7 +148,9 @@ void i2cSendStop(I2C_HandleTypeDef *hi2c)
 
 void i2cTransferConfig(I2C_HandleTypeDef *hi2c,  uint16_t DevAddress, uint8_t Size,  uint8_t Request)
 {
-
+//	 MODIFY_REG(hi2c->Instance->CR2, (I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN ),
+//	       (uint32_t)(((uint32_t)DevAddress << (I2C_CR2_SADD_Pos + 1)) | ((uint32_t)Size << I2C_CR2_NBYTES_Pos)  |
+//	    		   ((uint32_t)Request)<< I2C_CR2_RD_WRN_Pos));
 //  todo write the address into the message , read status register and handle dr empty event
 }
 
@@ -496,6 +498,8 @@ void I2C1_ER_IRQHandler(void)
 void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  __HAL_RCC_I2C1_CLK_ENABLE();
+
   if(hi2c->Instance==I2C1)
   {
   /* USER CODE BEGIN I2C1_MspInit 0 */
@@ -530,6 +534,9 @@ void MX_I2C1_Init(void)
 	i2cInitialized = 0;
 	i2cSetDataIdle();
 
+	__HAL_RCC_I2C1_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -559,7 +566,7 @@ void MX_I2C1_Init(void)
 #ifdef i2cUseDma
 	HAL_I2C_DmaInit(&hi2c1);
 #else
-
+	enableI2c();
 #endif
 
 
