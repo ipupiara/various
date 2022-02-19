@@ -534,8 +534,7 @@ void MX_I2C1_Init(void)
 	i2cInitialized = 0;
 	i2cSetDataIdle();
 
-	__HAL_RCC_I2C1_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+	 HAL_I2C_GpioInit(&hi2c1);
 
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
@@ -550,8 +549,6 @@ void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
-
-  HAL_I2C_GpioInit(&hi2c1);
 
   /* I2C1 interrupt Init */
 	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
