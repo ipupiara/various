@@ -12,7 +12,7 @@
 uint8_t resetOnError;
 uint8_t  i2cTransmitErrorCollectorInt8u;
 uint8_t i2cInitialized;
-uint8_t i2cSec100MsgPending;
+
 
 void MX_I2C1_Init(void);
 uint8_t isI2cBusy();

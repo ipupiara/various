@@ -47,10 +47,12 @@ void MX_GPIO_Init(void);
 void MX_ADC1_Init(void);
 void MX_TIM2_Init(void);
 
+uint8_t i2cSec100MsgPending;
+
 void sec100Tick()
 {
 //	triggerAdc1();
-//	i2cSec100Msg
+
 	i2cSec100MsgPending = 1;
 }
 
@@ -89,6 +91,7 @@ void stopHvPwm()
 int main(void)
 {
 	lastADCResult = 0;
+	i2cSec100MsgPending = 0;
 	hvPwmState = hvPwmIdle;
 
 	HAL_Init();

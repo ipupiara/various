@@ -65,21 +65,6 @@ uint8_t isI2cBusy()
 	return (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY));
 }
 
-uint8_t isI2cIdle()
-{
-	return i2cJobData.jobType == idleI2c;
-}
-
-uint8_t isI2cReceiving()
-{
-	return i2cJobData.jobType == receiveI2c;
-}
-
-uint8_t isI2cSending()
-{
-	return i2cJobData.jobType == sendI2c;
-}
-
 void enableI2c()
 {
 	 __HAL_I2C_ENABLE(&hi2c1);
@@ -521,18 +506,12 @@ void MX_I2C1_Init(void)
 #else
 	enableI2c();
 #endif
-
-
-
-
-
-
 	i2cInitialized = 1;
 }
 
 void initI2c()
 {
-	i2cSec100MsgPending = 0;
+
 	MX_I2C1_Init();
 }
 
