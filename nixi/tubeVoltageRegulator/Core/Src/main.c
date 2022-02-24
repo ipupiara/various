@@ -49,8 +49,9 @@ void MX_TIM2_Init(void);
 
 void sec100Tick()
 {
-	triggerAdc1();
-	i2cMsgPending = 1;
+//	triggerAdc1();
+//	i2cSec100Msg
+	i2cSec100MsgPending = 1;
 }
 
 
@@ -104,12 +105,9 @@ int main(void)
   BSP_OS_TickEnable();
    while (1)
   {
-	   if (i2cMsgPending != 0){
-		   i2cMsgPending = 0;
-		   sendI2cByteArray(0xaa,(uint8_t*) "",0, 0);
-	   }
-	   if (i2cFinished != 0) {
-		   i2cFinished = 0;
+	   if (i2cSec100MsgPending != 0){
+		   i2cSec100MsgPending = 0;
+		   sendI2cByteArray(0xaa,(uint8_t*) "",0);
 	   }
   }
 

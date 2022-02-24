@@ -32,9 +32,6 @@ extern "C" {
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_gpio.h"
 
-uint8_t i2cFinished;
-uint8_t i2cMsgPending;
-
 void setDebugOneOn();
 void setDebugOneOff();
 void toggleDebugOne();

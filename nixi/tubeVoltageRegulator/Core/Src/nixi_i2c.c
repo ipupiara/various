@@ -9,19 +9,18 @@
 #include <string.h>
 #include <nixi_i2c.h>
 
+//  todo receive handling of result string not yet implemented, just send for screen used so far
+
 //#define i2cUseDma
 #define I2C_FLAG_NACKF  I2C_FLAG_AF
 
 I2C_HandleTypeDef hi2c1;
 
 
-uint8_t  jobSemSet;
-
 #ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
 #endif
-
 
 
 typedef enum  {
@@ -40,19 +39,17 @@ typedef struct
 	uint8_t   address;
 } i2cJobDataType;
 
+
 i2cJobDataType i2cJobData;
 
 void i2cSetDataIdle()
 {
 	i2cJobData.jobType = idleI2c;
-	i2cFinished = 1;   // todo change to express the event character
-	jobSemSet = 1;
 }
 
 void i2cFinishedOk()
 {
 	i2cSetDataIdle();
-//	setI2cJobSema();
 }
 
 void i2cError(uint8_t err)
@@ -61,8 +58,11 @@ void i2cError(uint8_t err)
 	 //log error
 	i2cTransmitErrorCollectorInt8u = err;
 	 SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
-//	 setI2cJobSema();
+}
 
+uint8_t isI2cBusy()
+{
+	return (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY));
 }
 
 uint8_t isI2cIdle()
@@ -138,21 +138,15 @@ void DMA_SetTransferConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_
 
 void i2cSendStart(I2C_HandleTypeDef *hi2c)
 {
-//	WRITE_REG(hi2c->Instance->CR2, ((uint32_t)1U << I2C_CR2_START_Pos));
+	SET_BIT(hi2c->Instance->CR1, I2C_CR1_START);
 }
 
 void i2cSendStop(I2C_HandleTypeDef *hi2c)
 {
-//	WRITE_REG(hi2c->Instance->CR2, ((uint32_t)1U << I2C_CR2_STOP_Pos));
+	SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP);
 }
 
-void i2cTransferConfig(I2C_HandleTypeDef *hi2c,  uint16_t DevAddress, uint8_t Size,  uint8_t Request)
-{
-//	 MODIFY_REG(hi2c->Instance->CR2, (I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN ),
-//	       (uint32_t)(((uint32_t)DevAddress << (I2C_CR2_SADD_Pos + 1)) | ((uint32_t)Size << I2C_CR2_NBYTES_Pos)  |
-//	    		   ((uint32_t)Request)<< I2C_CR2_RD_WRN_Pos));
-//  todo write the address into the message , read status register and handle dr empty event
-}
+
 
 void writeAddressToDR()
 {
@@ -175,39 +169,18 @@ void establishContactAndRun()
 		__HAL_DMA_ENABLE(&hdma_i2c1_rx);
 	}
 #endif
-
-	i2cTransferConfig(&hi2c1,i2cJobData.address,i2cJobData.amtChars,(i2cJobData.jobType == receiveI2c ? 1:0));
-
+	// enable ack
+	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK);
 	i2cSendStart(&hi2c1);
 }
 
-uint8_t pollForI2cReady(uint8_t adr, uint8_t delay)
+
+uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars, uint8_t doSend)
 {
-	int8_t res = 0xFF;
-//	int8_t resOnErrStack = resetOnError;
-//	resetOnError = 0;
-	uint8_t dummyBuffer [1];
+	uint8_t res = 0x00;
 
-	while (res != 0) {
-		sendI2cByteArray(adr,&dummyBuffer[0],0, delay);  // do just a very short delay if desired
-//		resetOnError = resOnErrStack;
-	}
-    return res;
-}
-//  todo should eventually better be transferred into eeprom code
-
-
-uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars, uint8_t doSend, uint8_t delayMs)
-{
-	uint8_t res = 0xFF;
-
-	if ((i2cInitialized == 1) ) {          //&& (OSIntNesting > 0u))
-//		uint8_t semErr;
-//		OSSemPend(i2cResourceSem, 2803, &semErr);
-//		if (semErr == OS_ERR_NONE) {
+	if ((i2cInitialized == 1) && (! isI2cBusy()) ) {          //&& (OSIntNesting > 0u))
 		i2cTransmitErrorCollectorInt8u = 0;
-//			OSSemSet(i2cJobSem,0,&semErr);  // debug: be sure it was not set multiple times at last end of transfer..
-			jobSemSet = 0;
 			i2cJobData.buffer = pResultString;
 			i2cJobData.amtChars = amtChars;
 			i2cJobData.bufferCnt = 0;
@@ -220,36 +193,20 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 				memset(pResultString,0,amtChars);  // todo check if this work correct (not content of pointer variable is changed)
 				}
 			}
-
 			establishContactAndRun();
-
-	//		OSSemPend(i2cJobSem, 0, &semErr);
-//			if (semErr != OS_ERR_NONE) {
-//				transmitErrorCollectoruint8_t = semErr;
-//			}
-			if (delayMs > 0) {
-//				OSTimeDlyHMSM(0, 0, 0, delayMs);
-			}
-			//  todo wait until data written into eeprom memory
-//			OSSemSet(i2cResourceSem, 1, &semErr);
-//			res = transmitErrorCollectorInt8u;
-		//}  else {
-		//	res = semErr;
+			res = 1;
 	}
 	return res;
 }
 
-//  todo delay should not be done on transmit level on i2c side,
-//  but on client side that needs the delay
-//  else traffic will be blocked for all
-uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars, uint8_t delayMs)
+uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 {
-	return transmitI2cByteArray(adr, pString, amtChars, 1, delayMs);
+	return transmitI2cByteArray(adr, pString, amtChars,sendI2c);
 }
 
-uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars, uint8_t delayMs)
+uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 {
-	return transmitI2cByteArray(adr, pString, amtChars, 0, delayMs);
+	return transmitI2cByteArray(adr, pString, amtChars,receiveI2c);
 }
 
 
@@ -441,6 +398,11 @@ void I2C1_EV_IRQHandler(void)
 		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
 			receiveNextI2CByte();
 		}
+	} else {
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
+			i2cSendStop(&hi2c1);
+			i2cFinishedOk();
+		}
 	}
 #endif
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
@@ -450,10 +412,7 @@ void I2C1_EV_IRQHandler(void)
 		__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			// send receive bytes
 	}  //  else nack
-	if ((__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0) &&( isMessageTransferred()))  {
-		// send stop condition
-		i2cFinishedOk();
-	}
+
 
 //	if ((itflags & I2C_FLAG_TRA) != 0)  {      //  todo check if  tra is the right flag....
 //		i2cFinishedOk();
@@ -528,9 +487,6 @@ void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
 
 void MX_I2C1_Init(void)
 {
-
-	i2cFinished = 0;
-	i2cMsgPending = 0;
 	i2cInitialized = 0;
 	i2cSetDataIdle();
 
@@ -576,6 +532,7 @@ void MX_I2C1_Init(void)
 
 void initI2c()
 {
+	i2cSec100MsgPending = 0;
 	MX_I2C1_Init();
 }
 
