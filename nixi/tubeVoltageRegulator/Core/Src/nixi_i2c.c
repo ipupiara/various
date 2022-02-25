@@ -170,7 +170,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 			i2cJobData.amtChars = amtChars;
 			i2cJobData.bufferCnt = 0;
 			i2cJobData.address = adr;
-			if (doSend == 1) {
+			if (doSend == sendI2c) {
 				i2cJobData.jobType = sendI2c;
 			} else {
 				i2cJobData.jobType = receiveI2c;
@@ -186,7 +186,14 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 
 uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 {
-	return transmitI2cByteArray(adr, pString, amtChars,sendI2c);
+
+//			   sendI2cByteArray(0xaa,(uint8_t*) "1",1);
+
+			   uint8_t  arr [1];
+			  arr[0]=0xbb;
+			   HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
+//	return transmitI2cByteArray(adr, pString, amtChars,sendI2c);
+	return 0;
 }
 
 uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
@@ -468,17 +475,18 @@ void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
 
 }
 
-
-
-void MX_I2C1_Init(void)
+static void MX_I2C1_Init(void)
 {
-	i2cInitialized = 0;
-	i2cSetDataIdle();
 
-	 HAL_I2C_GpioInit(&hi2c1);
+  /* USER CODE BEGIN I2C1_Init 0 */
 
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 30000;
+  hi2c1.Init.ClockSpeed = 50000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -490,29 +498,58 @@ void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN I2C1_Init 2 */
 
-  /* I2C1 interrupt Init */
-	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+  /* USER CODE END I2C1_Init 2 */
 
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
-
-#ifdef i2cUseDma
-	HAL_I2C_DmaInit(&hi2c1);
-#else
-	enableI2c();
-#endif
-	i2cInitialized = 1;
 }
 
+
+
+//void MX_I2C1_Init(void)
+//{
+//	i2cInitialized = 0;
+//	i2cSetDataIdle();
+//
+//	 HAL_I2C_GpioInit(&hi2c1);
+//
+//  hi2c1.Instance = I2C1;
+//  hi2c1.Init.ClockSpeed = 30000;
+//  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+//  hi2c1.Init.OwnAddress1 = 0;
+//  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+//  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+//  hi2c1.Init.OwnAddress2 = 0;
+//  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+//  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+//  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//
+//  /* I2C1 interrupt Init */
+//	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+//	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+//
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
+//
+//#ifdef i2cUseDma
+//	HAL_I2C_DmaInit(&hi2c1);
+//#else
+//	enableI2c();
+//#endif
+//	i2cInitialized = 1;
+//}
+//
 void initI2c()
 {
 
 	MX_I2C1_Init();
+	i2cInitialized = 1;
 }
 
 

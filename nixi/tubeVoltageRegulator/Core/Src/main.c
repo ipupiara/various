@@ -100,17 +100,23 @@ int main(void)
 
 
   MX_GPIO_Init();
-  MX_TIM2_Init();
-  MX_ADC1_Init();
+//  MX_TIM2_Init();
+//  MX_ADC1_Init();
   initI2c();
   initScreen();
-  startSystemTimer();
-  BSP_OS_TickEnable();
+//  startSystemTimer();
+//  BSP_OS_TickEnable();
    while (1)
   {
 	   if (i2cSec100MsgPending != 0){
+
 		   i2cSec100MsgPending = 0;
-		   sendI2cByteArray(0xaa,(uint8_t*) "",0);
+		   uint8_t  arr [1];
+		  arr[0]=0xbb;
+
+
+			   sendI2cByteArray(0xaa,arr,1);
+
 	   }
   }
 
@@ -151,7 +157,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }

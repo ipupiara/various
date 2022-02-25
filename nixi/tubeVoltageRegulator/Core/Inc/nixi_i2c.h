@@ -14,7 +14,7 @@ uint8_t  i2cTransmitErrorCollectorInt8u;
 uint8_t i2cInitialized;
 
 
-void MX_I2C1_Init(void);
+static void MX_I2C1_Init(void);
 uint8_t isI2cBusy();
 uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars);
 uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars);
@@ -22,5 +22,8 @@ uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars)
 void initI2c();
 void reInitI2cAfterError();
 void enableI2c();
+
+void I2C1_EV_IRQHandler(void);
+void I2C1_ER_IRQHandler(void);
 
 #endif /* INC_NIXI_I2C_H_ */
