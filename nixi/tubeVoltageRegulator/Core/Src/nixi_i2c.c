@@ -367,6 +367,12 @@ uint8_t isMessageTransferred()
 	return  (i2cJobData.bufferCnt >= i2cJobData.amtChars);
 }
 
+
+uint8_t isCurrentByteSecondLastByte()
+{
+	return  (i2cJobData.bufferCnt = (i2cJobData.amtChars - 1));
+}
+
 #endif
 
 
@@ -378,33 +384,45 @@ uint8_t isMessageTransferred()
 
 void I2C1_EV_IRQHandler(void)
 {
-
-#ifndef i2cUseDma
-	if (! isMessageTransferred())  {
-		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
-			__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
-		}
-		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
-			sendNextI2CByte();
-		} else
-		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
-			receiveNextI2CByte();
-		}
+	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
+		writeAddressToDR();
 	} else {
-		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
+			uint8_t res = 0;
+			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
+			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;
+			if (isCurrentByteSecondLastByte())   {
+				CLEAR_BIT(hi2c->Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
+				SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP_Pos); //  send stop // (re-)start
+			}
+		}
+#ifndef i2cUseDma    // dma maybe needs also active sending of stop
+		if (! isMessageTransferred())  {
+			if (isCurrentByteSecondLastByte()) {      //  stm logic.....   :- )
+				 CLEAR_BIT(hi2c->Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
+			}
+			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
+				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
+			}
+			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
+				sendNextI2CByte();
+			} else
+			if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
+				receiveNextI2CByte();
+				// !!  isMessage.. must be done after receive...
+				if (isCurrentByteSecondLastByte() && isMessageTransferred())     {
+					SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP_Pos); //  send stop // (re-)start
+				}
+				if (isLastByteSecondLastByte) {  //  stm logic.....   :- )
+				}
+			}
+		} else {
 			i2cSendStop(&hi2c1);
 			i2cFinishedOk();
 		}
-	}
 #endif
-	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
-		writeAddressToDR();
-	}
-	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
-		__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
-			// send receive bytes
-	}  //  else nack
 
+	}
 
 //	if ((itflags & I2C_FLAG_TRA) != 0)  {      //  todo check if  tra is the right flag....
 //		i2cFinishedOk();
