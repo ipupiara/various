@@ -16,6 +16,8 @@
 
 I2C_HandleTypeDef hi2c1;
 
+void reInitAfterFailure();
+
 
 #ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
@@ -71,19 +73,10 @@ void i2cFinishedOk()
 
 void i2cError(uint8_t err)
 {
-	i2cSetDataIdle();
-	 //log error
-	i2cTransmitErrorCollectorInt8u = err;
-
-	if (i2cJobData.jobType == sendI2c) {
-		i2cMessageSent = 0xFF;
-	}
-	if (i2cJobData.jobType == receiveI2c)  {
-		i2cMessageReceived = 0xFF;
-	}
-	i2cSetDataIdle();
-
 	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
+	i2cTransmitErrorCollectorInt8u = err;
+	reInitAfterFailure();
+	 //log error
 }
 
 uint8_t isI2cBusy()
@@ -197,7 +190,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 	uint8_t res = 0x00;
 
 	if ((i2cInitialized == 1) && (! isI2cBusy()) && (i2cJobData.jobType == idleI2c) ) {          //&& (OSIntNesting > 0u))
-		i2cTransmitErrorCollectorInt8u = 0;
+           		i2cTransmitErrorCollectorInt8u = 0;
 		memset(i2cErrorString,0,i2cErrorStringLength);
 		i2cJobData.buffer = pResultString;
 		i2cJobData.amtChars = amtChars;
@@ -419,9 +412,7 @@ void I2C1_EV_IRQHandler(void)
 		writeAddressToDR();
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
-			uint8_t res;
-			UNUSED(res);
-
+			uint8_t res; UNUSED(res);
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;    //   clearing addr needs be proceeded by read of SR2..??
 			UNUSED(res);
@@ -447,11 +438,11 @@ void I2C1_EV_IRQHandler(void)
 				}
 			}
 		}
+#endif
 		if (isMessageTransferred())  {
 			i2cSendStop(&hi2c1);
 			i2cFinishedOk();
 		}
-#endif
 
 	}
 
@@ -467,7 +458,6 @@ void I2C1_EV_IRQHandler(void)
 
 void I2C1_ER_IRQHandler(void)
 {
-
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
@@ -489,14 +479,15 @@ void I2C1_ER_IRQHandler(void)
 	  //  todo implement refined error message with above details....
 
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
-;		  addToErrorString("NACK");
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
+		  addToErrorString("NACK");
 		  i2cError(0x69);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
 		  addToErrorString("STOP");
 		  i2cError(0x96);
 	  }
-
 }
 
 
@@ -602,10 +593,18 @@ static void MX_I2C1_Init(void)
 
 void initI2c()
 {
-
+	i2cSetDataIdle();
 	MX_I2C1_Init();
 	i2cInitialized = 1;
 }
 
 
+void reInitAfterFailure()
+{
+  __HAL_I2C_DISABLE(&hi2c1);
+	hi2c1.Instance->CR1 |= I2C_CR1_SWRST;
+	hi2c1.Instance->CR1 &= ~I2C_CR1_SWRST;
+	__HAL_I2C_ENABLE(&hi2c1);
 
+	initI2c();
+}

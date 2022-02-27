@@ -120,7 +120,7 @@ int main(void)
 		   uint8_t  arr [1];
 		  arr[0]=0xbb;
 
-			   sendI2cByteArray(0xaa,arr,1);
+			   sendI2cByteArray(0x11,arr,1);
 
 	   }
 	   if (i2cMessageReceived != 0)  {
