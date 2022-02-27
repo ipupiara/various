@@ -67,6 +67,8 @@ enum {
 	hvPwmRunning
 };
 
+uint8_t  i2cMessageReceived;
+uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
 
 uint8_t  hvPwmState;

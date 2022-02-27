@@ -42,6 +42,17 @@ typedef struct
 
 i2cJobDataType i2cJobData;
 
+
+void addToErrorString(char* stri )
+{
+	uint8_t pos;
+	uint8_t len = strlen((char*) stri);
+	for (pos = 0; (pos < len) && (strlen((char*) i2cErrorString) < (i2cErrorStringLength -1)) ; ++ pos)  {
+		i2cErrorString[strlen((char*) i2cErrorString)] = stri[pos];
+	}
+}
+
+
 void i2cSetDataIdle()
 {
 	i2cJobData.jobType = idleI2c;
@@ -49,6 +60,12 @@ void i2cSetDataIdle()
 
 void i2cFinishedOk()
 {
+	if (i2cJobData.jobType == sendI2c) {
+		i2cMessageSent = 1;
+	}
+	if (i2cJobData.jobType == receiveI2c)  {
+		i2cMessageReceived = 1;
+	}
 	i2cSetDataIdle();
 }
 
@@ -57,7 +74,16 @@ void i2cError(uint8_t err)
 	i2cSetDataIdle();
 	 //log error
 	i2cTransmitErrorCollectorInt8u = err;
-	 SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
+
+	if (i2cJobData.jobType == sendI2c) {
+		i2cMessageSent = 0xFF;
+	}
+	if (i2cJobData.jobType == receiveI2c)  {
+		i2cMessageReceived = 0xFF;
+	}
+	i2cSetDataIdle();
+
+	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
 }
 
 uint8_t isI2cBusy()
@@ -154,9 +180,15 @@ void establishContactAndRun()
 		__HAL_DMA_ENABLE(&hdma_i2c1_rx);
 	}
 #endif
+
+	 uint8_t  arr [1];
+				  arr[0]=0xbb;
+				   HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
+
+
 	// enable ack
-	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK);
-	i2cSendStart(&hi2c1);
+//	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK);
+//	i2cSendStart(&hi2c1);
 }
 
 
@@ -164,41 +196,39 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 {
 	uint8_t res = 0x00;
 
-	if ((i2cInitialized == 1) && (! isI2cBusy()) ) {          //&& (OSIntNesting > 0u))
+	if ((i2cInitialized == 1) && (! isI2cBusy()) && (i2cJobData.jobType == idleI2c) ) {          //&& (OSIntNesting > 0u))
 		i2cTransmitErrorCollectorInt8u = 0;
-			i2cJobData.buffer = pResultString;
-			i2cJobData.amtChars = amtChars;
-			i2cJobData.bufferCnt = 0;
-			i2cJobData.address = adr;
-			if (doSend == sendI2c) {
-				i2cJobData.jobType = sendI2c;
-			} else {
-				i2cJobData.jobType = receiveI2c;
-				if (pResultString != 0) {
-				memset(pResultString,0,amtChars);  // todo check if this work correct (not content of pointer variable is changed)
-				}
+		memset(i2cErrorString,0,i2cErrorStringLength);
+		i2cJobData.buffer = pResultString;
+		i2cJobData.amtChars = amtChars;
+		i2cJobData.bufferCnt = 0;
+		i2cJobData.address = adr;
+		if (doSend == sendI2c) {
+			i2cJobData.jobType = sendI2c;
+		} else {
+			i2cJobData.jobType = receiveI2c;
+			if (pResultString != 0) {
+			memset(pResultString,0,amtChars);  // todo check if this work correct (not content of pointer variable is changed)
 			}
-			establishContactAndRun();
-			res = 1;
+		}
+		establishContactAndRun();
+		res = 1;
 	}
 	return res;
 }
 
 uint8_t sendI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 {
-
-//			   sendI2cByteArray(0xaa,(uint8_t*) "1",1);
-
-			   uint8_t  arr [1];
-			  arr[0]=0xbb;
-			   HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
-//	return transmitI2cByteArray(adr, pString, amtChars,sendI2c);
-	return 0;
+	uint8_t res = 0;
+	res =  transmitI2cByteArray(adr, pString, amtChars,sendI2c);
+	return res;
 }
 
 uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 {
-	return transmitI2cByteArray(adr, pString, amtChars,receiveI2c);
+	uint8_t res = 0;
+	res =  transmitI2cByteArray(adr, pString, amtChars,receiveI2c);
+	return res;
 }
 
 
@@ -384,23 +414,24 @@ uint8_t isCurrentByteSecondLastByte()
 
 void I2C1_EV_IRQHandler(void)
 {
+	//  see datasheet  I2C -> functional description -> master receiver
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
 		writeAddressToDR();
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
-			uint8_t res = 0;
+			uint8_t res;
+			UNUSED(res);
+
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
-			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;
+			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;    //   clearing addr needs be proceeded by read of SR2..??
+			UNUSED(res);
 			if (isCurrentByteSecondLastByte())   {
-				CLEAR_BIT(hi2c->Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
-				SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP_Pos); //  send stop // (re-)start
+				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
+				SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos);
 			}
 		}
 #ifndef i2cUseDma    // dma maybe needs also active sending of stop
 		if (! isMessageTransferred())  {
-			if (isCurrentByteSecondLastByte()) {      //  stm logic.....   :- )
-				 CLEAR_BIT(hi2c->Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
-			}
 			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
 				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
 			}
@@ -411,12 +442,12 @@ void I2C1_EV_IRQHandler(void)
 				receiveNextI2CByte();
 				// !!  isMessage.. must be done after receive...
 				if (isCurrentByteSecondLastByte() && isMessageTransferred())     {
-					SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP_Pos); //  send stop // (re-)start
-				}
-				if (isLastByteSecondLastByte) {  //  stm logic.....   :- )
+					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
+					SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
 				}
 			}
-		} else {
+		}
+		if (isMessageTransferred())  {
 			i2cSendStop(&hi2c1);
 			i2cFinishedOk();
 		}
@@ -440,24 +471,29 @@ void I2C1_ER_IRQHandler(void)
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
+	    addToErrorString("BERR");
 	    i2cError(0x51);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
+	    addToErrorString("OVR");
 	    i2cError(0x52);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
+	    addToErrorString("ARRLO");
 	    i2cError(0x53);
 	  }
 	  //  todo implement refined error message with above details....
 
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
+;		  addToErrorString("NACK");
 		  i2cError(0x69);
 	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
+		  addToErrorString("STOP");
 		  i2cError(0x96);
 	  }
 
@@ -563,6 +599,7 @@ static void MX_I2C1_Init(void)
 //	i2cInitialized = 1;
 //}
 //
+
 void initI2c()
 {
 

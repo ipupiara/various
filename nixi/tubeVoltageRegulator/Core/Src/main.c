@@ -87,12 +87,18 @@ void stopHvPwm()
 	hvPwmState = hvPwmIdle;
 }
 
-
-int main(void)
+void initVariables()
 {
+	i2cMessageReceived = 0;
+	i2cMessageSent = 0;
 	lastADCResult = 0;
 	i2cSec100MsgPending = 0;
 	hvPwmState = hvPwmIdle;
+}
+
+int main(void)
+{
+	initVariables();
 
 	HAL_Init();
 
@@ -114,9 +120,24 @@ int main(void)
 		   uint8_t  arr [1];
 		  arr[0]=0xbb;
 
-
 			   sendI2cByteArray(0xaa,arr,1);
 
+	   }
+	   if (i2cMessageReceived != 0)  {
+		   if (i2cMessageReceived == 1) {
+
+		   }  else {
+
+		   }
+		   i2cMessageReceived = 0;
+	   }
+	   if (i2cMessageSent != 0)  {
+		   if (i2cMessageSent == 1) {
+
+		   }  else {
+
+		   }
+		   i2cMessageSent = 0;
 	   }
   }
 

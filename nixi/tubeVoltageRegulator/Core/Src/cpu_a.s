@@ -1,3 +1,6 @@
+
+//  pn 27. Feb 2022  added to tubeVoltageRegulator and tempix with own added and changed code
+
 @********************************************************************************************************
 @                                                uC/CPU
 @                                    CPU CONFIGURATION & PORT LAYER
@@ -33,6 +36,7 @@
 @ Note(s)  : This port supports the ARM Cortex-M3, Cortex-M4 and Cortex-M7 architectures.
 @********************************************************************************************************
 
+//  pn 27. Feb 2022  added to tubeVoltageRegulator and tempix with own added and changed code
 
 @********************************************************************************************************
 @                                           PUBLIC FUNCTIONS
