@@ -24,7 +24,7 @@
 #include <screen.h>
 
 
-//#define useDebugPort
+#define useDebugPort
 
 
 ADC_HandleTypeDef hadc1;
@@ -119,8 +119,8 @@ int main(void)
 		   i2cSec100MsgPending = 0;
 		   uint8_t  arr [1];
 		  arr[0]=0xbb;
-
-			   sendI2cByteArray(0x11,arr,1);
+		  sendI2cByteArray(0x11,arr,0);
+//			   sendI2cByteArray(0x3c,arr,0);
 
 	   }
 	   if (i2cMessageReceived != 0)  {
@@ -138,6 +138,10 @@ int main(void)
 
 		   }
 		   i2cMessageSent = 0;
+	   }
+	   if (i2cInitNeeded == 1) {
+		   i2cInitNeeded = 0;
+		   i2cReInitAfterFailure();
 	   }
   }
 

@@ -14,9 +14,9 @@
 //#define i2cUseDma
 #define I2C_FLAG_NACKF  I2C_FLAG_AF
 
-I2C_HandleTypeDef hi2c1;
+#define debugging
 
-void reInitAfterFailure();
+I2C_HandleTypeDef hi2c1;
 
 
 #ifdef i2cUseDma
@@ -41,16 +41,36 @@ typedef struct
 	uint8_t   address;
 } i2cJobDataType;
 
-
+static void MX_I2C1_Init(void);
 i2cJobDataType i2cJobData;
 
-
+#ifdef debugging
 void addToErrorString(char* stri )
 {
 	uint8_t pos;
 	uint8_t len = strlen((char*) stri);
 	for (pos = 0; (pos < len) && (strlen((char*) i2cErrorString) < (i2cErrorStringLength -1)) ; ++ pos)  {
 		i2cErrorString[strlen((char*) i2cErrorString)] = stri[pos];
+	}
+}
+#else
+#define addToErrorString( stri ) UNUSED( stri)
+#endif
+
+void setCr1Bit(uint16_t bitPos)
+{
+	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos) != 0 )  {
+		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_STOP_Pos);
+	}
+	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_START_Pos) != 0 )  {
+		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_START_Pos);
+	}
+	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_PEC_Pos) != 0 )  {
+		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_PEC_Pos);
+	}
+	if ((READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos) != 0 ) &&
+	    (bitPos != I2C_CR1_STOP_Pos)) {
+			SET_BIT(hi2c1.Instance->CR1, bitPos);
 	}
 }
 
@@ -73,9 +93,10 @@ void i2cFinishedOk()
 
 void i2cError(uint8_t err)
 {
-	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP);
+	setCr1Bit( I2C_CR1_STOP);
 	i2cTransmitErrorCollectorInt8u = err;
-	reInitAfterFailure();
+	__HAL_I2C_DISABLE(&hi2c1);
+	i2cInitNeeded = 1;
 	 //log error
 }
 
@@ -142,12 +163,12 @@ void DMA_SetTransferConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_
 
 void i2cSendStart(I2C_HandleTypeDef *hi2c)
 {
-	SET_BIT(hi2c->Instance->CR1, I2C_CR1_START);
+	setCr1Bit( I2C_CR1_START);
 }
 
 void i2cSendStop(I2C_HandleTypeDef *hi2c)
 {
-	SET_BIT(hi2c->Instance->CR1, I2C_CR1_STOP);
+	setCr1Bit( I2C_CR1_STOP);
 }
 
 
@@ -176,11 +197,11 @@ void establishContactAndRun()
 
 	 uint8_t  arr [1];
 				  arr[0]=0xbb;
-				   HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
+	HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
 
 
 	// enable ack
-//	SET_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK);
+//	setCr1Bit( I2C_CR1_ACK);
 //	i2cSendStart(&hi2c1);
 }
 
@@ -240,6 +261,8 @@ void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 //		++ dmeCounter;
 //	}
 }
+
+
 
 
 #ifdef i2cUseDma
@@ -415,10 +438,9 @@ void I2C1_EV_IRQHandler(void)
 			uint8_t res; UNUSED(res);
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;    //   clearing addr needs be proceeded by read of SR2..??
-			UNUSED(res);
 			if (isCurrentByteSecondLastByte())   {
 				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
-				SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos);
+				setCr1Bit(I2C_CR1_STOP_Pos);
 			}
 		}
 #ifndef i2cUseDma    // dma maybe needs also active sending of stop
@@ -434,21 +456,16 @@ void I2C1_EV_IRQHandler(void)
 				// !!  isMessage.. must be done after receive...
 				if (isCurrentByteSecondLastByte() && isMessageTransferred())     {
 					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
-					SET_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
+					setCr1Bit( I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
 				}
 			}
 		}
 #endif
-		if (isMessageTransferred())  {
-			i2cSendStop(&hi2c1);
-			i2cFinishedOk();
-		}
-
 	}
-
-//	if ((itflags & I2C_FLAG_TRA) != 0)  {      //  todo check if  tra is the right flag....
-//		i2cFinishedOk();
-//	}
+	if (isMessageTransferred())  {
+		i2cSendStop(&hi2c1);
+		i2cFinishedOk();
+	}
 	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)|| (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_NACKF) != 0) )  {
 		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
 		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
@@ -593,13 +610,15 @@ static void MX_I2C1_Init(void)
 
 void initI2c()
 {
+	i2cInitNeeded = 0;
 	i2cSetDataIdle();
+//	memset(i2cErrorString,0,i2cErrorStringLength);
 	MX_I2C1_Init();
 	i2cInitialized = 1;
 }
 
 
-void reInitAfterFailure()
+void i2cReInitAfterFailure()
 {
   __HAL_I2C_DISABLE(&hi2c1);
 	hi2c1.Instance->CR1 |= I2C_CR1_SWRST;
