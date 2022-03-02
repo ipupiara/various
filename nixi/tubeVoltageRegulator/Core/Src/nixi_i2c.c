@@ -454,7 +454,6 @@ void I2C1_EV_IRQHandler(void)
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
-			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;    //   clearing addr needs be proceeded by read of SR2..??
 			if (isCurrentByteSecondLastByte())   {
 				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
 				setCr1Bit(I2C_CR1_STOP_Pos);
@@ -463,7 +462,7 @@ void I2C1_EV_IRQHandler(void)
 #ifndef i2cUseDma    // dma maybe needs also active sending of stop
 		if (! isMessageTransferred())  {
 			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
-				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
+// read only flag				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
 			}
 			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
 				sendNextI2CByte();
@@ -473,16 +472,17 @@ void I2C1_EV_IRQHandler(void)
 					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
 					setCr1Bit( I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
 				}
-				receiveNextI2CByte();
+				if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {  // btf cleared by read of sr1 followed by read/write of dr, if btf is set,
+					                                             //  so be sure here and read it again without any other action between
+					receiveNextI2CByte();
+				}
 			}
 		}
 #endif
-
 	}
 
 	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)) {
-		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
-		CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
+		__HAL_I2C_CLEAR_STOPFLAG(&hi2c1);
 		addToErrorString("STOP");
 		i2cError(0x96);
 	}
