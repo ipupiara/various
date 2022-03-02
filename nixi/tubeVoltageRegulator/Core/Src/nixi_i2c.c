@@ -76,11 +76,11 @@ void setCr1Bit(uint16_t bitPos)
 
 void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
-	__HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
-	if (__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_STOPF) == 1)   {
-		setCr1Bit( I2C_CR1_STOP);   // maybe not needed here
+	if ((hi2c->Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE) {
+	//	 __HAL_I2C_DISABLE(hi2c);
+		__HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
+		__HAL_I2C_DISABLE(hi2c);
 	}
-    __HAL_I2C_DISABLE(hi2c);
 }
 
 void i2cSetDataIdle()
@@ -427,6 +427,11 @@ uint8_t isCurrentByteSecondLastByte()
 	return  (i2cJobData.bufferCnt = (i2cJobData.amtChars - 1));
 }
 
+uint8_t isCurrentByteLastByte()
+{
+	return  (i2cJobData.bufferCnt = (i2cJobData.amtChars));
+}
+
 #endif
 
 
@@ -438,12 +443,16 @@ uint8_t isCurrentByteSecondLastByte()
 
 void I2C1_EV_IRQHandler(void)
 {
+	uint8_t res; UNUSED(res);
 	//  see datasheet  I2C -> functional description -> master receiver
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
+		if (isCurrentByteLastByte())  {
+				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
+				setCr1Bit(I2C_CR1_STOP_Pos);
+		}
 		writeAddressToDR();
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
-			uint8_t res; UNUSED(res);
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			res = __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY) ;    //   clearing addr needs be proceeded by read of SR2..??
 			if (isCurrentByteSecondLastByte())   {
@@ -460,25 +469,26 @@ void I2C1_EV_IRQHandler(void)
 				sendNextI2CByte();
 			} else
 			if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
-				receiveNextI2CByte();
-				if (isCurrentByteSecondLastByte() && isMessageTransferred())     {
+				if (isCurrentByteSecondLastByte() ){  // && isMessageTransferred())     {
 					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
 					setCr1Bit( I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
 				}
+				receiveNextI2CByte();
 			}
 		}
 #endif
-		if (isMessageTransferred())  {
-			i2cStopTransmission(&hi2c1);
-			i2cFinishedOk();
-		}
+
 	}
 
-//	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)|| (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_NACKF) != 0) )  {
 	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)) {
 		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
-//		__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
-//		  i2cError(0x77);
+		CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
+		addToErrorString("STOP");
+		i2cError(0x96);
+	}
+	if (isMessageTransferred())  {
+		i2cStopTransmission(&hi2c1);
+		i2cFinishedOk();
 	}
 }
 
