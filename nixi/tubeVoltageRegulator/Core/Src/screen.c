@@ -105,13 +105,15 @@ uint8_t  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
 	uint8_t res = 0;
 
+	uint8_t waitTime = sJob[currentStep].waitCs;
+
 	return res;
 
 }
 
 void screenCentiSecTimer ()
 {
-	screenJobType*  sJ;
+	screenJobType*  sJ = NULL;
 
 	CPU_IntDis();
 		if (jobState == jobActive) {
@@ -119,18 +121,12 @@ void screenCentiSecTimer ()
 		}
 	CPU_IntEn();
 
-	uint8_t res = screenCentiStepExecution(sJ->size,sJ->screenJob);
-	UNUSED(res);
+	if (sJ != NULL) {
+		uint8_t res = screenCentiStepExecution(sJ->size,sJ->screenJob);
+		UNUSED(res);
 
-//	if (sJ != NULL) {
-//		uint8_t  arraySz = sizeof(sJ);
-//		uint8_t waittime = sJ[currentStep].waitCs;
-////		t_fvoid func = sJ[currentStep].stepMethod;
-//		if (currentStep <= sizeof(sJ)) {
-//
-//			func();
-//		}
-//	}
+
+	}
 
 }
 
