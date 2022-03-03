@@ -9,6 +9,8 @@
 #define INC_SCREEN_H_
 
 
+void screenMillisecTimer ();
+
 void initScreen();
 
 

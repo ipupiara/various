@@ -21,6 +21,7 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include <cpu.h>
+#include <screen.h>
 
 
 extern ADC_HandleTypeDef hadc1;
@@ -30,6 +31,8 @@ extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim3;
+
+
 
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */
@@ -155,6 +158,7 @@ void SysTick_Handler(void)
 {
 
   HAL_IncTick();
+  screenMillisecTimer();
   if ((uwTick % 10) == 0){
 	  sec100Tick();
   }

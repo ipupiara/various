@@ -57,20 +57,20 @@ void addToErrorString(char* stri )
 #define addToErrorString( stri ) UNUSED( stri)
 #endif
 
-void setCr1Bit(uint16_t bitPos)
+void setCr1Bit(uint16_t bitMask)
 {
-	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos) != 0 )  {
-		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_STOP_Pos);
-	}
-	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_START_Pos) != 0 )  {
-		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_START_Pos);
-	}
-	if (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_PEC_Pos) != 0 )  {
-		CLEAR_BIT(hi2c1.Instance->CR1,I2C_CR1_PEC_Pos);
-	}
-	if ((READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP_Pos) != 0 ) &&
-	    (bitPos != I2C_CR1_STOP_Pos)) {
-			SET_BIT(hi2c1.Instance->CR1, bitPos);
+	/*
+	 *
+	 * Note: When the STOP, START or PEC bit is set, the software must not perform any write access
+to I2C_CR1 before this bit is cleared by hardware. Otherwise there is a risk of setting a
+second STOP, START or PEC request.  (datsheet-> i2c -> registers -> cr1 at the end)
+	 */
+
+	if ((READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP) == 0 )
+			&& (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_PEC ) == 0 )
+			&& (READ_BIT(hi2c1.Instance->CR1, I2C_CR1_STOP ) == 0 ) ) {
+
+			SET_BIT(hi2c1.Instance->CR1, bitMask);
 	}
 }
 
@@ -429,7 +429,7 @@ uint8_t isCurrentByteSecondLastByte()
 
 uint8_t isCurrentByteLastByte()
 {
-	return  (i2cJobData.bufferCnt = (i2cJobData.amtChars));
+	return  (i2cJobData.bufferCnt == (i2cJobData.amtChars));
 }
 
 #endif
@@ -446,17 +446,17 @@ void I2C1_EV_IRQHandler(void)
 	uint8_t res; UNUSED(res);
 	//  see datasheet  I2C -> functional description -> master receiver
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
-		if (isCurrentByteLastByte())  {
-				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
-				setCr1Bit(I2C_CR1_STOP_Pos);
-		}
+//		if (isCurrentByteLastByte())  {
+//				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );
+//				setCr1Bit(I2C_CR1_STOP );
+//		}
 		writeAddressToDR();
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			if (isCurrentByteSecondLastByte())   {
-				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);
-				setCr1Bit(I2C_CR1_STOP_Pos);
+				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );
+				setCr1Bit(I2C_CR1_STOP );
 			}
 		}
 #ifndef i2cUseDma    // dma maybe needs also active sending of stop
@@ -469,8 +469,8 @@ void I2C1_EV_IRQHandler(void)
 			} else
 			if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
 				if (isCurrentByteSecondLastByte() ){  // && isMessageTransferred())     {
-					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK_Pos);		//  clear ACK byte in ...
-					setCr1Bit( I2C_CR1_STOP_Pos); //  send stop  ((re-)start)
+					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );		//  clear ACK byte in ...
+					setCr1Bit( I2C_CR1_STOP ); //  send stop  ((re-)start)
 				}
 				if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {  // btf cleared by read of sr1 followed by read/write of dr, if btf is set,
 					                                             //  so be sure here and read it again without any other action between

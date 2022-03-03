@@ -1,5 +1,8 @@
 #include <main.h>
 #include <string.h>
+#include <nixi_i2c.h>
+
+//    wip   work in progress     ,    entry on own risk :-)
 
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -48,7 +51,39 @@
 #define write(REG)
 #define bool uint8_t
 
-void cmd(uint8_t comm)
+typedef  uint8_t   commandLineType [] ;
+
+commandLineType initCommand = {LCD_CLEARDISPLAY, LCD_ENTRYMODESET + LCD_ENTRYLEFT , LCD_DISPLAYCONTROL + LCD_DISPLAYON };
+
+typedef enum  {
+	waitActive,
+	waitInactive
+}  waitStates;
+uint8_t waitState;
+uint8_t nextWait;
+uint32_t  timeToWaitFor;
+
+void setNextWait(uint8_t ms)
+{
+
+}
+
+void screenMillisecTimer ()
+{
+	if (waitState == waitActive) {
+
+
+
+	}
+}
+
+void sendCommandLine(commandLineType cmd)
+{
+
+}
+
+
+void cmd(uint8_t pComm)
 {
 
 }
@@ -69,6 +104,7 @@ uint8_t 	_cols;
 uint8_t 	_rows ;
 uint8_t 	_charsize;
 uint8_t 	_backlightval;
+
 void  clear(){
 	cmd(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
 	delayMicroseconds(2000);  // this cmd takes a long time!
@@ -177,6 +213,8 @@ bool  getBacklight() {
 
 void initScreen()
 {
+	waitState = waitInactive;
+	setNextWait(100);
 
 }
 
