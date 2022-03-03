@@ -1,5 +1,6 @@
 
 #include <screen.h>
+#include <cpu.h>
 #include <main.h>
 #include <string.h>
 #include <nixi_i2c.h>
@@ -53,42 +54,85 @@
 #define write(REG)
 #define bool uint8_t
 
-void initFunctionSet();
+
+typedef enum {
+	jobActive,
+	jobInactive
+} jobStateEnum;
+
+jobStateEnum jobState;
+
 
 typedef void(*t_fvoid)(void);
 
 typedef struct {
-	uint8_t initWaitMs;
+	uint8_t waitCs;
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
+
+typedef struct {
+	uint8_t   size;
+	screenJobStepType  screenJob [];
+
+}screenJobType;
+
 /////////////////////////////  work in progress ,  access on on risk
 
 //commandLineType initCommand = {LCD_CLEARDISPLAY, LCD_ENTRYMODESET + LCD_ENTRYLEFT , LCD_DISPLAYCONTROL + LCD_DISPLAYON };
 
-uint8_t nextWait;
-uint32_t  timeToWaitFor;
+screenJobType *  currentScreenJob;
+uint8_t  currentStep;
 
-
-void initFunctionSet()
+uint8_t setNextScreenJob(screenJobType* sJob)
 {
-
-}
-
-void setNextWait(uint8_t ms)
-{
-
-}
-
-void screenMillisecTimer ()
-{
-	if (screenWaitState == screenWaitActive) {
-
-
-
+	uint8_t res = 0;  // todo  check that used inside privileged code, else no effect of method
+						//  see also F103 programming manual  cpsid instruction
+	CPU_IntDis();
+	if ( jobState == jobInactive) {
+		currentScreenJob = sJob;
+		currentStep = 0;
+		jobState = jobActive;
+		res = 1;
 	}
+	CPU_IntEn();
+
+	return res;
 }
 
 
+
+uint8_t  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
+{
+	uint8_t res = 0;
+
+	return res;
+
+}
+
+void screenCentiSecTimer ()
+{
+	screenJobType*  sJ;
+
+	CPU_IntDis();
+		if (jobState == jobActive) {
+			sJ = currentScreenJob;
+		}
+	CPU_IntEn();
+
+	uint8_t res = screenCentiStepExecution(sJ->size,sJ->screenJob);
+	UNUSED(res);
+
+//	if (sJ != NULL) {
+//		uint8_t  arraySz = sizeof(sJ);
+//		uint8_t waittime = sJ[currentStep].waitCs;
+////		t_fvoid func = sJ[currentStep].stepMethod;
+//		if (currentStep <= sizeof(sJ)) {
+//
+//			func();
+//		}
+//	}
+
+}
 
 
 void cmd(uint8_t pComm)
@@ -217,12 +261,29 @@ bool  getBacklight() {
   return _backlightval == LCD_BACKLIGHT;
 }
 
-screenJobStepType  initJob [2 ]=  { {100,initFunctionSet}, {200, initScreen} };
+void initScreenHW(void)
+{
+
+}
+
+void printHelloScreen(void)
+{
+
+}
+
+//screenJobStepType  initJob [2 ] =  { {100,initScreenHW}, {200, printHelloScreen} };
+
+screenJobType  initJob = {2, {{100,initScreenHW}, {200, printHelloScreen}}};
+
 
 void initScreen()
 {
-	screenWaitState = screenWaitInactive;
-	setNextWait(100);
+	currentScreenJob = NULL;
+	currentStep = 0;
+	jobState = jobInactive;
+	currentStep = 0;
+	setNextScreenJob(&initJob);
+
 
 }
 

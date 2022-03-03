@@ -54,6 +54,8 @@ void sec100Tick()
 {
 //	triggerAdc1();
 
+	  screenCentiSecTimer();
+
 	i2cSec100MsgPending = 1;
 }
 

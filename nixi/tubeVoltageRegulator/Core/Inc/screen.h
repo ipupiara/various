@@ -10,15 +10,10 @@
 #ifndef INC_SCREEN_H_
 #define INC_SCREEN_H_
 
-typedef enum  {
-	screenWaitActive,
-	screenWaitInactive
-}  waitStates;
 
-void screenMillisecTimer ();
+void screenCentiSecTimer ();
 
 void initScreen();
-uint8_t screenWaitState;
 
 
 #endif /* INC_SCREEN_H_ */

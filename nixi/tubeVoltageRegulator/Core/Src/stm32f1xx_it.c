@@ -21,7 +21,6 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include <cpu.h>
-#include <screen.h>
 
 
 extern ADC_HandleTypeDef hadc1;
@@ -159,9 +158,6 @@ void SysTick_Handler(void)
 
   HAL_IncTick();
 
-  if (screenWaitState == screenWaitActive) {
-	  screenMillisecTimer();
-  }
   if ((uwTick % 10) == 0){
 	  sec100Tick();
   }
