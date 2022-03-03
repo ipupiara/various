@@ -158,7 +158,10 @@ void SysTick_Handler(void)
 {
 
   HAL_IncTick();
-  screenMillisecTimer();
+
+  if (screenWaitState == screenWaitActive) {
+	  screenMillisecTimer();
+  }
   if ((uwTick % 10) == 0){
 	  sec100Tick();
   }

@@ -189,7 +189,7 @@ void writeAddressToDR()
 	}
 }
 
-void establishContactAndRun()
+uint8_t establishContactAndRun()
 {
 #ifdef i2cUseDma
 	if (i2cJobData.jobType == sendI2c) {
@@ -203,14 +203,37 @@ void establishContactAndRun()
 	}
 #endif
 
-	 uint8_t  arr [1];
-				  arr[0]=0xbb;
-	HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
+	uint8_t res = 0;
+
+
+	    if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_BUSY) == 0) ) {
+
+	    if ((hi2c1.Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE)
+	    {
+	      __HAL_I2C_ENABLE(&hi2c1);
+	    }
+
+	    CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_POS);
+
+	    __HAL_I2C_ENABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
+
+
+	    SET_BIT(hi2c1.Instance->CR1, I2C_CR1_START);
+
+	    return 1;
+	  }
+
+
+
+//	 uint8_t  arr [1];
+//				  arr[0]=0xbb;
+//	HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
 
 
 	// enable ack
 //	setCr1Bit( I2C_CR1_ACK);
 //	i2cSendStart(&hi2c1);
+	return res;
 }
 
 
@@ -236,6 +259,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 		establishContactAndRun();
 		res = 1;
 	}
+
 	return res;
 }
 

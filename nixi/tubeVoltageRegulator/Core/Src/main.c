@@ -118,11 +118,11 @@ int main(void)
 	   if (i2cSec100MsgPending != 0){
 
 		   i2cSec100MsgPending = 0;
-//		   uint8_t  arr [1];
-//		  arr[0]=0xbb;
-//		  sendI2cByteArray(0x11,arr,0);
-		uint8_t stri [] = {};
-			   sendI2cByteArray(0x3c,stri,strlen((char*)stri));
+		   uint8_t  arr [1];
+		  arr[0]=0xbb;
+		  sendI2cByteArray(0x11,arr,0);
+//		uint8_t stri [] = {};
+//			   sendI2cByteArray(0x3c,stri,strlen((char*)stri));
 
 	   }
 	   if (i2cMessageReceived != 0)  {

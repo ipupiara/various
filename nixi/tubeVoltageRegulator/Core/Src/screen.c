@@ -1,3 +1,5 @@
+
+#include <screen.h>
 #include <main.h>
 #include <string.h>
 #include <nixi_i2c.h>
@@ -51,17 +53,26 @@
 #define write(REG)
 #define bool uint8_t
 
-typedef  uint8_t   commandLineType [] ;
+void initFunctionSet();
 
-commandLineType initCommand = {LCD_CLEARDISPLAY, LCD_ENTRYMODESET + LCD_ENTRYLEFT , LCD_DISPLAYCONTROL + LCD_DISPLAYON };
+typedef void(*t_fvoid)(void);
 
-typedef enum  {
-	waitActive,
-	waitInactive
-}  waitStates;
-uint8_t waitState;
+typedef struct {
+	uint8_t initWaitMs;
+	t_fvoid  stepMethod ;
+} screenJobStepType ;
+/////////////////////////////  work in progress ,  access on on risk
+
+//commandLineType initCommand = {LCD_CLEARDISPLAY, LCD_ENTRYMODESET + LCD_ENTRYLEFT , LCD_DISPLAYCONTROL + LCD_DISPLAYON };
+
 uint8_t nextWait;
 uint32_t  timeToWaitFor;
+
+
+void initFunctionSet()
+{
+
+}
 
 void setNextWait(uint8_t ms)
 {
@@ -70,17 +81,14 @@ void setNextWait(uint8_t ms)
 
 void screenMillisecTimer ()
 {
-	if (waitState == waitActive) {
+	if (screenWaitState == screenWaitActive) {
 
 
 
 	}
 }
 
-void sendCommandLine(commandLineType cmd)
-{
 
-}
 
 
 void cmd(uint8_t pComm)
@@ -209,11 +217,11 @@ bool  getBacklight() {
   return _backlightval == LCD_BACKLIGHT;
 }
 
-
+screenJobStepType  initJob [2 ]=  { {100,initFunctionSet}, {200, initScreen} };
 
 void initScreen()
 {
-	waitState = waitInactive;
+	screenWaitState = screenWaitInactive;
 	setNextWait(100);
 
 }
