@@ -6,6 +6,7 @@
 #include <nixi_i2c.h>
 
 //    wip   work in progress     ,    entry on own risk :-)
+/////////////////////////////  work in progress ,  access on on risk
 
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -56,22 +57,13 @@
 #define LCD_AsciiControlByte		0x40
 #define LCD_CommandControlByte      0x00
 
-
-//#define cmd(REG)
-//#define expanderWrite(REG)
-//#define write(REG)
-//#define bool uint8_t
-
-
 typedef enum {
 	jobActive,
 	jobInactive
 } jobStateEnum;
 
-jobStateEnum jobState;
-
-
 typedef void(*t_fvoid)(void);
+
 
 typedef struct {
 	uint8_t waitCs;
@@ -84,10 +76,15 @@ typedef struct {
 
 }screenJobType;
 
-/////////////////////////////  work in progress ,  access on on risk
-
 
 typedef uint8_t commandLineType [];
+
+typedef void(*t_fPar)(commandLineType* pCmdLine);
+
+jobStateEnum jobState;
+screenJobType *  currentScreenJob;
+uint8_t  currentStep;
+uint8_t  currentWaitCycle;
 
 
 uint8_t sendI2cScreenCommand(uint8_t* cmd)
@@ -96,10 +93,6 @@ uint8_t sendI2cScreenCommand(uint8_t* cmd)
 	sendI2cByteArray(0x3c,cmd,strlen((char*)cmd));
 	return res;
 }
-
-screenJobType *  currentScreenJob;
-uint8_t  currentStep;
-uint8_t  currentWaitCycle;
 
 uint8_t setNextScreenJob(screenJobType* sJob)
 {
@@ -156,38 +149,43 @@ void screenCentiSecTimer ()
 
 void initScreenFuntionSet(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS,0x00};
 	sendI2cScreenCommand(initCommand);
 }
 
 
 void initDisplayControl(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON };
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON,0x00 };
 	sendI2cScreenCommand(initCommand);
 }
 
 void clearDisplay(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY };
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY,0x00 };
 	sendI2cScreenCommand(initCommand);
 }
 
 void initEntryModeSet(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT };
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT,0x00 };
 	sendI2cScreenCommand(initCommand);
 }
 
 void helloScreen(void)
 {
-	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte,0x00};
 	strcat((char*) initCommand,"tubeVoltageRegulator");
 	sendI2cScreenCommand(initCommand);
 }
 
-
-//screenJobStepType  initJob [2 ] =  { {100,initScreenHW}, {200, printHelloScreen} };
+// experimental, question is what needs more ram / flash
+void anotherScreen (commandLineType** pCmdLine)
+{
+	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte,0x00};
+	strcat((char*) initCommand,"tubeVoltageRegulator");
+	*pCmdLine= &initCommand;
+}
 
 screenJobType  initJob = {5, {{50,initScreenFuntionSet}, {10, initDisplayControl}, {10, clearDisplay}, {10, initEntryModeSet}, {10, helloScreen}}};
 
@@ -197,7 +195,7 @@ void initScreen()
 	currentScreenJob = NULL;
 	currentStep = 0;
 	jobState = jobInactive;
-	currentStep = 0;
+	currentWaitCycle = 0;
 	setNextScreenJob(&initJob);
 
 
