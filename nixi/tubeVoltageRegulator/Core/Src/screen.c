@@ -48,11 +48,19 @@
 #define LCD_BACKLIGHT 0x08
 #define LCD_NOBACKLIGHT 0x00
 
+//  control bytes
+#define LCD_ContinuousControlByte  0x80
+#define LCD_LastControlByte			0x00
+
+//  flags for control bytes
+#define LCD_AsciiControlByte		0x40
+#define LCD_CommandControlByte      0x00
+
 
 //#define cmd(REG)
-#define expanderWrite(REG)
-#define write(REG)
-#define bool uint8_t
+//#define expanderWrite(REG)
+//#define write(REG)
+//#define bool uint8_t
 
 
 typedef enum {
@@ -78,10 +86,20 @@ typedef struct {
 
 /////////////////////////////  work in progress ,  access on on risk
 
-//commandLineType initCommand = {LCD_CLEARDISPLAY, LCD_ENTRYMODESET + LCD_ENTRYLEFT , LCD_DISPLAYCONTROL + LCD_DISPLAYON };
+
+typedef uint8_t commandLineType [];
+
+
+uint8_t sendI2cScreenCommand(uint8_t* cmd)
+{
+	uint8_t res = 0;
+	sendI2cByteArray(0x3c,cmd,strlen((char*)cmd));
+	return res;
+}
 
 screenJobType *  currentScreenJob;
 uint8_t  currentStep;
+uint8_t  currentWaitCycle;
 
 uint8_t setNextScreenJob(screenJobType* sJob)
 {
@@ -91,6 +109,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 	if ( jobState == jobInactive) {
 		currentScreenJob = sJob;
 		currentStep = 0;
+		currentWaitCycle = 0;
 		jobState = jobActive;
 		res = 1;
 	}
@@ -99,16 +118,16 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 	return res;
 }
 
-
-
-uint8_t  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
+void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
-	uint8_t res = 0;
-
 	uint8_t waitTime = sJob[currentStep].waitCs;
-
-	return res;
-
+	if (currentWaitCycle < waitTime) {
+		++ currentWaitCycle;
+	} else {
+		sJob [currentStep].stepMethod();
+		currentWaitCycle = 0;
+		++ currentStep;
+	}
 }
 
 void screenCentiSecTimer ()
@@ -122,154 +141,55 @@ void screenCentiSecTimer ()
 	CPU_IntEn();
 
 	if (sJ != NULL) {
-		uint8_t res = screenCentiStepExecution(sJ->size,sJ->screenJob);
-		UNUSED(res);
+		screenCentiStepExecution(sJ->size,sJ->screenJob);
 
-
-	}
-
-}
-
-
-void cmd(uint8_t pComm)
-{
-
-}
-
-
-void delayMicroseconds()
-{
-
-}
-
-	uint8_t _displayfunction;
-	uint8_t _displaycontrol;
-	uint8_t _displaymode;
-
-
-uint8_t _addr;
-uint8_t 	_cols;
-uint8_t 	_rows ;
-uint8_t 	_charsize;
-uint8_t 	_backlightval;
-
-void  clear(){
-	cmd(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
-	delayMicroseconds(2000);  // this cmd takes a long time!
-}
-
-void  home(){
-	cmd(LCD_RETURNHOME);  // set cursor position to zero
-	delayMicroseconds(2000);  // this cmd takes a long time!
-}
-
-void  setCursor(uint8_t col, uint8_t row){
-	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-	if (row > _rows) {
-		row = _rows-1;    // we count rows starting w/0
-	}
-	cmd(LCD_SETDDRAMADDR | (col + row_offsets[row]));
-}
-
-// Turn the display on/off (quickly)
-void  noDisplay() {
-	_displaycontrol &= ~LCD_DISPLAYON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-void  display() {
-	_displaycontrol |= LCD_DISPLAYON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-// Turns the underline cursor on/off
-void  noCursor() {
-	_displaycontrol &= ~LCD_CURSORON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-void  cursor() {
-	_displaycontrol |= LCD_CURSORON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-// Turn on and off the blinking cursor
-void  noBlink() {
-	_displaycontrol &= ~LCD_BLINKON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-void  blink() {
-	_displaycontrol |= LCD_BLINKON;
-	cmd(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-// These cmds scroll the display without changing the RAM
-void  scrollDisplayLeft(void) {
-	cmd(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
-}
-void  scrollDisplayRight(void) {
-	cmd(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
-}
-
-// This is for text that flows Left to Right
-void  leftToRight(void) {
-	_displaymode |= LCD_ENTRYLEFT;
-	cmd(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This is for text that flows Right to Left
-void  rightToLeft(void) {
-	_displaymode &= ~LCD_ENTRYLEFT;
-	cmd(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This will 'right justify' text from the cursor
-void  autoscroll(void) {
-	_displaymode |= LCD_ENTRYSHIFTINCREMENT;
-	cmd(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This will 'left justify' text from the cursor
-void  noAutoscroll(void) {
-	_displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
-	cmd(LCD_ENTRYMODESET | _displaymode);
-}
-
-// Allows us to fill the first 8 CGRAM locations
-// with custom characters
-void  createChar(uint8_t location, uint8_t charmap[]) {
-	location &= 0x7; // we only have 8 locations 0-7
-	cmd(LCD_SETCGRAMADDR | (location << 3));
-	for (int i=0; i<8; i++) {
-		write(charmap[i]);
+		if (currentStep >= sJ->size) {
+			CPU_IntDis();
+			currentScreenJob = NULL;
+			currentWaitCycle = 0;
+			currentStep = 0;
+			jobState = jobInactive;
+			CPU_IntEn();
+		}
 	}
 }
 
-// Turn the (optional) backlight off/on
-void  noBacklight(void) {
-	_backlightval=LCD_NOBACKLIGHT;
-	expanderWrite(0);
-}
-
-void  backlight(void) {
-	_backlightval=LCD_BACKLIGHT;
-	expanderWrite(0);
-}
-bool  getBacklight() {
-  return _backlightval == LCD_BACKLIGHT;
-}
-
-void initScreenHW(void)
+void initScreenFuntionSet(void)
 {
-
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
+	sendI2cScreenCommand(initCommand);
 }
 
-void printHelloScreen(void)
+
+void initDisplayControl(void)
 {
-
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON };
+	sendI2cScreenCommand(initCommand);
 }
+
+void clearDisplay(void)
+{
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY };
+	sendI2cScreenCommand(initCommand);
+}
+
+void initEntryModeSet(void)
+{
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT };
+	sendI2cScreenCommand(initCommand);
+}
+
+void helloScreen(void)
+{
+	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	strcat((char*) initCommand,"tubeVoltageRegulator");
+	sendI2cScreenCommand(initCommand);
+}
+
 
 //screenJobStepType  initJob [2 ] =  { {100,initScreenHW}, {200, printHelloScreen} };
 
-screenJobType  initJob = {2, {{100,initScreenHW}, {200, printHelloScreen}}};
+screenJobType  initJob = {5, {{50,initScreenFuntionSet}, {10, initDisplayControl}, {10, clearDisplay}, {10, initEntryModeSet}, {10, helloScreen}}};
 
 
 void initScreen()
