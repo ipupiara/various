@@ -106,9 +106,16 @@ void addToByteArray(pByteArrayT pBary,uint8_t sz, uint8_t  arr [sz])
 	if (pBary->len + sz <= byteArrayMaxSz)  {
 		toMove = sz;
 	}else  {
-		toMove = byteArrayMaxSz - pBary->len;
+		toMove = byteArrayMaxSz - pBary->len ;
 	}
-	memmove(pBary->buffer,arr,toMove);  //   todo   fix destination calculation now worng
+//	uint8_t i1;
+//	for (i1 = 0; i1 < toMove; ++ i1) {
+//		pBary->buffer[pBary->len] = arr[i1];
+//		++pBary->len;
+//	}
+
+	memmove(&(pBary->buffer[pBary->len]),arr,toMove);
+	pBary->len += toMove;
 }
 
 byteArrayT byteBuffer;
