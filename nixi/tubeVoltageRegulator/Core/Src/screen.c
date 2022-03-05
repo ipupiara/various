@@ -18,8 +18,8 @@
 #define LCD_SETDDRAMADDR 0x80
 
 // flags for display entry mode
-#define LCD_ENTRYRIGHT 0x00
-#define LCD_ENTRYLEFT 0x02
+#define LCD_CURSORLEFTADRDEC 0x00
+#define LCD_CURSORRIGHTADRINC 0x02
 #define LCD_ENTRYSHIFTINCREMENT 0x01
 #define LCD_ENTRYSHIFTDECREMENT 0x00
 
@@ -69,6 +69,8 @@ typedef void(*t_fvoid)(void);
 
 typedef struct {
 	uint8_t waitCs;
+	uint8_t x;
+	uint8_t y;
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
@@ -183,35 +185,51 @@ void screenCentiSecTimer ()
 	}
 }
 
-void initScreenFuntionSet(void)
+uint8_t lines [4] = {0x00, 0x40, 0x14, 0x54};
+
+uint8_t getDdramAdr(uint8_t xPos, uint8_t yPos)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
-	addToByteArray(&byteBuffer, 2, initCommand);
+	uint8_t res = lines [yPos - 1];
+	res += xPos - 1;
+	return res;
 }
 
+void initScreenFuntionSet(void)
+{
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
+	addToByteArray(&byteBuffer, 2, cmd);
+}
 
 void initDisplayControl(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON };
-	addToByteArray(&byteBuffer, 2, initCommand);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON + LCD_CURSORON + LCD_BLINKON};
+	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void clearDisplay(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY};
-	addToByteArray(&byteBuffer, 2, initCommand);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY};
+	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void initEntryModeSet(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT };
-	addToByteArray(&byteBuffer, 2, initCommand);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_CURSORRIGHTADRINC };
+	addToByteArray(&byteBuffer, 2, cmd);
+}
+
+void setcursor(void)
+{
+	uint8_t adr = 0x00;
+	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].x, currentScreenJob->screenJobSteps[currentStepIndex].y);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
+	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void helloScreen(void)
 {
-	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
-	addToByteArray(&byteBuffer, 3, initCommand);
+	commandLineType cmd = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 3, cmd);
 	char* stri = "tubeVoltageRegulator";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
@@ -219,14 +237,14 @@ void helloScreen(void)
 //   handling of needed waitStates could as well be done on display itself (encapsulation principle) ...  ??
 void anotherScreen (commandLineType** pCmdLine)
 {
-	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
-	addToByteArray(&byteBuffer, 3, initCommand);
+	commandLineType cmd = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 3, cmd);
 	char* stri = "tubeVoltageRegulator";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
 
 
-screenJobType  initJob = {5, {{50,initScreenFuntionSet}, {10, initDisplayControl}, {10, clearDisplay}, {10, initEntryModeSet}, {10, helloScreen}}};
+screenJobType  initJob = {5, {{50,0,0,initScreenFuntionSet}, {10,0,0, initDisplayControl}, {10,0,0, clearDisplay}, {10,0,0, initEntryModeSet}, {10,0,0, helloScreen}}};
 
 
 void initScreen()
