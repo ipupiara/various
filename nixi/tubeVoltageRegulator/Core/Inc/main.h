@@ -32,6 +32,8 @@ extern "C" {
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_gpio.h"
 
+#define screenI2cAddress 0x3c
+
 void setDebugOneOn();
 void setDebugOneOff();
 void toggleDebugOne();

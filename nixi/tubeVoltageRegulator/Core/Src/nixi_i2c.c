@@ -277,10 +277,6 @@ uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pString,uint8_t amtChars)
 	return res;
 }
 
-
-
-
-
 void incDMAErrorCounter(DMA_HandleTypeDef *hdma)
 {
 //	if (__HAL_DMA_GET_FLAG(hdma,__HAL_DMA_GET_TE_FLAG_INDEX(hdma))) {

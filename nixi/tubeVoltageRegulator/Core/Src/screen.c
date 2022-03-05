@@ -57,6 +57,8 @@
 #define LCD_AsciiControlByte		0x40
 #define LCD_CommandControlByte      0x00
 
+#define byteArrayMaxSz   80
+
 typedef enum {
 	jobActive,
 	jobInactive
@@ -71,8 +73,8 @@ typedef struct {
 } screenJobStepType ;
 
 typedef struct {
-	uint8_t   size;
-	screenJobStepType  screenJob [];
+	uint8_t   amtJobSteps;
+	screenJobStepType  screenJobSteps [];
 
 }screenJobType;
 
@@ -81,29 +83,54 @@ typedef uint8_t commandLineType [];
 
 typedef void(*t_fPar)(commandLineType* pCmdLine);
 
+typedef struct  {
+	uint8_t len;
+	uint8_t buffer [byteArrayMaxSz];
+} byteArrayT;
+
+typedef byteArrayT* pByteArrayT;
+
 jobStateEnum jobState;
 screenJobType *  currentScreenJob;
-uint8_t  currentStep;
+uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
+void clear(pByteArrayT pBary)
+{
+	memset(pBary,0,byteArrayMaxSz);
+}
 
-uint8_t sendI2cScreenCommand(uint8_t* cmd)
+void addToByteArray(pByteArrayT pBary,uint8_t sz, uint8_t  arr [sz])
+{
+	uint8_t toMove;
+	if (pBary->len + sz <= byteArrayMaxSz)  {
+		toMove = sz;
+	}else  {
+		toMove = byteArrayMaxSz - pBary->len;
+	}
+	memmove(pBary->buffer,arr,toMove);  //   todo   fix destination calculation now worng
+}
+
+byteArrayT byteBuffer;
+
+
+uint8_t sendI2cScreenCommand()
 {
 	uint8_t res = 0;
-	res = strlen((char*)cmd);  // just now for debug, remove later;
-	sendI2cByteArray(0x3c,cmd,strlen((char*)cmd));
+	res = sendI2cByteArray(screenI2cAddress,byteBuffer.buffer ,byteBuffer.len);
 	return res;
 }
 
 uint8_t setNextScreenJob(screenJobType* sJob)
 {
 	uint8_t res = 0;  // todo  check that used inside privileged code, else no effect of method
-						//  see also F103 programming manual  cpsid instruction
+						//  see also F103 programming manual  cpsid instruction, also check primask values... confusings??...
 	CPU_IntDis();
 	if ( jobState == jobInactive) {
 		currentScreenJob = sJob;
-		currentStep = 0;
+		currentStepIndex = 0;
 		currentWaitCycle = 0;
+		clear(&byteBuffer);
 		jobState = jobActive;
 		res = 1;
 	}
@@ -114,34 +141,35 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 
 void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
-	uint8_t waitTime = sJob[currentStep].waitCs;
+	uint8_t waitTime = sJob[currentStepIndex].waitCs;
 	if (currentWaitCycle < waitTime) {
 		++ currentWaitCycle;
 	} else {
-		sJob [currentStep].stepMethod();
+		sJob [currentStepIndex].stepMethod();
+
 		currentWaitCycle = 0;
-		++ currentStep;
+		++ currentStepIndex;
 	}
 }
 
 void screenCentiSecTimer ()
 {
-	screenJobType*  sJ = NULL;
+	screenJobType*  screenJob = NULL;
 
 	CPU_IntDis();
 		if (jobState == jobActive) {
-			sJ = currentScreenJob;
+			screenJob = currentScreenJob;
 		}
 	CPU_IntEn();
 
-	if (sJ != NULL) {
-		screenCentiStepExecution(sJ->size,sJ->screenJob);
+	if (screenJob != NULL) {
+		screenCentiStepExecution(screenJob->amtJobSteps,screenJob->screenJobSteps);
 
-		if (currentStep >= sJ->size) {
+		if (currentStepIndex >= screenJob->amtJobSteps) {
 			CPU_IntDis();
 			currentScreenJob = NULL;
 			currentWaitCycle = 0;
-			currentStep = 0;
+			currentStepIndex = 0;
 			jobState = jobInactive;
 			CPU_IntEn();
 		}
@@ -150,43 +178,46 @@ void screenCentiSecTimer ()
 
 void initScreenFuntionSet(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS,0x00};
-	sendI2cScreenCommand(initCommand);
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
+	addToByteArray(&byteBuffer, 2, initCommand);
 }
 
 
 void initDisplayControl(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON,0x00 };
-	sendI2cScreenCommand(initCommand);
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON };
+	addToByteArray(&byteBuffer, 2, initCommand);
 }
 
 void clearDisplay(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY,0x00 };
-	sendI2cScreenCommand(initCommand);
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_CLEARDISPLAY};
+	addToByteArray(&byteBuffer, 2, initCommand);
 }
 
 void initEntryModeSet(void)
 {
-	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT,0x00 };
-	sendI2cScreenCommand(initCommand);
+	commandLineType initCommand = {LCD_LastControlByte + LCD_CommandControlByte,LCD_ENTRYMODESET + LCD_ENTRYLEFT };
+	addToByteArray(&byteBuffer, 2, initCommand);
 }
 
 void helloScreen(void)
 {
-	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte,0x00};
-	strcat((char*) initCommand,"tubeVoltageRegulator");
-	sendI2cScreenCommand(initCommand);
+	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 3, initCommand);
+	char* stri = "tubeVoltageRegulator";
+	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
-
-// experimental, question is what needs more ram / flash
+//  experimental   question: how much can be sent together with i2c without performing wait states,
+//   handling of needed waitStates could as well be done on display itself (encapsulation principle) ...  ??
 void anotherScreen (commandLineType** pCmdLine)
 {
-	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte,0x00};
-	strcat((char*) initCommand,"tubeVoltageRegulator");
-	*pCmdLine= &initCommand;
+	commandLineType initCommand = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 3, initCommand);
+	char* stri = "tubeVoltageRegulator";
+	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
+
 
 screenJobType  initJob = {5, {{50,initScreenFuntionSet}, {10, initDisplayControl}, {10, clearDisplay}, {10, initEntryModeSet}, {10, helloScreen}}};
 
@@ -194,9 +225,10 @@ screenJobType  initJob = {5, {{50,initScreenFuntionSet}, {10, initDisplayControl
 void initScreen()
 {
 	currentScreenJob = NULL;
-	currentStep = 0;
+	currentStepIndex = 0;
 	jobState = jobInactive;
 	currentWaitCycle = 0;
+	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 
 

@@ -56,7 +56,7 @@ void sec100Tick()
 
 	  screenCentiSecTimer();
 
-	i2cSec100MsgPending = 1;
+//	i2cSec100MsgPending = 1;
 }
 
 
@@ -129,7 +129,8 @@ int main(void)
 
 	   }
 	   if (sec100Event == 1)  {
-
+		   	  sec100Event = 0;
+		   	  sec100Tick();
 	   }
 	   if (i2cMessageReceived != 0)  {
 		   if (i2cMessageReceived == 1) {
