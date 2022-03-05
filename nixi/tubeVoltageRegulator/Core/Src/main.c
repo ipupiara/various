@@ -97,6 +97,7 @@ void initVariables()
 	lastADCResult = 0;
 	i2cSec100MsgPending = 0;
 	hvPwmState = hvPwmIdle;
+	sec100Event = 0;
 }
 
 int main(void)
@@ -127,6 +128,9 @@ int main(void)
 //			   sendI2cByteArray(0x3c,stri,strlen((char*)stri));
 
 	   }
+	   if (sec100Event == 1)  {
+
+	   }
 	   if (i2cMessageReceived != 0)  {
 		   if (i2cMessageReceived == 1) {
 
@@ -134,6 +138,10 @@ int main(void)
 
 		   }
 		   i2cMessageReceived = 0;
+	   }
+	   if (i2cInitNeeded == 1) {
+	   		   i2cInitNeeded = 0;
+	   		   i2cReInitAfterFailure();
 	   }
 	   if (i2cMessageSent != 0)  {
 		   if (i2cMessageSent == 1) {
@@ -143,10 +151,7 @@ int main(void)
 		   }
 		   i2cMessageSent = 0;
 	   }
-	   if (i2cInitNeeded == 1) {
-		   i2cInitNeeded = 0;
-		   i2cReInitAfterFailure();
-	   }
+
   }
 
 }

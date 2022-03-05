@@ -159,7 +159,7 @@ void SysTick_Handler(void)
   HAL_IncTick();
 
   if ((uwTick % 10) == 0){
-	  sec100Tick();
+	  sec100Event = 1;
   }
 }
 

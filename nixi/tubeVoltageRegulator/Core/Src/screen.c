@@ -90,6 +90,7 @@ uint8_t  currentWaitCycle;
 uint8_t sendI2cScreenCommand(uint8_t* cmd)
 {
 	uint8_t res = 0;
+	res = strlen((char*)cmd);  // just now for debug, remove later;
 	sendI2cByteArray(0x3c,cmd,strlen((char*)cmd));
 	return res;
 }
