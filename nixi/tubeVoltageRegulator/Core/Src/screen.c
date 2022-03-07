@@ -57,6 +57,10 @@
 #define LCD_AsciiControlByte		0x40
 #define LCD_CommandControlByte      0x00
 
+#define waitShortCs   	2
+#define waitMediumCs		5
+#define waitLongCs		120
+
 #define byteArrayMaxSz   80
 
 typedef enum {
@@ -127,6 +131,7 @@ uint8_t sendI2cScreenCommand()
 {
 	uint8_t res = 0;
 	res = sendI2cByteArray(screenI2cAddress,byteBuffer.buffer ,byteBuffer.len);
+	clear(&byteBuffer);
 	return res;
 }
 
@@ -197,7 +202,7 @@ uint8_t getDdramAdr(uint8_t xPos, uint8_t yPos)
 void initScreenFuntionSet(void)
 {
 	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
-	addToByteArray(&byteBuffer, 2, cmd);
+	addToByteArray(&byteBuffer, waitShortCs, cmd);
 }
 
 void initDisplayControl(void)
@@ -218,12 +223,12 @@ void initEntryModeSet(void)
 	addToByteArray(&byteBuffer, 2, cmd);
 }
 
-void setcursor(void)
+void setCursor(void)
 {
 	uint8_t adr = 0x00;
 	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].x, currentScreenJob->screenJobSteps[currentStepIndex].y);
-	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
-	addToByteArray(&byteBuffer, 2, cmd);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR , adr };
+	addToByteArray(&byteBuffer, 3, cmd);
 }
 
 void helloScreen(void)
@@ -243,8 +248,19 @@ void anotherScreen (commandLineType** pCmdLine)
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
 
+void paintHello()
+{
+	char* stri = "tubeVoltageRegulator";
+	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
+}
 
-screenJobType  initJob = {5, {{50,0,0,initScreenFuntionSet}, {10,0,0, initDisplayControl}, {10,0,0, clearDisplay}, {10,0,0, initEntryModeSet}, {10,0,0, helloScreen}}};
+screenJobType  initJob = {5, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortCs,0,0, initDisplayControl}, {waitShortCs,0,0, clearDisplay},
+								{waitShortCs,0,0, initEntryModeSet}, {waitShortCs,0,0, helloScreen}}};
+
+screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
+							, {waitShortCs,2,0,setCursor}, {waitShortCs,0,0, paintHello}
+							, {waitShortCs,3,0,setCursor}, {waitShortCs,0,0, paintHello}
+							, {waitShortCs,4,0,setCursor}, {waitShortCs,0,0, paintHello}}};
 
 
 void initScreen()
@@ -255,7 +271,6 @@ void initScreen()
 	currentWaitCycle = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
-
-
+	setNextScreenJob(&testPaint);
 }
 
