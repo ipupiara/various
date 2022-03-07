@@ -160,7 +160,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 		++ currentWaitCycle;
 	} else {
 		sJob [currentStepIndex].stepMethod();
-
+		sendI2cScreenCommand();
 		currentWaitCycle = 0;
 		++ currentStepIndex;
 	}
@@ -246,6 +246,11 @@ void anotherScreen (commandLineType** pCmdLine)
 	addToByteArray(&byteBuffer, 3, cmd);
 	char* stri = "tubeVoltageRegulator";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
+}
+
+void emptyWait()
+{
+
 }
 
 void paintHello()
