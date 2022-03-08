@@ -100,6 +100,8 @@ void initVariables()
 	sec100Event = 0;
 }
 
+uint8_t debugTrigger;			// can be used for any needed kind of debugging
+
 int main(void)
 {
 	initVariables();
@@ -151,6 +153,11 @@ int main(void)
 
 		   }
 		   i2cMessageSent = 0;
+	   }
+	   if (debugTrigger == 1) {
+		 debugTrigger = 0;
+
+		 setDebugScreenJob();
 	   }
 
   }

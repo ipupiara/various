@@ -15,5 +15,6 @@ void screenCentiSecTimer ();
 
 void initScreen();
 
+void setDebugScreenJob();
 
 #endif /* INC_SCREEN_H_ */

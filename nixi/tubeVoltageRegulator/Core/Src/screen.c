@@ -227,8 +227,8 @@ void setCursor(void)
 {
 	uint8_t adr = 0x00;
 	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].x, currentScreenJob->screenJobSteps[currentStepIndex].y);
-	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR , adr };
-	addToByteArray(&byteBuffer, 3, cmd);
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
+	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void helloScreen(void)
@@ -268,6 +268,11 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 							, {waitShortCs,4,0,setCursor}, {waitShortCs,0,0, paintHello}}};
 
 
+void setDebugScreenJob()
+{
+	setNextScreenJob(&testPaint);
+}
+
 void initScreen()
 {
 	currentScreenJob = NULL;
@@ -276,6 +281,5 @@ void initScreen()
 	currentWaitCycle = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
-	setNextScreenJob(&testPaint);
 }
 
