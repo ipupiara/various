@@ -69,11 +69,11 @@ enum {
 	hvPwmRunning
 };
 
-uint8_t  i2cMessageReceived;
-uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
+extern uint8_t  i2cMessageReceived;
+extern uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
-uint8_t  sec100Event;
-uint8_t  hvPwmState;
+extern uint8_t  sec100Event;
+extern uint8_t  hvPwmState;
 
 /* USER CODE END EFP */
 

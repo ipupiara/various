@@ -73,8 +73,8 @@ typedef void(*t_fvoid)(void);
 
 typedef struct {
 	uint8_t waitCs;
-	uint8_t x;
-	uint8_t y;
+	uint8_t xPos;
+	uint8_t yPos;
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
@@ -100,6 +100,9 @@ jobStateEnum jobState;
 screenJobType *  currentScreenJob;
 uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
+
+uint8_t centiSecCounter;		//  variables used for debugging
+uint8_t useCentiSecCounter;    //  variables used for debugging
 
 void clear(pByteArrayT pBary)
 {
@@ -166,6 +169,8 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 	}
 }
 
+
+
 void screenCentiSecTimer ()
 {
 	screenJobType*  screenJob = NULL;
@@ -186,6 +191,14 @@ void screenCentiSecTimer ()
 			currentStepIndex = 0;
 			jobState = jobInactive;
 			CPU_IntEn();
+		}
+	}
+	if (useCentiSecCounter == 1) {
+		if (centiSecCounter == 50)  {
+			centiSecCounter = 0;
+			setHalloPaintJob();
+		} else  {
+			++ centiSecCounter;
 		}
 	}
 }
@@ -226,7 +239,7 @@ void initEntryModeSet(void)
 void setCursor(void)
 {
 	uint8_t adr = 0x00;
-	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].x, currentScreenJob->screenJobSteps[currentStepIndex].y);
+	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].xPos, currentScreenJob->screenJobSteps[currentStepIndex].yPos);
 	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
 	addToByteArray(&byteBuffer, 2, cmd);
 }
@@ -267,11 +280,18 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 							, {waitShortCs,3,0,setCursor}, {waitShortCs,0,0, paintHello}
 							, {waitShortCs,4,0,setCursor}, {waitShortCs,0,0, paintHello}}};
 
+screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
 void setDebugScreenJob()
 {
 	setNextScreenJob(&testPaint);
 }
+
+void setHalloPaintJob()
+{
+	setNextScreenJob(&halloPaint);
+}
+
 
 void initScreen()
 {
@@ -279,6 +299,8 @@ void initScreen()
 	currentStepIndex = 0;
 	jobState = jobInactive;
 	currentWaitCycle = 0;
+	centiSecCounter = 0;
+	useCentiSecCounter = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 }

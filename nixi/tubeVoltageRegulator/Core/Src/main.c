@@ -40,7 +40,11 @@ TIM_HandleTypeDef htim2;
 #define debugPin1_GPIO_Port GPIOC
 #endif
 
+uint8_t  i2cMessageReceived;
+uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
+uint8_t  sec100Event;
+uint8_t  hvPwmState;
 
 
 void SystemClock_Config(void);
@@ -54,9 +58,9 @@ void sec100Tick()
 {
 //	triggerAdc1();
 
-	  screenCentiSecTimer();
+//	  screenCentiSecTimer();
 
-//	i2cSec100MsgPending = 1;
+	i2cSec100MsgPending = 1;
 }
 
 
@@ -108,6 +112,13 @@ int main(void)
 
 	HAL_Init();
 
+	uint32_t prevTick = uwTick;
+	while (uwTick < prevTick + 5000) {
+
+	}
+
+
+
   SystemClock_Config();
 
 
@@ -115,7 +126,7 @@ int main(void)
 //  MX_TIM2_Init();
 //  MX_ADC1_Init();
   initI2c();
-  initScreen();
+//  initScreen();
 //  startSystemTimer();
 //  BSP_OS_TickEnable();
    while (1)
@@ -123,11 +134,11 @@ int main(void)
 	   if (i2cSec100MsgPending != 0){
 
 		   i2cSec100MsgPending = 0;
-		   uint8_t  arr [1];
+		   uint8_t  arr [1]; UNUSED(arr);
 		  arr[0]=0xbb;
-		  sendI2cByteArray(0x11,arr,0);
-//		uint8_t stri [] = {};
-//			   sendI2cByteArray(0x3c,stri,strlen((char*)stri));
+//		  sendI2cByteArray(0x11,arr,0);
+		uint8_t stri [] = {0x00, 0x38,0x32};
+			   sendI2cByteArray(0x3c,stri, 3);
 
 	   }
 	   if (sec100Event == 1)  {

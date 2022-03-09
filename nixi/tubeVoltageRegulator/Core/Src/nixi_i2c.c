@@ -18,6 +18,12 @@
 
 I2C_HandleTypeDef hi2c1;
 
+uint8_t i2cErrorString  [i2cErrorStringLength];
+uint8_t  i2cTransmitErrorCollectorInt8u;
+uint8_t i2cInitialized;
+uint8_t i2cInitNeeded;
+
+
 
 #ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
@@ -217,7 +223,6 @@ uint8_t establishContactAndRun()
 
 	    __HAL_I2C_ENABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
 
-
 	    SET_BIT(hi2c1.Instance->CR1, I2C_CR1_START);
 
 	    return 1;
@@ -228,7 +233,7 @@ uint8_t establishContactAndRun()
 //	 uint8_t  arr [1];
 //				  arr[0]=0xbb;
 //	HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
-
+//
 
 	// enable ack
 //	setCr1Bit( I2C_CR1_ACK);
@@ -444,7 +449,7 @@ uint8_t isMessageTransferred()
 
 uint8_t isCurrentByteSecondLastByte()
 {
-	return  (i2cJobData.bufferCnt = (i2cJobData.amtChars - 1));
+	return  (i2cJobData.bufferCnt == (i2cJobData.amtChars - 1));
 }
 
 uint8_t isCurrentByteLastByte()
@@ -466,10 +471,6 @@ void I2C1_EV_IRQHandler(void)
 	uint8_t res; UNUSED(res);
 	//  see datasheet  I2C -> functional description -> master receiver
 	if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_SB) != 0){
-//		if (isCurrentByteLastByte())  {
-//				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );
-//				setCr1Bit(I2C_CR1_STOP );
-//		}
 		writeAddressToDR();
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
@@ -479,10 +480,10 @@ void I2C1_EV_IRQHandler(void)
 				setCr1Bit(I2C_CR1_STOP );
 			}
 		}
-#ifndef i2cUseDma    // dma maybe needs also active sending of stop
+#ifndef i2cUseDma    // todo dma maybe needs also active sending of stop
 		if (! isMessageTransferred())  {
-			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)) {
-// read only flag				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
+			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)!= 0) {
+				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
 			}
 			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
 				sendNextI2CByte();
@@ -490,10 +491,7 @@ void I2C1_EV_IRQHandler(void)
 			if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
 				if (isCurrentByteSecondLastByte() ){  // && isMessageTransferred())     {
 					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );		//  clear ACK byte in ...
-					setCr1Bit( I2C_CR1_STOP ); //  send stop  ((re-)start)
-				}
-				if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {  // btf cleared by read of sr1 followed by read/write of dr, if btf is set,
-					                                             //  so be sure here and read it again without any other action between
+					setCr1Bit( I2C_CR1_STOP ); //  send stop  ( or (re-)start)
 					receiveNextI2CByte();
 				}
 			}
@@ -519,26 +517,31 @@ void I2C1_ER_IRQHandler(void)
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
 	    addToErrorString("BERR");
 	    i2cError(0x51);
-	  }
+	  }  else
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
 	    addToErrorString("OVR");
 	    i2cError(0x52);
-	  }
+	  } else
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
 	    addToErrorString("ARRLO");
 	    i2cError(0x53);
-	  }
+	  }  else
 	  //  todo implement refined error message with above details....
 
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
 		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
 		  addToErrorString("NACK");
 		  i2cError(0x69);
+	  }  else {   //  should actually be named I2C_FLAG_NACKF. how this name ?
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
+		  addToErrorString("ER other");
+		  i2cError(0x54);
 	  }
+
 //	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
 //		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
 //		  addToErrorString("STOP");
@@ -575,19 +578,29 @@ void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
   }
 
 }
+void i2c_GpioInit()
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**I2C1 GPIO Configuration
+    PB6     ------> I2C1_SCL
+    PB7     ------> I2C1_SDA
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
 
 static void MX_I2C1_Init(void)
 {
 
-  /* USER CODE BEGIN I2C1_Init 0 */
+	__HAL_RCC_I2C1_CLK_ENABLE();
+	i2c_GpioInit();
 
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 50000;
+  hi2c1.Init.ClockSpeed = 25000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -599,10 +612,11 @@ static void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN I2C1_Init 2 */
 
-  /* USER CODE END I2C1_Init 2 */
-
+  HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+  HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 }
 
 

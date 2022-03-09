@@ -9,12 +9,12 @@
 #define INC_NIXI_I2C_H
 
 #define i2cErrorStringLength  80
-uint8_t i2cErrorString  [i2cErrorStringLength];
 
 
-uint8_t  i2cTransmitErrorCollectorInt8u;
-uint8_t i2cInitialized;
-uint8_t i2cInitNeeded;
+extern uint8_t i2cErrorString  [i2cErrorStringLength];
+extern uint8_t  i2cTransmitErrorCollectorInt8u;
+extern uint8_t i2cInitialized;
+extern uint8_t i2cInitNeeded;
 
 
 uint8_t isI2cBusy();

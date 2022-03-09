@@ -12,6 +12,7 @@
 
 
 void screenCentiSecTimer ();
+void setHalloPaintJob();
 
 void initScreen();
 
