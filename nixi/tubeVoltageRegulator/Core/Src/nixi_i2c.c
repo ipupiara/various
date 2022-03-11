@@ -47,7 +47,7 @@ typedef struct
 	uint8_t   address;
 } i2cJobDataType;
 
-static void MX_I2C1_Init(void);
+static void i2c1_hw_Init(void);
 i2cJobDataType i2cJobData;
 
 #ifdef debugging
@@ -82,6 +82,8 @@ second STOP, START or PEC request.  (datsheet-> i2c -> registers -> cr1 at the e
 
 void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
+
+//	nonsense
 	if ((hi2c->Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE) {
 	//	 __HAL_I2C_DISABLE(hi2c);
 		__HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
@@ -94,23 +96,36 @@ void i2cSetDataIdle()
 	i2cJobData.jobType = idleI2c;
 }
 
+#define isReceiveJob  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
+
+#define isInReceiveJob(__HANDLE__) ( __HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0)
+
 void i2cFinishedOk()
 {
+
+	if (i2cJobData.jobType != idleI2c) {
+			i2cStopTransmission(&hi2c1);
+			i2cFinishedOk();
+		}
+
+
 	if (i2cJobData.jobType == sendI2c) {
 		i2cMessageSent = 1;
 	}
 	if (i2cJobData.jobType == receiveI2c)  {
 		i2cMessageReceived = 1;
 	}
+	__HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
 	i2cSetDataIdle();
 }
 
 void i2cError(uint8_t err)
 {
 	i2cTransmitErrorCollectorInt8u = err;
-	i2cStopTransmission(&hi2c1);
-	i2cSetDataIdle();
+	__HAL_I2C_DISABLE_IT(hi2c, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
+	__HAL_I2C_DISABLE(hi2c);
 	i2cInitNeeded = 1;
+	i2cSetDataIdle();
 	 //log error
 }
 
@@ -464,7 +479,10 @@ uint8_t isCurrentByteLastByte()
   * @brief This function handles I2C1 event interrupt.
   */
 
-
+void terminateTransferOk()
+{
+	i2cFinishedOK()
+}
 
 void I2C1_EV_IRQHandler(void)
 {
@@ -475,38 +493,36 @@ void I2C1_EV_IRQHandler(void)
 	} else {
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
-			if (isCurrentByteSecondLastByte())   {
+			if ((isCurrentByteSecondLastByte()) && (isInReceiveJob(&hi2c1)) )   {
+				// todo tested sending, not tested yet in receiving
 				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );
 				setCr1Bit(I2C_CR1_STOP );
 			}
 		}
-#ifndef i2cUseDma    // todo dma maybe needs also active sending of stop
-		if (! isMessageTransferred())  {
-			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)!= 0) {
-				__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
-			}
-			if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
-				sendNextI2CByte();
-			} else
-			if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
-				if (isCurrentByteSecondLastByte() ){  // && isMessageTransferred())     {
-					CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );		//  clear ACK byte in ...
-					setCr1Bit( I2C_CR1_STOP ); //  send stop  ( or (re-)start)
-					receiveNextI2CByte();
-				}
+//#ifndef i2cUseDma    // todo dma maybe needs also active sending of stop
+
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)!= 0) {
+			__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
+			if (isCurrentByteLastByte()) {
+				terminateTransferOk();
 			}
 		}
-#endif
-	}
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
+			if (isCurrentByteLastByte()) {
+				terminateTransferOk();
+			}  else {
+				sendNextI2CByte();
+			}
+		} else
+		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_RXNE) != 0)   {
+			if (isCurrentByteSecondLastByte() ){  // && isMessageTransferred())     {
+				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );		//  clear ACK byte in ...
+				setCr1Bit( I2C_CR1_STOP ); //  send stop  ( or (re-)start)
+				receiveNextI2CByte();
+			}
+		}
 
-	if ((__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)) {
-		__HAL_I2C_CLEAR_STOPFLAG(&hi2c1);
-		addToErrorString("STOP");
-		i2cError(0x96);
-	}
-	if (isMessageTransferred())  {
-		i2cStopTransmission(&hi2c1);
-		i2cFinishedOk();
+//#endif
 	}
 }
 
@@ -578,9 +594,12 @@ void HAL_I2C_GpioInit(I2C_HandleTypeDef* hi2c)
   }
 
 }
-void i2c_GpioInit()
+
+
+static void i2c1_hw_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**I2C1 GPIO Configuration
@@ -591,32 +610,27 @@ void i2c_GpioInit()
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
 
-static void MX_I2C1_Init(void)
-{
+    __HAL_RCC_I2C1_CLK_ENABLE();
 
-	__HAL_RCC_I2C1_CLK_ENABLE();
-	i2c_GpioInit();
+	hi2c1.Instance = I2C1;
+	hi2c1.Init.ClockSpeed = 25000;
+	hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+	hi2c1.Init.OwnAddress1 = 0;
+	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	hi2c1.Init.OwnAddress2 = 0;
+	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+	{
+	Error_Handler();
+	}
 
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 25000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-  HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 }
 
 
@@ -666,7 +680,7 @@ void initI2c()
 	i2cInitNeeded = 0;
 	i2cSetDataIdle();
 //	memset(i2cErrorString,0,i2cErrorStringLength);
-	MX_I2C1_Init();
+	i2c1_hw_Init();
 	i2cInitialized = 1;
 }
 
