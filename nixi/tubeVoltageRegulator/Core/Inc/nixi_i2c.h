@@ -23,7 +23,6 @@ uint8_t receiveI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars)
 
 void initI2c();
 void i2cReInitAfterFailure();
-void enableI2c();
 
 void I2C1_EV_IRQHandler(void);
 void I2C1_ER_IRQHandler(void);

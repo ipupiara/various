@@ -80,9 +80,22 @@ second STOP, START or PEC request.  (datsheet-> i2c -> registers -> cr1 at the e
 	}
 }
 
+void enableI2c()
+{
+	 __HAL_I2C_ENABLE(&hi2c1);
+}
+
+void disableI2c()
+{
+	__HAL_I2C_DISABLE(&hi2c1);
+}
+
+
 void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
 	setCr1Bit( I2C_CR1_STOP );
+	__HAL_I2C_DISABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
+//	disableI2c();
 }
 
 void i2cSetDataIdle()
@@ -104,15 +117,15 @@ void i2cFinishedOk()
 	if (i2cJobData.jobType == receiveI2c)  {
 		i2cMessageReceived = 1;
 	}
-	__HAL_I2C_DISABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
-	__HAL_I2C_DISABLE(&hi2c1);
+
 	i2cSetDataIdle();
 }
 
 void i2cError(uint8_t err)
 {
 	i2cTransmitErrorCollectorInt8u = err;
-	i2cStopTransmission(&hi2c1);
+//	i2cStopTransmission(&hi2c1);
+	disableI2c();
 	i2cInitNeeded = 1;
 	i2cSetDataIdle();
 	 //log error
@@ -123,15 +136,6 @@ uint8_t isI2cBusy()
 	return (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY));
 }
 
-void enableI2c()
-{
-	 __HAL_I2C_ENABLE(&hi2c1);
-}
-
-void disableI2c()
-{
-	__HAL_I2C_DISABLE(&hi2c1);
-}
 
 // structure copied from stm32f7xx_hal_dma.c
 typedef struct
@@ -220,7 +224,7 @@ uint8_t establishContactAndRun()
 
 	    if ((hi2c1.Instance->CR1 & I2C_CR1_PE) != I2C_CR1_PE)
 	    {
-	      __HAL_I2C_ENABLE(&hi2c1);
+	    	enableI2c();
 	    }
 
 	    CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_POS);
@@ -621,44 +625,44 @@ void i2c1_hw_Init(void)
 
 
 
-void MX_I2C1_Init(void)
-{
-	i2cInitialized = 0;
-	i2cSetDataIdle();
-
-	 HAL_I2C_GpioInit(&hi2c1);
-
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 30000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* I2C1 interrupt Init */
-	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
-
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
-	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
-
-#ifdef i2cUseDma
-	HAL_I2C_DmaInit(&hi2c1);
-#else
-	enableI2c();
-#endif
-	i2cInitialized = 1;
-}
+//void MX_I2C1_Init(void)
+//{
+//	i2cInitialized = 0;
+//	i2cSetDataIdle();
+//
+//	 HAL_I2C_GpioInit(&hi2c1);
+//
+//  hi2c1.Instance = I2C1;
+//  hi2c1.Init.ClockSpeed = 30000;
+//  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+//  hi2c1.Init.OwnAddress1 = 0;
+//  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+//  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+//  hi2c1.Init.OwnAddress2 = 0;
+//  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+//  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+//  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//
+//  /* I2C1 interrupt Init */
+//	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+//	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+//
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
+//	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
+//
+//#ifdef i2cUseDma
+//	HAL_I2C_DmaInit(&hi2c1);
+//#else
+//	enableI2c();
+//#endif
+//	i2cInitialized = 1;
+//}
 
 
 void initI2c()
@@ -673,10 +677,10 @@ void initI2c()
 
 void i2cReInitAfterFailure()
 {
-  __HAL_I2C_DISABLE(&hi2c1);
+	disableI2c();
 	hi2c1.Instance->CR1 |= I2C_CR1_SWRST;
 	hi2c1.Instance->CR1 &= ~I2C_CR1_SWRST;
-	__HAL_I2C_ENABLE(&hi2c1);
+	enableI2c();
 
 	initI2c();
 }
