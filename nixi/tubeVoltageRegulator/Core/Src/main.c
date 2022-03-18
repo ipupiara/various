@@ -138,7 +138,7 @@ int main(void)
 		  arr[0]=0xbb;
 //		  sendI2cByteArray(0x11,arr,0);
 		uint8_t stri [] = {0x00, 0x38,0x32};
-			   sendI2cByteArray(0x3c,stri, 3);
+			   sendI2cByteArray(0x3c,stri, 2);
 
 	   }
 	   if (sec100Event == 1)  {
