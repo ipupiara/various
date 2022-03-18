@@ -103,9 +103,9 @@ void i2cSetDataIdle()
 	i2cJobData.jobType = idleI2c;
 }
 
-#define isReceiveJob  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
-
-#define isInReceiveJob(__HANDLE__) ( __HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0)
+#define isJobBusy  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
+#define isInReceiveJob(__HANDLE__) ( (__HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0) && (isJobBusy))
+//  todo  receive so far not yet tested pn, 18 mar 22)
 
 void i2cFinishedOk()
 {

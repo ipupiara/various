@@ -102,7 +102,7 @@ uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
 uint8_t centiSecCounter;		//  variables used for debugging
-uint8_t useCentiSecCounter;    //  variables used for debugging
+//uint8_t useCentiSecCounter;    //  variables used for debugging
 
 void clear(pByteArrayT pBary)
 {
@@ -142,7 +142,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 {
 	uint8_t res = 0;  // todo  check that used inside privileged code, else no effect of method
 						//  see also F103 programming manual  cpsid instruction, also check primask values... confusings??...
-	CPU_IntDis();
+	CPU_IntDis();  //  todo check that own assembler uses same constants as code in HAL (not only same value)
 	if ( jobState == jobInactive) {
 		currentScreenJob = sJob;
 		currentStepIndex = 0;
@@ -160,16 +160,16 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
 	uint8_t waitTime = sJob[currentStepIndex].waitCs;
 	if (currentWaitCycle < waitTime) {
+		if (currentWaitCycle == 0) {
+			sJob [currentStepIndex].stepMethod();
+			sendI2cScreenCommand();
+		}
 		++ currentWaitCycle;
 	} else {
-		sJob [currentStepIndex].stepMethod();
-		sendI2cScreenCommand();
 		currentWaitCycle = 0;
 		++ currentStepIndex;
 	}
 }
-
-
 
 void screenCentiSecTimer ()
 {
@@ -193,14 +193,14 @@ void screenCentiSecTimer ()
 			CPU_IntEn();
 		}
 	}
-	if (useCentiSecCounter == 1) {
-		if (centiSecCounter == 50)  {
-			centiSecCounter = 0;
-			setHalloPaintJob();
-		} else  {
-			++ centiSecCounter;
-		}
-	}
+//	if (useCentiSecCounter == 1) {
+//		if (centiSecCounter == 50)  {
+//			centiSecCounter = 0;
+//			setHalloPaintJob();
+//		} else  {
+//			++ centiSecCounter;
+//		}
+//	}
 }
 
 uint8_t lines [4] = {0x00, 0x40, 0x14, 0x54};
@@ -215,7 +215,7 @@ uint8_t getDdramAdr(uint8_t xPos, uint8_t yPos)
 void initScreenFuntionSet(void)
 {
 	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte, LCD_FUNCTIONSET + LCD_8BITMODE + LCD_2LINE + LCD_5x8DOTS};
-	addToByteArray(&byteBuffer, waitShortCs, cmd);
+	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void initDisplayControl(void)
@@ -276,9 +276,9 @@ screenJobType  initJob = {5, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortC
 								{waitShortCs,0,0, initEntryModeSet}, {waitShortCs,0,0, helloScreen}}};
 
 screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,2,0,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,3,0,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,4,0,setCursor}, {waitShortCs,0,0, paintHello}}};
+							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
+							, {waitShortCs,3,1,setCursor}, {waitShortCs,0,0, paintHello}
+							, {waitShortCs,4,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
@@ -300,7 +300,7 @@ void initScreen()
 	jobState = jobInactive;
 	currentWaitCycle = 0;
 	centiSecCounter = 0;
-	useCentiSecCounter = 0;
+//	useCentiSecCounter = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 }

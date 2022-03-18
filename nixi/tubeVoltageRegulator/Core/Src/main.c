@@ -52,15 +52,15 @@ void MX_GPIO_Init(void);
 void MX_ADC1_Init(void);
 void MX_TIM2_Init(void);
 
-uint8_t i2cSec100MsgPending;
+//uint8_t i2cSec100DebugMsgPending;
 
 void sec100Tick()
 {
 //	triggerAdc1();
 
-//	  screenCentiSecTimer();
+	  screenCentiSecTimer();
 
-	i2cSec100MsgPending = 1;
+//	i2cSec100DebugMsgPending = 1;
 }
 
 
@@ -99,7 +99,7 @@ void initVariables()
 	i2cMessageReceived = 0;
 	i2cMessageSent = 0;
 	lastADCResult = 0;
-	i2cSec100MsgPending = 0;
+//	i2cSec100DebugMsgPending = 0;
 	hvPwmState = hvPwmIdle;
 	sec100Event = 0;
 }
@@ -131,16 +131,16 @@ int main(void)
 //  BSP_OS_TickEnable();
    while (1)
   {
-	   if (i2cSec100MsgPending != 0){
-
-		   i2cSec100MsgPending = 0;
-		   uint8_t  arr [1]; UNUSED(arr);
-		  arr[0]=0xbb;
-//		  sendI2cByteArray(0x11,arr,0);
-		uint8_t stri [] = {0x00, 0x38,0x32};
-			   sendI2cByteArray(0x3c,stri, 2);
-
-	   }
+//	   if (i2cSec100DebugMsgPending != 0){
+//
+//		   i2cSec100DebugMsgPending = 0;
+//		   uint8_t  arr [1]; UNUSED(arr);
+//		  arr[0]=0xbb;
+////		  sendI2cByteArray(0x11,arr,0);
+//		uint8_t stri [] = {0x00, 0x38,0x32};
+//			   sendI2cByteArray(0x3c,stri, 2);
+//
+//	   }
 	   if (sec100Event == 1)  {
 		   	  sec100Event = 0;
 		   	  sec100Tick();
