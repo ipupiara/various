@@ -102,7 +102,7 @@ uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
 uint8_t centiSecCounter;		//  variables used for debugging
-//uint8_t useCentiSecCounter;    //  variables used for debugging
+uint8_t useCentiSecCounter;    //  variables used for debugging
 
 void clear(pByteArrayT pBary)
 {
@@ -147,7 +147,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 		currentScreenJob = sJob;
 		currentStepIndex = 0;
 		currentWaitCycle = 0;
-		clear(&byteBuffer);
+		clear(&byteBuffer);  //  could be omitted here after debugging
 		jobState = jobActive;
 		res = 1;
 	}
@@ -193,14 +193,16 @@ void screenCentiSecTimer ()
 			CPU_IntEn();
 		}
 	}
-//	if (useCentiSecCounter == 1) {
-//		if (centiSecCounter == 50)  {
-//			centiSecCounter = 0;
-//			setHalloPaintJob();
-//		} else  {
-//			++ centiSecCounter;
-//		}
-//	}
+
+	if (useCentiSecCounter == 1) {
+		if (centiSecCounter == 50)  {
+			centiSecCounter = 0;
+			useCentiSecCounter = 0;
+			setHalloPaintJob();
+		} else  {
+			++ centiSecCounter;
+		}
+	}
 }
 
 uint8_t lines [4] = {0x00, 0x40, 0x14, 0x54};
@@ -244,6 +246,12 @@ void setCursor(void)
 	addToByteArray(&byteBuffer, 2, cmd);
 }
 
+void returnHome(void)
+{
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_RETURNHOME};
+	addToByteArray(&byteBuffer, 2, cmd);
+}
+
 void helloScreen(void)
 {
 	commandLineType cmd = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
@@ -255,8 +263,8 @@ void helloScreen(void)
 //   handling of needed waitStates could as well be done on display itself (encapsulation principle) ...  ??
 void anotherScreen (commandLineType** pCmdLine)
 {
-	commandLineType cmd = {LCD_ContinuousControlByte + LCD_CommandControlByte,LCD_RETURNHOME,LCD_LastControlByte + LCD_AsciiControlByte};
-	addToByteArray(&byteBuffer, 3, cmd);
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
 	char* stri = "tubeVoltageRegulator";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
@@ -268,12 +276,15 @@ void emptyWait()
 
 void paintHello()
 {
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
 	char* stri = "tubeVoltageRegulator";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
 
-screenJobType  initJob = {5, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortCs,0,0, initDisplayControl}, {waitShortCs,0,0, clearDisplay},
-								{waitShortCs,0,0, initEntryModeSet}, {waitShortCs,0,0, helloScreen}}};
+screenJobType  initJob = {6, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortCs,0,0, initDisplayControl},
+								{waitShortCs,0,0, clearDisplay},{waitShortCs,0,0, initEntryModeSet},
+								{waitShortCs,0,0,returnHome},{waitShortCs,0,0, paintHello}}};
 
 screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
 							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
@@ -300,7 +311,7 @@ void initScreen()
 	jobState = jobInactive;
 	currentWaitCycle = 0;
 	centiSecCounter = 0;
-//	useCentiSecCounter = 0;
+	useCentiSecCounter = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 }
