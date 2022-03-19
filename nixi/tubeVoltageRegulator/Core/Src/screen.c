@@ -78,6 +78,7 @@ typedef struct {
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
+
 typedef struct {
 	uint8_t   amtJobSteps;
 	screenJobStepType  screenJobSteps [];
@@ -134,7 +135,6 @@ uint8_t sendI2cScreenCommand()
 {
 	uint8_t res = 0;
 	res = sendI2cByteArray(screenI2cAddress,byteBuffer.buffer ,byteBuffer.len);
-	clear(&byteBuffer);
 	return res;
 }
 
@@ -161,6 +161,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 	uint8_t waitTime = sJob[currentStepIndex].waitCs;
 	if (currentWaitCycle < waitTime) {
 		if (currentWaitCycle == 0) {
+			clear(&byteBuffer);
 			sJob [currentStepIndex].stepMethod();
 			sendI2cScreenCommand();
 		}
@@ -222,7 +223,7 @@ void initScreenFuntionSet(void)
 
 void initDisplayControl(void)
 {
-	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON + LCD_CURSORON + LCD_BLINKON};
+	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_DISPLAYCONTROL+ LCD_DISPLAYON + LCD_CURSOROFF + LCD_BLINKOFF};
 	addToByteArray(&byteBuffer, 2, cmd);
 }
 

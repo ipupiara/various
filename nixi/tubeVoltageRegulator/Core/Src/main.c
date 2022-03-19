@@ -124,11 +124,7 @@ int main(void)
 	HAL_Init();
 
 	uint32_t prevTick = uwTick;
-	while (uwTick < prevTick + 500) {
-
-	}
-
-
+	while (uwTick < prevTick + 500) {}
 
   SystemClock_Config();
 
