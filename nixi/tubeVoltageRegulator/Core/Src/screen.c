@@ -78,6 +78,17 @@ typedef struct {
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
+typedef struct {
+	union {
+		struct {
+			uint8_t xPos;
+			uint8_t yPos;
+		} pos;
+		void* param;
+	} uni;
+	uint8_t waitCs;
+	t_fvoid  stepMethod ;
+} screenJobStepT ;
 
 typedef struct {
 	uint8_t   amtJobSteps;
@@ -85,10 +96,15 @@ typedef struct {
 
 }screenJobType;
 
+typedef struct {
+	uint8_t   amtJobSteps;
+	screenJobStepT  screenJobSteps [];
+
+}screenJobT;
 
 typedef uint8_t commandLineType [];
 
-typedef void(*t_fPar)(commandLineType* pCmdLine);
+typedef void(*t_fPar)(void* pCmdLine);
 
 typedef struct  {
 	uint8_t len;
@@ -293,6 +309,11 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 							, {waitShortCs,4,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
+
+screenJobType paintCanScreen = {1, {{waitShortCs,1,1,setCursor}}};
+
+
+
 
 void setDebugScreenJob()
 {
