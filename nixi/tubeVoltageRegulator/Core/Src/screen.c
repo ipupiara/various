@@ -69,7 +69,7 @@ typedef enum {
 } jobStateEnum;
 
 typedef void(*t_fvoid)(void);
-
+typedef void(*t_fPar)(void* pCmdLine);
 
 typedef struct {
 	uint8_t waitCs;
@@ -79,6 +79,7 @@ typedef struct {
 } screenJobStepType ;
 
 typedef struct {
+	uint8_t waitCs;
 	union {
 		struct {
 			uint8_t xPos;
@@ -86,8 +87,10 @@ typedef struct {
 		} pos;
 		void* param;
 	} uni;
-	uint8_t waitCs;
-	t_fvoid  stepMethod ;
+	union {
+		t_fvoid  stepMethod ;
+		t_fPar   stepParMethod;
+	};
 } screenJobStepT ;
 
 typedef struct {
@@ -104,8 +107,6 @@ typedef struct {
 
 typedef uint8_t commandLineType [];
 
-typedef void(*t_fPar)(void* pCmdLine);
-
 typedef struct  {
 	uint8_t len;
 	uint8_t buffer [byteArrayMaxSz];
@@ -120,6 +121,8 @@ uint8_t  currentWaitCycle;
 
 uint8_t centiSecCounter;		//  variables used for debugging
 uint8_t useCentiSecCounter;    //  variables used for debugging
+
+void setHelloPaintJob();
 
 void clear(pByteArrayT pBary)
 {
@@ -215,7 +218,7 @@ void screenCentiSecTimer ()
 		if (centiSecCounter == 50)  {
 			centiSecCounter = 0;
 			useCentiSecCounter = 0;
-			setHalloPaintJob();
+			setHelloPaintJob();
 		} else  {
 			++ centiSecCounter;
 		}
@@ -255,12 +258,22 @@ void initEntryModeSet(void)
 	addToByteArray(&byteBuffer, 2, cmd);
 }
 
-void setCursor(void)
+void addCursorToByteArray(uint8_t xPos, uint8_t yPos)
 {
 	uint8_t adr = 0x00;
-	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].xPos, currentScreenJob->screenJobSteps[currentStepIndex].yPos);
+	adr = getDdramAdr(xPos, yPos);
 	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
 	addToByteArray(&byteBuffer, 2, cmd);
+}
+
+void setCursor(void)
+{
+	addCursorToByteArray(currentScreenJob->screenJobSteps[currentStepIndex].xPos,
+			currentScreenJob->screenJobSteps[currentStepIndex].yPos);
+//	uint8_t adr = 0x00;
+//	adr = getDdramAdr(currentScreenJob->screenJobSteps[currentStepIndex].xPos, currentScreenJob->screenJobSteps[currentStepIndex].yPos);
+//	commandLineType cmd = {LCD_LastControlByte + LCD_CommandControlByte,LCD_SETDDRAMADDR + adr };
+//	addToByteArray(&byteBuffer, 2, cmd);
 }
 
 void returnHome(void)
@@ -299,6 +312,11 @@ void paintHello()
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
 
+void paintCanScr()
+{
+
+}
+
 screenJobType  initJob = {6, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortCs,0,0, initDisplayControl},
 								{waitShortCs,0,0, clearDisplay},{waitShortCs,0,0, initEntryModeSet},
 								{waitShortCs,0,0,returnHome},{waitShortCs,0,0, paintHello}}};
@@ -310,17 +328,20 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType paintCanScreen = {1, {{waitShortCs,1,1,setCursor}}};
+screenJobType canScreen = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,paintCanScr}}};
 
 
-
+void paintCanScreen()
+{
+	setNextScreenJob(&canScreen);
+}
 
 void setDebugScreenJob()
 {
 	setNextScreenJob(&testPaint);
 }
 
-void setHalloPaintJob()
+void setHelloPaintJob()
 {
 	setNextScreenJob(&halloPaint);
 }

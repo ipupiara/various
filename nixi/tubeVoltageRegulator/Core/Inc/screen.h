@@ -12,10 +12,9 @@
 
 
 void screenCentiSecTimer ();
-void setHalloPaintJob();
 
+void paintCanScreen();
 void initScreen();
-
 void setDebugScreenJob();
 
 #endif /* INC_SCREEN_H_ */
