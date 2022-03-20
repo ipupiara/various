@@ -86,11 +86,11 @@ typedef struct {
 			uint8_t yPos;
 		} pos;
 		void* param;
-	} uni;
+	} uni1;
 	union {
 		t_fvoid  stepMethod ;
 		t_fPar   stepParMethod;
-	};
+	} uni2;
 } screenJobStepT ;
 
 typedef struct {
