@@ -5,6 +5,7 @@ git add plasticWelder/plastic-welder/*
 git add michisLamps/*
 git add tempomat/*
 git add nixi/*
+git add boosterPac --all
 git add nixi/nixitest/
 git add nixi/tubeVoltageRegulator/*
 git add moskitoPlate/*
