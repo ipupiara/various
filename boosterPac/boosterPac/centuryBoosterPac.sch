@@ -246,6 +246,13 @@ In this library the device names are the same as the pin names of the symbols, t
 <text x="-2.54" y="-4.699" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="-UB" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
 </symbol>
+<symbol name="+15V">
+<wire x1="0" y1="1.905" x2="0" y2="0.635" width="0.1524" layer="94"/>
+<wire x1="-0.635" y1="1.27" x2="0.635" y2="1.27" width="0.1524" layer="94"/>
+<circle x="0" y="1.27" radius="1.27" width="0.254" layer="94"/>
+<text x="-2.54" y="3.175" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="+15V" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="GND" prefix="SUPPLY">
@@ -278,6 +285,19 @@ In this library the device names are the same as the pin names of the symbols, t
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
 <gate name="G$1" symbol="-UB" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="+15V" prefix="SUPPLY">
+<description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
+<gates>
+<gate name="+15V" symbol="+15V" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -7840,7 +7860,6 @@ Source: www.e-switch.com .. 5500.pdf</description>
 </classes>
 <parts>
 <part name="J1" library="con-molex" deviceset="22-?-02" device="05-7028"/>
-<part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="Q1" library="transistor-small-signal" deviceset="BSS123" device=""/>
 <part name="R17" library="resistor" deviceset="R-EU_" device="0309/10" value="1k"/>
 <part name="R16" library="resistor" deviceset="R-EU_" device="0309/10" value="5k"/>
@@ -7885,6 +7904,8 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="R18" library="resistor" deviceset="R-EU_" device="0309/10" value="xk?"/>
 <part name="J4" library="con-molex" deviceset="22-?-02" device="05-7028"/>
+<part name="SUPPLY2" library="supply2" deviceset="-UB" device=""/>
+<part name="SUPPLY9" library="supply2" deviceset="+15V" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7895,13 +7916,10 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <text x="119.38" y="96.52" size="1.778" layer="91" rot="R270">======</text>
 <text x="20.32" y="73.66" size="1.778" layer="91">push button</text>
 <text x="20.32" y="78.74" size="1.778" layer="91">load simulation for battery test on leds ???</text>
-<text x="-58.42" y="58.42" size="1.778" layer="91">protection ?</text>
-<text x="-33.02" y="35.56" size="3.81" layer="91">?</text>
 </plain>
 <instances>
-<instance part="J1" gate="-1" x="-50.8" y="104.14" rot="R180"/>
-<instance part="J1" gate="-2" x="-50.8" y="99.06" rot="R180"/>
-<instance part="SUPPLY2" gate="GND" x="-38.1" y="35.56"/>
+<instance part="J1" gate="-1" x="-55.88" y="104.14" rot="R180"/>
+<instance part="J1" gate="-2" x="-55.88" y="93.98" rot="R180"/>
 <instance part="Q1" gate="G$1" x="-27.94" y="60.96"/>
 <instance part="R17" gate="G$1" x="-38.1" y="63.5" rot="R90"/>
 <instance part="R16" gate="G$1" x="-38.1" y="48.26" rot="R90"/>
@@ -7937,18 +7955,20 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <instance part="SUPPLY3" gate="G$1" x="-25.4" y="35.56"/>
 <instance part="R11" gate="G$1" x="99.06" y="40.64"/>
 <instance part="D6" gate="1" x="86.36" y="7.62" rot="R90"/>
-<instance part="D8" gate="1" x="-53.34" y="63.5" rot="R180"/>
-<instance part="SUPPLY5" gate="G$1" x="-71.12" y="66.04"/>
+<instance part="D8" gate="1" x="-45.72" y="88.9"/>
+<instance part="SUPPLY5" gate="G$1" x="-71.12" y="10.16"/>
 <instance part="SUPPLY4" gate="G$1" x="30.48" y="-10.16" rot="R180"/>
 <instance part="SUPPLY6" gate="G$1" x="132.08" y="20.32"/>
 <instance part="S1" gate="-1" x="15.24" y="96.52" rot="MR0"/>
-<instance part="BATTERY" gate="-1" x="-73.66" y="63.5" rot="R180"/>
-<instance part="BATTERY" gate="-2" x="-73.66" y="78.74" rot="R180"/>
-<instance part="SUPPLY7" gate="G$1" x="-71.12" y="81.28" rot="R180"/>
-<instance part="SUPPLY8" gate="GND" x="-55.88" y="76.2"/>
+<instance part="BATTERY" gate="-1" x="-73.66" y="7.62" rot="R180"/>
+<instance part="BATTERY" gate="-2" x="-73.66" y="38.1" rot="R180"/>
+<instance part="SUPPLY7" gate="G$1" x="-71.12" y="40.64" rot="R180"/>
+<instance part="SUPPLY8" gate="GND" x="-55.88" y="35.56"/>
 <instance part="R18" gate="G$1" x="10.16" y="81.28" rot="R90"/>
 <instance part="J4" gate="-1" x="154.94" y="106.68"/>
 <instance part="J4" gate="-2" x="154.94" y="101.6"/>
+<instance part="SUPPLY2" gate="G$1" x="-55.88" y="78.74" rot="R270"/>
+<instance part="SUPPLY9" gate="+15V" x="-35.56" y="119.38"/>
 </instances>
 <busses>
 </busses>
@@ -8128,19 +8148,6 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <pinref part="R14" gate="G$1" pin="2"/>
 </segment>
 </net>
-<net name="N$10" class="0">
-<segment>
-<pinref part="J1" gate="-1" pin="S"/>
-<wire x1="-48.26" y1="104.14" x2="-43.18" y2="104.14" width="0.1524" layer="91"/>
-<wire x1="-43.18" y1="104.14" x2="-43.18" y2="116.84" width="0.1524" layer="91"/>
-<wire x1="-43.18" y1="116.84" x2="-38.1" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="R17" gate="G$1" pin="2"/>
-<wire x1="-38.1" y1="116.84" x2="-38.1" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="-38.1" y1="116.84" x2="-20.32" y2="116.84" width="0.1524" layer="91"/>
-<wire x1="-20.32" y1="116.84" x2="-20.32" y2="139.7" width="0.1524" layer="91"/>
-<wire x1="-20.32" y1="139.7" x2="-15.24" y2="139.7" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$3" class="0">
 <segment>
 <pinref part="VR1" gate="G$1" pin="A"/>
@@ -8205,13 +8212,11 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <wire x1="88.9" y1="-7.62" x2="83.82" y2="-7.62" width="0.1524" layer="91" curve="-180"/>
 <wire x1="22.86" y1="-7.62" x2="-5.08" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="-7.62" x2="-5.08" y2="-7.62" width="0.1524" layer="91" curve="-180"/>
-<pinref part="D8" gate="1" pin="C"/>
-<wire x1="-55.88" y1="63.5" x2="-63.5" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="-63.5" y1="63.5" x2="-71.12" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="-71.12" y1="63.5" x2="-71.12" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-63.5" y1="7.62" x2="-71.12" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="-71.12" y1="7.62" x2="-71.12" y2="12.7" width="0.1524" layer="91"/>
 <pinref part="SUPPLY5" gate="G$1" pin="+UB"/>
-<junction x="-71.12" y="63.5"/>
-<wire x1="-63.5" y1="-7.62" x2="-63.5" y2="63.5" width="0.1524" layer="91"/>
+<junction x="-71.12" y="7.62"/>
+<wire x1="-63.5" y1="-7.62" x2="-63.5" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="BATTERY" gate="-1" pin="S"/>
 <label x="-55.88" y="-7.62" size="1.778" layer="95"/>
 <label x="109.22" y="17.78" size="1.778" layer="95"/>
@@ -8296,26 +8301,31 @@ Source: www.e-switch.com .. 5500.pdf</description>
 </net>
 <net name="GND" class="0">
 <segment>
-<pinref part="R16" gate="G$1" pin="1"/>
-<wire x1="-38.1" y1="43.18" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="SUPPLY2" gate="GND" pin="GND"/>
-<pinref part="D8" gate="1" pin="A"/>
-<pinref part="J1" gate="-2" pin="S"/>
-<wire x1="-48.26" y1="99.06" x2="-45.72" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="99.06" x2="-45.72" y2="78.74" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="78.74" x2="-45.72" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="63.5" x2="-50.8" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="63.5" x2="-45.72" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="38.1" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="BATTERY" gate="-2" pin="S"/>
-<wire x1="-71.12" y1="78.74" x2="-55.88" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="SUPPLY7" gate="G$1" pin="-UB"/>
-<junction x="-71.12" y="78.74"/>
 <pinref part="SUPPLY8" gate="GND" pin="GND"/>
-<wire x1="-55.88" y1="78.74" x2="-45.72" y2="78.74" width="0.1524" layer="91"/>
-<junction x="-55.88" y="78.74"/>
-<label x="-63.5" y="78.74" size="1.778" layer="95"/>
-<wire x1="-25.4" y1="38.1" x2="-38.1" y2="38.1" width="0.1524" layer="91" style="shortdash"/>
+<junction x="-60.96" y="38.1"/>
+<pinref part="BATTERY" gate="-2" pin="S"/>
+<wire x1="-71.12" y1="38.1" x2="-55.88" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="SUPPLY7" gate="G$1" pin="-UB"/>
+<junction x="-71.12" y="38.1"/>
+<label x="-63.5" y="38.1" size="1.778" layer="95"/>
+<pinref part="J2" gate="-1" pin="S"/>
+<wire x1="17.78" y1="38.1" x2="17.78" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="-25.4" y1="38.1" x2="17.78" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="SUPPLY3" gate="G$1" pin="-UB"/>
+<wire x1="-55.88" y1="38.1" x2="-53.34" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="R16" gate="G$1" pin="1"/>
+<wire x1="-53.34" y1="38.1" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="38.1" x2="-25.4" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="43.18" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
+<junction x="-38.1" y="38.1"/>
+<pinref part="J1" gate="-2" pin="S"/>
+<wire x1="-53.34" y1="38.1" x2="-53.34" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="SUPPLY2" gate="G$1" pin="-UB"/>
+<wire x1="-53.34" y1="78.74" x2="-53.34" y2="88.9" width="0.1524" layer="91"/>
+<junction x="-53.34" y="78.74"/>
+<pinref part="D8" gate="1" pin="A"/>
+<wire x1="-53.34" y1="88.9" x2="-53.34" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="-48.26" y1="88.9" x2="-53.34" y2="88.9" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -8330,18 +8340,28 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <wire x1="10.16" y1="86.36" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="-UB" class="0">
-<segment>
-<pinref part="J2" gate="-1" pin="S"/>
-<wire x1="17.78" y1="38.1" x2="17.78" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="-25.4" y1="38.1" x2="17.78" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="SUPPLY3" gate="G$1" pin="-UB"/>
-</segment>
-</net>
 <net name="N$29" class="0">
 <segment>
 <pinref part="IC1" gate="A1" pin="VI"/>
-<wire x1="-2.54" y1="139.7" x2="7.62" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="-7.62" y1="139.7" x2="7.62" y2="139.7" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="+15V" class="0">
+<segment>
+<pinref part="J1" gate="-1" pin="S"/>
+<pinref part="R17" gate="G$1" pin="2"/>
+<wire x1="-38.1" y1="116.84" x2="-38.1" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="104.14" x2="-38.1" y2="88.9" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="88.9" x2="-38.1" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="116.84" x2="-35.56" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="-35.56" y1="116.84" x2="-20.32" y2="116.84" width="0.1524" layer="91"/>
+<wire x1="-20.32" y1="116.84" x2="-20.32" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="-20.32" y1="139.7" x2="-12.7" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="-53.34" y1="104.14" x2="-38.1" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="SUPPLY9" gate="+15V" pin="+15V"/>
+<junction x="-35.56" y="116.84"/>
+<pinref part="D8" gate="1" pin="C"/>
+<wire x1="-43.18" y1="88.9" x2="-38.1" y2="88.9" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
