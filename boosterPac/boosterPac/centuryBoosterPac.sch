@@ -7705,141 +7705,56 @@ Source: www.kingbright.com</description>
 Marquardt, Siemens, C&amp;K, ITT, and others&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
-<package name="5501-1LED">
-<description>&lt;b&gt;PUSHBUTTON SERIES 5500 SWITCHES&lt;/b&gt; with 1 LED&lt;p&gt;
-Source: www.e-switch.com .. 5500.pdf</description>
-<wire x1="-8.6549" y1="-6.1001" x2="-2.9649" y2="-6.1001" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-6.1001" x2="8.6549" y2="-6.1001" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="-6.1001" x2="8.6549" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="6.1001" x2="-2.9649" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="6.1001" x2="-8.6549" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="-8.6549" y1="6.1001" x2="-8.6549" y2="-6.1001" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-6.1001" x2="-2.9649" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-6.1001" x2="-1.27" y2="-4.699" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="-4.699" x2="-1.27" y2="4.699" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="4.699" x2="-2.9649" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="-6.1001" x2="7.239" y2="-4.699" width="0.2032" layer="21"/>
-<wire x1="7.239" y1="-4.699" x2="7.239" y2="4.699" width="0.2032" layer="21"/>
-<wire x1="7.239" y1="4.699" x2="8.6549" y2="6.1001" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="4.699" x2="7.239" y2="4.699" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="-4.699" x2="7.239" y2="-4.699" width="0.2032" layer="21"/>
-<circle x="-5.08" y="0" radius="1.4199" width="0.2032" layer="21"/>
-<pad name="NO" x="5.08" y="3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="1A" x="0" y="3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="1B" x="0" y="-3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="NC" x="5.08" y="-3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="-" x="-5.08" y="3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="+" x="-5.08" y="-3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<text x="-8.89" y="-5.08" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="3.81" y="-3.81" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
-<hole x="-7.62" y="3.81" drill="1.1"/>
-<hole x="7.62" y="-3.81" drill="1.1"/>
-</package>
-<package name="5511-1LED">
-<description>&lt;b&gt;PUSHBUTTON SERIES 5511 SWITCHES&lt;/b&gt; with 1 LED&lt;p&gt;
-Source: www.e-switch.com .. 5500.pdf</description>
-<wire x1="-8.6549" y1="-8.5501" x2="-2.9649" y2="-8.5501" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-8.5501" x2="8.6549" y2="-8.5501" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="-8.5501" x2="8.6549" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="8.5501" x2="-2.9649" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="8.5501" x2="-8.6549" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="-8.6549" y1="8.5501" x2="-8.6549" y2="-8.5501" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-8.5501" x2="-2.9649" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="-2.9649" y1="-8.5501" x2="-1.27" y2="-7.149" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="-7.149" x2="-1.27" y2="7.149" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="7.149" x2="-2.9649" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="8.6549" y1="-8.5501" x2="7.239" y2="-7.149" width="0.2032" layer="21"/>
-<wire x1="7.239" y1="-7.149" x2="7.239" y2="7.149" width="0.2032" layer="21"/>
-<wire x1="7.239" y1="7.149" x2="8.6549" y2="8.5501" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="7.149" x2="7.239" y2="7.149" width="0.2032" layer="21"/>
-<wire x1="-1.27" y1="-7.149" x2="7.239" y2="-7.149" width="0.2032" layer="21"/>
-<circle x="-5.08" y="0" radius="1.4199" width="0.2032" layer="21"/>
-<pad name="NO" x="5.08" y="3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="1A" x="0" y="3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="1B" x="0" y="-3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="NC" x="5.08" y="-3.81" drill="0.9" diameter="1.5" shape="square" rot="R90"/>
-<pad name="+G" x="-5.08" y="3.81" drill="0.9" diameter="1.4224" shape="square" rot="R90"/>
-<pad name="-G" x="-5.08" y="-3.81" drill="0.9" diameter="1.4224" shape="square" rot="R90"/>
-<text x="-8.89" y="-5.08" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="3.81" y="-3.81" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
-<hole x="-7.62" y="3.81" drill="1.1"/>
-<hole x="7.62" y="-3.81" drill="1.1"/>
+<package name="TL3XPO">
+<description>&lt;b&gt;TINY SWITCH&lt;/b&gt;&lt;p&gt;
+Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da-01-de-Subminiaturschalter_TL_36YO.pdf</description>
+<wire x1="-5.08" y1="2.54" x2="5.08" y2="2.54" width="0.2032" layer="21"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="-2.54" width="0.2032" layer="21"/>
+<wire x1="5.08" y1="-2.54" x2="-5.08" y2="-2.54" width="0.2032" layer="21"/>
+<wire x1="-5.08" y1="-2.54" x2="-5.08" y2="2.54" width="0.2032" layer="21"/>
+<wire x1="-3.175" y1="1.27" x2="0" y2="1.27" width="0.2032" layer="51"/>
+<wire x1="-3.175" y1="-1.27" x2="0" y2="-1.27" width="0.2032" layer="51"/>
+<wire x1="0" y1="1.27" x2="0" y2="-1.27" width="0.2032" layer="51" curve="-180"/>
+<wire x1="-1.375" y1="1.275" x2="-1.35" y2="-1.3" width="0.2032" layer="51" curve="-273.242292"/>
+<circle x="-3.175" y="0" radius="1.27" width="0.2032" layer="51"/>
+<pad name="1" x="-2.54" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
+<pad name="2" x="0" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
+<pad name="3" x="2.54" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
+<text x="-5.08" y="3.175" size="1.778" layer="25">&gt;NAME</text>
+<text x="-5.08" y="-5.08" size="1.778" layer="27">&gt;VALUE</text>
 </package>
 </packages>
 <symbols>
-<symbol name="NO-NC-2">
-<wire x1="-2.54" y1="0" x2="-2.54" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="-1.27" y1="0" x2="3.048" y2="1.778" width="0.2032" layer="94"/>
-<wire x1="0.762" y1="1.016" x2="0.762" y2="1.524" width="0.2032" layer="94"/>
-<wire x1="0.762" y1="2.032" x2="0.762" y2="2.794" width="0.2032" layer="94"/>
-<wire x1="0.762" y1="2.794" x2="0.762" y2="3.048" width="0.2032" layer="94"/>
-<wire x1="0.762" y1="3.556" x2="0.762" y2="4.064" width="0.2032" layer="94"/>
-<wire x1="1.27" y1="4.064" x2="0.762" y2="4.064" width="0.2032" layer="94"/>
-<wire x1="0.762" y1="4.064" x2="0.254" y2="4.064" width="0.2032" layer="94"/>
-<wire x1="0.254" y1="2.286" x2="0.762" y2="2.794" width="0.1524" layer="94"/>
-<wire x1="0.762" y1="2.794" x2="1.27" y2="2.286" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="0" x2="-1.27" y2="0" width="0.2032" layer="94"/>
-<wire x1="2.54" y1="-1.778" x2="2.54" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="2.54" y1="2.54" x2="2.54" y2="1.778" width="0.1524" layer="94"/>
-<circle x="-2.54" y="0" radius="0.508" width="0" layer="94"/>
-<text x="-3.048" y="4.826" size="1.778" layer="95">&gt;NAME</text>
-<text x="-3.81" y="-5.588" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="1A" x="-5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1"/>
-<pin name="1B" x="-5.08" y="-2.54" visible="off" length="short" direction="pas" swaplevel="1"/>
-<pin name="NO" x="5.08" y="-2.54" visible="off" length="short" direction="pas" swaplevel="2" rot="R180"/>
-<pin name="NC" x="5.08" y="2.54" visible="off" length="short" direction="pas" swaplevel="2" rot="R180"/>
-</symbol>
-<symbol name="LED">
-<wire x1="1.27" y1="1.27" x2="0" y2="-1.27" width="0.254" layer="94"/>
-<wire x1="0" y1="-1.27" x2="0" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="0" y1="-1.27" x2="-1.27" y2="1.27" width="0.254" layer="94"/>
-<wire x1="1.27" y1="-1.27" x2="0" y2="-1.27" width="0.254" layer="94"/>
-<wire x1="0" y1="-1.27" x2="-1.27" y2="-1.27" width="0.254" layer="94"/>
-<wire x1="0.889" y1="-1.905" x2="1.651" y2="-2.667" width="0.1524" layer="94"/>
-<wire x1="1.651" y1="-2.667" x2="1.397" y2="-2.032" width="0.1524" layer="94"/>
-<wire x1="1.651" y1="-2.667" x2="1.016" y2="-2.413" width="0.1524" layer="94"/>
-<wire x1="0.889" y1="-2.794" x2="1.651" y2="-3.556" width="0.1524" layer="94"/>
-<wire x1="1.651" y1="-3.556" x2="1.397" y2="-2.921" width="0.1524" layer="94"/>
-<wire x1="1.651" y1="-3.556" x2="1.016" y2="-3.302" width="0.1524" layer="94"/>
-<wire x1="1.27" y1="1.27" x2="0" y2="1.27" width="0.254" layer="94"/>
-<wire x1="0" y1="1.27" x2="-1.27" y2="1.27" width="0.254" layer="94"/>
-<wire x1="0" y1="1.27" x2="0" y2="-1.27" width="0.254" layer="94"/>
-<text x="-2.54" y="-5.08" size="1.778" layer="95" rot="R90">&gt;NAME</text>
-<text x="3.81" y="-5.08" size="1.778" layer="96" rot="R90">&gt;VALUE</text>
-<pin name="K" x="0" y="-5.08" visible="off" length="short" direction="pas" rot="R90"/>
-<pin name="A" x="0" y="2.54" visible="off" length="short" direction="pas" rot="R270"/>
+<symbol name="ON-MOM">
+<wire x1="0" y1="-3.175" x2="0" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="-2.54" x2="-1.524" y2="3.048" width="0.254" layer="94"/>
+<wire x1="1.27" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="2.54" y1="2.54" x2="2.54" y2="3.175" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="2.54" x2="-1.27" y2="2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="2.54" x2="-2.54" y2="3.175" width="0.254" layer="94"/>
+<wire x1="0.508" y1="1.27" x2="1.016" y2="1.524" width="0.1524" layer="94"/>
+<wire x1="0.508" y1="1.27" x2="1.016" y2="1.016" width="0.1524" layer="94"/>
+<wire x1="0.508" y1="1.27" x2="1.524" y2="1.27" width="0.1524" layer="94"/>
+<text x="5.08" y="-2.54" size="1.778" layer="95" rot="R90">&gt;NAME</text>
+<text x="7.62" y="-2.54" size="1.778" layer="96" rot="R90">&gt;VALUE</text>
+<pin name="P" x="0" y="-5.08" visible="pad" length="short" direction="pas" rot="R90"/>
+<pin name="S" x="2.54" y="5.08" visible="pad" length="short" direction="pas" rot="R270"/>
+<pin name="O" x="-2.54" y="5.08" visible="pad" length="short" direction="pas" rot="R270"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="55?-1LED" prefix="S">
-<description>&lt;b&gt;PUSHBUTTON SERIES 5500 SWITCHES&lt;/b&gt; 1 LED&lt;p&gt;
-Source: www.e-switch.com .. 5500.pdf</description>
+<deviceset name="TL32PO" prefix="S">
+<description>&lt;b&gt;TINY SWITCH&lt;/b&gt; ON - MOM&lt;p&gt;
+Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da-01-de-Subminiaturschalter_TL_36YO.pdf</description>
 <gates>
-<gate name="-1" symbol="NO-NC-2" x="0" y="0" addlevel="always"/>
-<gate name="-LED" symbol="LED" x="0" y="-12.7" addlevel="always"/>
+<gate name="BEF1" symbol="ON-MOM" x="0" y="0"/>
 </gates>
 <devices>
-<device name="01" package="5501-1LED">
+<device name="" package="TL3XPO">
 <connects>
-<connect gate="-1" pin="1A" pad="1A"/>
-<connect gate="-1" pin="1B" pad="1B"/>
-<connect gate="-1" pin="NC" pad="NC"/>
-<connect gate="-1" pin="NO" pad="NO"/>
-<connect gate="-LED" pin="A" pad="+"/>
-<connect gate="-LED" pin="K" pad="-"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="11" package="5511-1LED">
-<connects>
-<connect gate="-1" pin="1A" pad="1A"/>
-<connect gate="-1" pin="1B" pad="1B"/>
-<connect gate="-1" pin="NC" pad="NC"/>
-<connect gate="-1" pin="NO" pad="NO"/>
-<connect gate="-LED" pin="A" pad="+G"/>
-<connect gate="-LED" pin="K" pad="-G"/>
+<connect gate="BEF1" pin="O" pad="1"/>
+<connect gate="BEF1" pin="P" pad="2"/>
+<connect gate="BEF1" pin="S" pad="3"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -7880,11 +7795,11 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <part name="R9" library="resistor" deviceset="R-EU_" device="0309/10" value="10k"/>
 <part name="D10" library="diode" deviceset="1N5400" device=""/>
 <part name="R6" library="resistor" deviceset="R-EU_" device="0309/10" value="210"/>
-<part name="LED1_YEL" library="led" deviceset="LED" device=""/>
-<part name="LED2_RED" library="led" deviceset="LED" device=""/>
-<part name="LED3_RED" library="led" deviceset="LED" device=""/>
+<part name="LED5_YEL" library="led" deviceset="LED" device=""/>
 <part name="LED4_RED" library="led" deviceset="LED" device=""/>
-<part name="LED5_GRN" library="led" deviceset="LED" device=""/>
+<part name="LED3_RED" library="led" deviceset="LED" device=""/>
+<part name="LED2_RED" library="led" deviceset="LED" device=""/>
+<part name="LED1_GRN" library="led" deviceset="LED" device=""/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="0309/10" value="1k"/>
 <part name="R4" library="resistor" deviceset="R-EU_" device="0309/10" value="1k"/>
 <part name="R3" library="resistor" deviceset="R-EU_" device="0309/10" value="1k"/>
@@ -7898,28 +7813,29 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <part name="SUPPLY5" library="supply2" deviceset="+UB" device=""/>
 <part name="SUPPLY4" library="supply2" deviceset="+UB" device=""/>
 <part name="SUPPLY6" library="supply2" deviceset="+UB" device=""/>
-<part name="S1" library="switch" deviceset="55?-1LED" device="01"/>
 <part name="BATTERY" library="con-molex" deviceset="22-?-02" device="05-7028"/>
 <part name="SUPPLY7" library="supply2" deviceset="-UB" device=""/>
 <part name="SUPPLY8" library="supply2" deviceset="GND" device=""/>
 <part name="R18" library="resistor" deviceset="R-EU_" device="0309/10" value="xk?"/>
-<part name="J4" library="con-molex" deviceset="22-?-02" device="05-7028"/>
 <part name="SUPPLY2" library="supply2" deviceset="-UB" device=""/>
 <part name="SUPPLY9" library="supply2" deviceset="+15V" device=""/>
+<part name="S2" library="switch" deviceset="TL32PO" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="-78.74" y="106.68" size="1.778" layer="91">power from 220V power adapter</text>
+<text x="-71.12" y="106.68" size="1.778" layer="91">power from 220V adapter</text>
 <text x="-7.62" y="137.16" size="1.778" layer="91">======</text>
 <text x="35.56" y="132.08" size="1.778" layer="91" rot="R270">======</text>
 <text x="119.38" y="96.52" size="1.778" layer="91" rot="R270">======</text>
 <text x="20.32" y="73.66" size="1.778" layer="91">push button</text>
 <text x="20.32" y="78.74" size="1.778" layer="91">load simulation for battery test on leds ???</text>
+<text x="0" y="99.06" size="3.81" layer="91">?</text>
+<text x="-45.72" y="27.94" size="1.778" layer="91">protection</text>
 </plain>
 <instances>
 <instance part="J1" gate="-1" x="-55.88" y="104.14" rot="R180"/>
-<instance part="J1" gate="-2" x="-55.88" y="93.98" rot="R180"/>
+<instance part="J1" gate="-2" x="-55.88" y="96.52" rot="R180"/>
 <instance part="Q1" gate="G$1" x="-27.94" y="60.96"/>
 <instance part="R17" gate="G$1" x="-38.1" y="63.5" rot="R90"/>
 <instance part="R16" gate="G$1" x="-38.1" y="48.26" rot="R90"/>
@@ -7941,11 +7857,11 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <instance part="R9" gate="G$1" x="-10.16" y="96.52" rot="R180"/>
 <instance part="D10" gate="1" x="121.92" y="99.06" rot="R270"/>
 <instance part="R6" gate="G$1" x="121.92" y="27.94" rot="R270"/>
-<instance part="LED1_YEL" gate="G$1" x="48.26" y="66.04" rot="R90"/>
-<instance part="LED2_RED" gate="G$1" x="48.26" y="55.88" rot="R90"/>
+<instance part="LED5_YEL" gate="G$1" x="48.26" y="66.04" rot="R90"/>
+<instance part="LED4_RED" gate="G$1" x="48.26" y="55.88" rot="R90"/>
 <instance part="LED3_RED" gate="G$1" x="48.26" y="45.72" rot="R90"/>
-<instance part="LED4_RED" gate="G$1" x="48.26" y="35.56" rot="R90"/>
-<instance part="LED5_GRN" gate="G$1" x="48.26" y="25.4" rot="R90"/>
+<instance part="LED2_RED" gate="G$1" x="48.26" y="35.56" rot="R90"/>
+<instance part="LED1_GRN" gate="G$1" x="48.26" y="25.4" rot="R90"/>
 <instance part="R5" gate="G$1" x="43.18" y="17.78" rot="R270"/>
 <instance part="R4" gate="G$1" x="38.1" y="12.7" rot="R270"/>
 <instance part="R3" gate="G$1" x="33.02" y="7.62" rot="R270"/>
@@ -7955,20 +7871,18 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <instance part="SUPPLY3" gate="G$1" x="-25.4" y="35.56"/>
 <instance part="R11" gate="G$1" x="99.06" y="40.64"/>
 <instance part="D6" gate="1" x="86.36" y="7.62" rot="R90"/>
-<instance part="D8" gate="1" x="-45.72" y="88.9"/>
-<instance part="SUPPLY5" gate="G$1" x="-71.12" y="10.16"/>
+<instance part="D8" gate="1" x="-48.26" y="27.94" rot="R270"/>
+<instance part="SUPPLY5" gate="G$1" x="-71.12" y="30.48"/>
 <instance part="SUPPLY4" gate="G$1" x="30.48" y="-10.16" rot="R180"/>
 <instance part="SUPPLY6" gate="G$1" x="132.08" y="20.32"/>
-<instance part="S1" gate="-1" x="15.24" y="96.52" rot="MR0"/>
-<instance part="BATTERY" gate="-1" x="-73.66" y="7.62" rot="R180"/>
+<instance part="BATTERY" gate="-1" x="-73.66" y="27.94" rot="R180"/>
 <instance part="BATTERY" gate="-2" x="-73.66" y="38.1" rot="R180"/>
 <instance part="SUPPLY7" gate="G$1" x="-71.12" y="40.64" rot="R180"/>
 <instance part="SUPPLY8" gate="GND" x="-55.88" y="35.56"/>
-<instance part="R18" gate="G$1" x="10.16" y="81.28" rot="R90"/>
-<instance part="J4" gate="-1" x="154.94" y="106.68"/>
-<instance part="J4" gate="-2" x="154.94" y="101.6"/>
+<instance part="R18" gate="G$1" x="5.08" y="99.06" rot="R90"/>
 <instance part="SUPPLY2" gate="G$1" x="-55.88" y="78.74" rot="R270"/>
 <instance part="SUPPLY9" gate="+15V" x="-35.56" y="119.38"/>
+<instance part="S2" gate="BEF1" x="15.24" y="96.52" rot="MR270"/>
 </instances>
 <busses>
 </busses>
@@ -8072,7 +7986,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <segment>
 <wire x1="27.94" y1="55.88" x2="27.94" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="1"/>
-<pinref part="LED2_RED" gate="G$1" pin="A"/>
+<pinref part="LED4_RED" gate="G$1" pin="A"/>
 <wire x1="27.94" y1="55.88" x2="45.72" y2="55.88" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -8080,7 +7994,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <segment>
 <wire x1="22.86" y1="66.04" x2="22.86" y2="2.54" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="1"/>
-<pinref part="LED1_YEL" gate="G$1" pin="A"/>
+<pinref part="LED5_YEL" gate="G$1" pin="A"/>
 <wire x1="22.86" y1="66.04" x2="45.72" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -8108,7 +8022,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <wire x1="60.96" y1="73.66" x2="83.82" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="2901N" gate="G$1" pin="13"/>
 <wire x1="83.82" y1="73.66" x2="83.82" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="LED2_RED" gate="G$1" pin="C"/>
+<pinref part="LED4_RED" gate="G$1" pin="C"/>
 <wire x1="53.34" y1="55.88" x2="60.96" y2="55.88" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -8125,7 +8039,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <net name="N$25" class="0">
 <segment>
 <pinref part="2901N" gate="G$1" pin="1"/>
-<pinref part="LED4_RED" gate="G$1" pin="C"/>
+<pinref part="LED2_RED" gate="G$1" pin="C"/>
 <wire x1="81.28" y1="38.1" x2="81.28" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="53.34" y1="35.56" x2="81.28" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="35.56" x2="81.28" y2="38.1" width="0.1524" layer="91"/>
@@ -8175,8 +8089,9 @@ Source: www.e-switch.com .. 5500.pdf</description>
 </net>
 <net name="+UB" class="0">
 <segment>
-<wire x1="-63.5" y1="-7.62" x2="-10.16" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="-63.5" y1="-7.62" x2="-48.26" y2="-7.62" width="0.1524" layer="91"/>
 <pinref part="R15" gate="G$1" pin="1"/>
+<wire x1="-48.26" y1="-7.62" x2="-10.16" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="91.44" y1="17.78" x2="91.44" y2="20.32" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="121.92" y1="22.86" x2="121.92" y2="17.78" width="0.1524" layer="91"/>
@@ -8212,15 +8127,17 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <wire x1="88.9" y1="-7.62" x2="83.82" y2="-7.62" width="0.1524" layer="91" curve="-180"/>
 <wire x1="22.86" y1="-7.62" x2="-5.08" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="-7.62" x2="-5.08" y2="-7.62" width="0.1524" layer="91" curve="-180"/>
-<wire x1="-63.5" y1="7.62" x2="-71.12" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="-71.12" y1="7.62" x2="-71.12" y2="12.7" width="0.1524" layer="91"/>
+<wire x1="-63.5" y1="27.94" x2="-71.12" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="-71.12" y1="27.94" x2="-71.12" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="SUPPLY5" gate="G$1" pin="+UB"/>
-<junction x="-71.12" y="7.62"/>
-<wire x1="-63.5" y1="-7.62" x2="-63.5" y2="7.62" width="0.1524" layer="91"/>
+<junction x="-71.12" y="27.94"/>
+<wire x1="-63.5" y1="-7.62" x2="-63.5" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="BATTERY" gate="-1" pin="S"/>
 <label x="-55.88" y="-7.62" size="1.778" layer="95"/>
 <label x="109.22" y="17.78" size="1.778" layer="95"/>
 <label x="121.92" y="139.7" size="1.778" layer="95"/>
+<pinref part="D8" gate="1" pin="C"/>
+<wire x1="-48.26" y1="25.4" x2="-48.26" y2="-7.62" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -8230,9 +8147,9 @@ Source: www.e-switch.com .. 5500.pdf</description>
 </net>
 <net name="N$6" class="0">
 <segment>
-<pinref part="LED5_GRN" gate="G$1" pin="C"/>
+<pinref part="LED1_GRN" gate="G$1" pin="C"/>
 <wire x1="53.34" y1="25.4" x2="45.72" y2="25.4" width="0.1524" layer="91"/>
-<pinref part="LED5_GRN" gate="G$1" pin="A"/>
+<pinref part="LED1_GRN" gate="G$1" pin="A"/>
 <wire x1="43.18" y1="25.4" x2="45.72" y2="25.4" width="0.1524" layer="91"/>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="43.18" y1="22.86" x2="43.18" y2="25.4" width="0.1524" layer="91"/>
@@ -8245,13 +8162,6 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <segment>
 <wire x1="91.44" y1="50.8" x2="91.44" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="2901N" gate="G$1" pin="5"/>
-</segment>
-</net>
-<net name="N$26" class="0">
-<segment>
-<wire x1="10.16" y1="76.2" x2="12.7" y2="76.2" width="0.1524" layer="91"/>
-<wire x1="12.7" y1="76.2" x2="12.7" y2="63.5" width="0.1524" layer="91"/>
-<pinref part="R18" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="UVAR-1" class="0">
@@ -8290,7 +8200,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <pinref part="2901N" gate="G$1" pin="12"/>
 <wire x1="86.36" y1="76.2" x2="86.36" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="109.22" x2="86.36" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="LED1_YEL" gate="G$1" pin="C"/>
+<pinref part="LED5_YEL" gate="G$1" pin="C"/>
 <wire x1="53.34" y1="66.04" x2="53.34" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="25.4" y1="114.3" x2="25.4" y2="109.22" width="0.1524" layer="91"/>
 <label x="-7.62" y="114.3" size="1.778" layer="95"/>
@@ -8302,7 +8212,6 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <net name="GND" class="0">
 <segment>
 <pinref part="SUPPLY8" gate="GND" pin="GND"/>
-<junction x="-60.96" y="38.1"/>
 <pinref part="BATTERY" gate="-2" pin="S"/>
 <wire x1="-71.12" y1="38.1" x2="-55.88" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="SUPPLY7" gate="G$1" pin="-UB"/>
@@ -8314,30 +8223,21 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <pinref part="SUPPLY3" gate="G$1" pin="-UB"/>
 <wire x1="-55.88" y1="38.1" x2="-53.34" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="R16" gate="G$1" pin="1"/>
-<wire x1="-53.34" y1="38.1" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="-38.1" y1="38.1" x2="-25.4" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-53.34" y1="38.1" x2="-48.26" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-48.26" y1="38.1" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="38.1" x2="-27.94" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-27.94" y1="38.1" x2="-25.4" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="-38.1" y1="43.18" x2="-38.1" y2="38.1" width="0.1524" layer="91"/>
 <junction x="-38.1" y="38.1"/>
 <pinref part="J1" gate="-2" pin="S"/>
 <wire x1="-53.34" y1="38.1" x2="-53.34" y2="78.74" width="0.1524" layer="91"/>
 <pinref part="SUPPLY2" gate="G$1" pin="-UB"/>
-<wire x1="-53.34" y1="78.74" x2="-53.34" y2="88.9" width="0.1524" layer="91"/>
+<wire x1="-53.34" y1="78.74" x2="-53.34" y2="96.52" width="0.1524" layer="91"/>
 <junction x="-53.34" y="78.74"/>
+<pinref part="Q1" gate="G$1" pin="S"/>
+<wire x1="-27.94" y1="55.88" x2="-27.94" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="D8" gate="1" pin="A"/>
-<wire x1="-53.34" y1="88.9" x2="-53.34" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="-48.26" y1="88.9" x2="-53.34" y2="88.9" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<wire x1="17.78" y1="63.5" x2="17.78" y2="93.98" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$28" class="0">
-<segment>
-<pinref part="R18" gate="G$1" pin="2"/>
-<pinref part="S1" gate="-1" pin="NO"/>
-<wire x1="10.16" y1="86.36" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="-48.26" y1="38.1" x2="-48.26" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$29" class="0">
@@ -8351,8 +8251,7 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <pinref part="J1" gate="-1" pin="S"/>
 <pinref part="R17" gate="G$1" pin="2"/>
 <wire x1="-38.1" y1="116.84" x2="-38.1" y2="104.14" width="0.1524" layer="91"/>
-<wire x1="-38.1" y1="104.14" x2="-38.1" y2="88.9" width="0.1524" layer="91"/>
-<wire x1="-38.1" y1="88.9" x2="-38.1" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="104.14" x2="-38.1" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="-38.1" y1="116.84" x2="-35.56" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="-35.56" y1="116.84" x2="-20.32" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="-20.32" y1="116.84" x2="-20.32" y2="139.7" width="0.1524" layer="91"/>
@@ -8360,8 +8259,34 @@ Source: www.e-switch.com .. 5500.pdf</description>
 <wire x1="-53.34" y1="104.14" x2="-38.1" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="SUPPLY9" gate="+15V" pin="+15V"/>
 <junction x="-35.56" y="116.84"/>
-<pinref part="D8" gate="1" pin="C"/>
-<wire x1="-43.18" y1="88.9" x2="-38.1" y2="88.9" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$28" class="0">
+<segment>
+<pinref part="R18" gate="G$1" pin="2"/>
+<wire x1="5.08" y1="104.14" x2="20.32" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="63.5" x2="17.78" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="86.36" x2="20.32" y2="86.36" width="0.1524" layer="91"/>
+<pinref part="S2" gate="BEF1" pin="P"/>
+<wire x1="20.32" y1="86.36" x2="20.32" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="104.14" x2="20.32" y2="96.52" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<wire x1="12.7" y1="66.04" x2="12.7" y2="93.98" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$26" class="0">
+<segment>
+<pinref part="R18" gate="G$1" pin="1"/>
+<pinref part="S2" gate="BEF1" pin="S"/>
+<wire x1="5.08" y1="93.98" x2="10.16" y2="93.98" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$10" class="0">
+<segment>
+<junction x="-60.96" y="38.1"/>
 </segment>
 </net>
 </nets>
