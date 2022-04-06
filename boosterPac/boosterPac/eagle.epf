@@ -320,10 +320,10 @@ UsedLibrary="C:/Program Files (x86)/EAGLE-5.8.0/lbr/zilog.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="379 171 978 570"
+Loc="-34 37 565 436"
 State=2
 Number=0
 
 [Desktop]
-Screen="1366 768"
+Screen="644 480"
 Window="Win_1"
