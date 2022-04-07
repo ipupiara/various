@@ -7829,9 +7829,9 @@ Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da
 <text x="50.8" y="5.08" size="1.778" layer="91" rot="R90">======</text>
 <text x="12.7" y="78.74" size="1.778" layer="91">push button</text>
 <text x="-45.72" y="27.94" size="1.778" layer="91">protection</text>
-<text x="132.08" y="104.14" size="1.778" layer="91">no power adapter connected, S2 not conducting:
+<text x="134.62" y="104.14" size="1.778" layer="91">no power adapter connected, S2 not conducting:
 - Uvar is on high impedance, no led on</text>
-<text x="132.08" y="53.34" size="1.778" layer="91">220V power adapter connected with matching
+<text x="134.62" y="63.5" size="1.778" layer="91">220V power adapter connected with matching
 adapter, S2 pressed (Uvar1 exactly 0):
 --- Uvar on gnd because Q1 is open
 --- 2901 VCC on UB+ with 210 ohm between
@@ -7840,13 +7840,20 @@ adapter, S2 pressed (Uvar1 exactly 0):
 --- neg input on VR2 regulated voltage
 --- pos input on [R9..R11.R16] voltage div net
 --- all leds always in indicating state</text>
-<text x="132.08" y="93.98" size="1.778" layer="91">no power adapter connected, S2 conducting:
+<text x="134.62" y="93.98" size="1.778" layer="91">no power adapter connected, S2 conducting:
 ---  same as with power adapter connected</text>
-<text x="-96.52" y="7.62" size="1.778" layer="91">connected to Batterie is 
+<text x="-96.52" y="5.08" size="1.778" layer="91">connected to Batterie is 
 internal Battery, evtl.
-external Batterie or not
-impossible external 
-Battery loader</text>
+external Batterie or
+external Battery loader
+(LIMA)</text>
+<text x="129.54" y="45.72" size="3.302" layer="91">load current/voltage</text>
+<text x="129.54" y="111.76" size="3.302" layer="91">leds</text>
+<text x="134.62" y="30.48" size="1.778" layer="91">using power adapter for load
+==================
+where is a current limitingresistor? 
+what is the loadcurrent?
+what the load volatage?</text>
 </plain>
 <instances>
 <instance part="J1" gate="-1" x="-55.88" y="104.14" rot="R180"/>
