@@ -7832,6 +7832,24 @@ Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da
 <text x="15.24" y="83.82" size="1.778" layer="91">load simulation for battery test on leds ???</text>
 <text x="-7.62" y="83.82" size="3.81" layer="91">?</text>
 <text x="-45.72" y="27.94" size="1.778" layer="91">protection</text>
+<text x="132.08" y="104.14" size="1.778" layer="91">no power adapter connected, S2 not conducting:
+- Uvar is on high impedance, no led on</text>
+<text x="132.08" y="53.34" size="1.778" layer="91">220V power adapter connected with matching
+adapter, S2 pressed (Uvar1 exactly 0):
+--- Uvar on gnd because Q1 is open
+--- 2901 VCC on UB+ with 210 ohm between
+--- UB+ whatever is connected to Batterie
+--- VSS on gnd
+--- neg input on VR2 regulated voltage
+--- pos input on [R9..R11.R16] voltage div net
+--- all leds always in indicating state</text>
+<text x="132.08" y="93.98" size="1.778" layer="91">no power adapter connected, S2 conducting:
+---  same as with power adapter connected</text>
+<text x="-96.52" y="7.62" size="1.778" layer="91">connected to Batterie is 
+internal Battery, evtl.
+external Batterie or not
+impossible external 
+Battery loader</text>
 </plain>
 <instances>
 <instance part="J1" gate="-1" x="-55.88" y="104.14" rot="R180"/>
@@ -8127,8 +8145,8 @@ Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da
 <pinref part="LED5_YEL" gate="G$1" pin="C"/>
 <wire x1="45.72" y1="66.04" x2="45.72" y2="76.2" width="0.1524" layer="91"/>
 <label x="-12.7" y="93.98" size="1.778" layer="95"/>
-<label x="96.52" y="99.06" size="1.778" layer="95"/>
-<label x="-17.78" y="76.2" size="1.778" layer="95" rot="R90"/>
+<label x="96.52" y="93.98" size="1.778" layer="95"/>
+<label x="-15.24" y="76.2" size="1.778" layer="95" rot="R90"/>
 <label x="58.42" y="-12.7" size="1.778" layer="95"/>
 <wire x1="83.82" y1="91.44" x2="83.82" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="119.38" y1="93.98" x2="119.38" y2="0" width="0.1524" layer="91"/>
@@ -8297,4 +8315,10 @@ Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da
 </sheets>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
