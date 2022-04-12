@@ -11310,6 +11310,12 @@ In this library the device names are the same as the pin names of the symbols, t
 <text x="124.46" y="-7.62" size="2.54" layer="91">blue leds</text>
 <text x="73.66" y="78.74" size="1.778" layer="91">prevent multiple events by delaying</text>
 <text x="73.66" y="73.66" size="1.778" layer="91">(maybe not needed at all)</text>
+<text x="22.86" y="-35.56" size="2.54" layer="91">4,3 .. between R8 and base Q3
+1,2 .. power in, 12V and GND</text>
+<text x="152.4" y="-40.64" size="2.54" layer="91">7,8 .. between R3 and gate Q1 (n-channel Mosfet)
+6    .. R7
+4,5 .. alarm button</text>
+<text x="68.58" y="109.22" size="5.08" layer="91">receiver board</text>
 </plain>
 <instances>
 <instance part="T1" gate="G1" x="66.04" y="68.58"/>
@@ -11633,9 +11639,20 @@ In this library the device names are the same as the pin names of the symbols, t
 <pinref part="IC3" gate="D" pin="I"/>
 </segment>
 </net>
+<net name="N$18" class="0">
+<segment>
+<wire x1="66.04" y1="106.68" x2="116.84" y2="106.68" width="0.6096" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
