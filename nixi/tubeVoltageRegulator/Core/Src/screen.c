@@ -308,7 +308,7 @@ void paintHello()
 {
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	char* stri = "tubeVoltageRegulator";
+	char* stri = "screen initialized";
 	addToByteArray(&byteBuffer, strlen(stri), (uint8_t*) stri);
 }
 
