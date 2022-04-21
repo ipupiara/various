@@ -29,4 +29,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Core/i2c</name>
+			<type>2</type>
+			<location>/home/peetz/projects/stm32/various/stm32-libs/i2c</location>
+		</link>
+	</linkedResources>
 </projectDescription>
