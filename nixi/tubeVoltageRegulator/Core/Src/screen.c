@@ -72,14 +72,14 @@ typedef void(*t_fvoid)(void);
 typedef void(*t_fPar)(void* pCmdLine);
 
 typedef struct {
-	uint8_t waitCs;
+	uint8_t waitS11;
 	uint8_t xPos;
 	uint8_t yPos;
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
 typedef struct {
-	uint8_t waitCs;
+	uint8_t waitS11;
 	union {
 		struct {
 			uint8_t xPos;
@@ -119,8 +119,8 @@ screenJobType *  currentScreenJob;
 uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
-uint8_t centiSecCounter;		//  variables used for debugging
-uint8_t useCentiSecCounter;    //  variables used for debugging
+uint8_t waitCycleCounter;		//  variables used for debugging
+uint8_t useWaitCycleCounter;    //  variables used for debugging
 
 void setHelloPaintJob();
 
@@ -177,7 +177,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 
 void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
-	uint8_t waitTime = sJob[currentStepIndex].waitCs;
+	uint8_t waitTime = sJob[currentStepIndex].waitS11;
 	if (currentWaitCycle < waitTime) {
 		if (currentWaitCycle == 0) {
 			clear(&byteBuffer);
@@ -214,13 +214,13 @@ void screenCentiSecTimer ()
 		}
 	}
 
-	if (useCentiSecCounter == 1) {
-		if (centiSecCounter == 50)  {
-			centiSecCounter = 0;
-			useCentiSecCounter = 0;
+	if (useWaitCycleCounter == 1) {
+		if (waitCycleCounter == 50)  {
+			waitCycleCounter = 0;
+			useWaitCycleCounter = 0;
 			setHelloPaintJob();
 		} else  {
-			++ centiSecCounter;
+			++ waitCycleCounter;
 		}
 	}
 }
@@ -353,8 +353,8 @@ void initScreen()
 	currentStepIndex = 0;
 	jobState = jobInactive;
 	currentWaitCycle = 0;
-	centiSecCounter = 0;
-	useCentiSecCounter = 0;
+	waitCycleCounter = 0;
+	useWaitCycleCounter = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 }

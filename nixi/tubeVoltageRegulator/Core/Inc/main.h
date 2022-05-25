@@ -40,7 +40,7 @@ void toggleDebugOne();
 
 void Error_Handler(void);
 
-void sec100Tick();
+void sec11Tick();
 void triggerAdc1();
 
 void startSystemTimer(void);
@@ -72,7 +72,7 @@ enum {
 extern uint8_t  i2cMessageReceived;
 extern uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
-extern uint8_t  sec100Event;
+extern uint8_t  sec11Event;
 extern uint8_t  hvPwmState;
 
 /* USER CODE END EFP */

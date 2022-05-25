@@ -23,6 +23,7 @@
 #include "main.h"
 #include <nixi_i2c.h>
 #include <screen.h>
+#include <humidTempSensor.h>
 
 
 #define useDebugPort
@@ -43,7 +44,7 @@ TIM_HandleTypeDef htim2;
 uint8_t  i2cMessageReceived;
 uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
-uint8_t  sec100Event;
+uint8_t  sec11Event;
 uint8_t  hvPwmState;
 
 
@@ -58,7 +59,7 @@ uint8_t sec100Cnt;
 //#define debugSingleI2cMsg
 
 
-void sec100Tick()
+void sec11Tick()
 {
 //	triggerAdc1();
 
@@ -112,7 +113,7 @@ void initVariables()
 	i2cSec100DebugMsgPending = 0;
 	sec100Cnt =0;
 	hvPwmState = hvPwmIdle;
-	sec100Event = 0;
+	sec11Event = 0;
 }
 
 uint8_t debugTrigger;			// can be used for any needed kind of debugging
@@ -135,6 +136,7 @@ int main(void)
   initI2c();
 #ifndef debugSingleI2cMsg
   initScreen();
+  initHumidTempSensor();
 #endif
   startSystemTimer();
   BSP_OS_TickEnable();
@@ -150,9 +152,9 @@ int main(void)
 			   sendI2cByteArray(0x3c,stri, 2);
 
 	   }
-	   if (sec100Event == 1)  {
-		   	  sec100Event = 0;
-		   	  sec100Tick();
+	   if (sec11Event == 1)  {
+		   	  sec11Event = 0;
+		   	  sec11Tick();
 	   }
 	   if (i2cMessageReceived != 0)  {
 		   if (i2cMessageReceived == 1) {
