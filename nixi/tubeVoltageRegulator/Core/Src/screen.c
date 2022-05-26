@@ -7,6 +7,8 @@
 
 //    wip   work in progress     ,    entry on own risk :-)
 /////////////////////////////  work in progress ,  access on on risk
+#define screenI2cAddress 0x3c
+
 
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -191,7 +193,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 	}
 }
 
-void screenCentiSecTimer ()
+void screenS11Timer ()
 {
 	screenJobType*  screenJob = NULL;
 

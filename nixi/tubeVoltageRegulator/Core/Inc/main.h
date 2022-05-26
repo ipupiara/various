@@ -32,8 +32,6 @@ extern "C" {
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_gpio.h"
 
-#define screenI2cAddress 0x3c
-
 void setDebugOneOn();
 void setDebugOneOff();
 void toggleDebugOne();
@@ -73,6 +71,7 @@ extern uint8_t  i2cMessageReceived;
 extern uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
 extern uint8_t  sec11Event;
+extern uint8_t  humidTempRequired;
 extern uint8_t  hvPwmState;
 
 /* USER CODE END EFP */

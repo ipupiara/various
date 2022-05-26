@@ -45,6 +45,7 @@ uint8_t  i2cMessageReceived;
 uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
 uint8_t  sec11Event;
+uint8_t  humidTempRequired;
 uint8_t  hvPwmState;
 
 
@@ -64,8 +65,9 @@ void sec11Tick()
 //	triggerAdc1();
 
 #ifndef debugSingleI2cMsg
-	  screenCentiSecTimer();
+	  screenS11Timer();
 #else
+
 	if (sec100Cnt >= 50)  {
 		sec100Cnt = 0;
 		i2cSec100DebugMsgPending = 1;
@@ -73,6 +75,7 @@ void sec11Tick()
 	++ sec100Cnt;
 #endif
 }
+
 
 
 uint16_t clockRelValueVsMaxClk(uint16_t valAtMax)
@@ -114,6 +117,7 @@ void initVariables()
 	sec100Cnt =0;
 	hvPwmState = hvPwmIdle;
 	sec11Event = 0;
+	humidTempRequired = 0;
 }
 
 uint8_t debugTrigger;			// can be used for any needed kind of debugging
@@ -155,6 +159,10 @@ int main(void)
 	   if (sec11Event == 1)  {
 		   	  sec11Event = 0;
 		   	  sec11Tick();
+	   }
+	   if (humidTempRequired == 1)   {
+		   humidTempRequired= 0;
+		   humidTempTick();
 	   }
 	   if (i2cMessageReceived != 0)  {
 		   if (i2cMessageReceived == 1) {

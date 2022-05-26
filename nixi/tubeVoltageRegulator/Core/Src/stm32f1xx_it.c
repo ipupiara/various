@@ -159,7 +159,10 @@ void SysTick_Handler(void)
   HAL_IncTick();
 
   if ((uwTick % 11) == 0){
-	  sec11Event = 1;
+//	  sec11Event = 1;
+  }
+  if ((uwTick % 31) == 0)   { //       3203) == 0)
+	  humidTempRequired = 1;
   }
 }
 
