@@ -9,7 +9,7 @@
 #define INC_NIXI_I2C_H
 
 #define i2cErrorStringLength  80
-
+#define debugging
 
 extern uint8_t i2cErrorString  [i2cErrorStringLength];
 extern uint8_t  i2cTransmitErrorCollectorInt8u;

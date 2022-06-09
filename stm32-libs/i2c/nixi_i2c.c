@@ -14,7 +14,6 @@
 //#define i2cUseDma
 #define I2C_FLAG_NACKF  I2C_FLAG_AF
 
-#define debugging
 
 I2C_HandleTypeDef hi2c1;
 
@@ -535,7 +534,7 @@ void I2C1_ER_IRQHandler(void)
 		  addToErrorString("NACK");
 		  i2cError(0x69);
 	  }  else {   //  should actually be named I2C_FLAG_NACKF. how this name ?
-		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
+//		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
 		  addToErrorString("ER other");
 		  i2cError(0x54);
 	  }
@@ -547,7 +546,7 @@ void I2C1_ER_IRQHandler(void)
 //	  }
 }
 
-void i2c1_hw_Init(void)
+void init_i2c1_hw(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -577,6 +576,8 @@ void i2c1_hw_Init(void)
 	Error_Handler();
 	}
 
+
+
 	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
@@ -589,7 +590,7 @@ void initI2c()
 	i2cInitNeeded = 0;
 	i2cSetDataIdle();
 //	memset(i2cErrorString,0,i2cErrorStringLength);
-	i2c1_hw_Init();
+	init_i2c1_hw();
 	i2cInitialized = 1;
 }
 

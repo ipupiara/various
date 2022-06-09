@@ -38,7 +38,7 @@ void toggleDebugOne();
 
 void Error_Handler(void);
 
-void sec11Tick();
+//void sec1msTick();
 void triggerAdc1();
 
 void startSystemTimer(void);
@@ -70,7 +70,7 @@ enum {
 extern uint8_t  i2cMessageReceived;
 extern uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
-extern uint8_t  sec11Event;
+extern uint8_t  sec1msEvent;
 extern uint8_t  humidTempRequired;
 extern uint8_t  hvPwmState;
 

@@ -59,9 +59,9 @@
 #define LCD_AsciiControlByte		0x40
 #define LCD_CommandControlByte      0x00
 
-#define waitShortCs   	2
-#define waitMediumCs		5
-#define waitLongCs		120
+#define waitShortCs   	20
+#define waitMediumCs		50
+#define waitLongCs		1200
 
 #define byteArrayMaxSz   80
 
@@ -74,14 +74,14 @@ typedef void(*t_fvoid)(void);
 typedef void(*t_fPar)(void* pCmdLine);
 
 typedef struct {
-	uint8_t waitS11;
+	uint16_t waitS1ms;
 	uint8_t xPos;
 	uint8_t yPos;
 	t_fvoid  stepMethod ;
 } screenJobStepType ;
 
 typedef struct {
-	uint8_t waitS11;
+	uint16_t waitS1ms;
 	union {
 		struct {
 			uint8_t xPos;
@@ -179,7 +179,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 
 void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
-	uint8_t waitTime = sJob[currentStepIndex].waitS11;
+	uint16_t waitTime = sJob[currentStepIndex].waitS1ms;
 	if (currentWaitCycle < waitTime) {
 		if (currentWaitCycle == 0) {
 			clear(&byteBuffer);
@@ -193,7 +193,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 	}
 }
 
-void screenS11Timer ()
+void screenS1msTimer ()
 {
 	screenJobType*  screenJob = NULL;
 

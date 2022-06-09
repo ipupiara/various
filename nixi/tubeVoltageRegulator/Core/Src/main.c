@@ -24,6 +24,7 @@
 #include <nixi_i2c.h>
 #include <screen.h>
 #include <humidTempSensor.h>
+#include <usart.h>
 
 
 #define useDebugPort
@@ -44,7 +45,7 @@ TIM_HandleTypeDef htim2;
 uint8_t  i2cMessageReceived;
 uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean error
 
-uint8_t  sec11Event;
+uint8_t  sec1msEvent;
 uint8_t  humidTempRequired;
 uint8_t  hvPwmState;
 
@@ -60,12 +61,12 @@ uint8_t sec100Cnt;
 //#define debugSingleI2cMsg
 
 
-void sec11Tick()
+void sec1msTick()
 {
 //	triggerAdc1();
 
 #ifndef debugSingleI2cMsg
-	  screenS11Timer();
+//	  screenS1msTimer();
 #else
 
 	if (sec100Cnt >= 50)  {
@@ -116,7 +117,7 @@ void initVariables()
 	i2cSec100DebugMsgPending = 0;
 	sec100Cnt =0;
 	hvPwmState = hvPwmIdle;
-	sec11Event = 0;
+	sec1msEvent = 0;
 	humidTempRequired = 0;
 }
 
@@ -128,8 +129,6 @@ int main(void)
 
 	HAL_Init();
 
-	uint32_t prevTick = uwTick;
-	while (uwTick < prevTick + 500) {}
 
   SystemClock_Config();
 
@@ -137,33 +136,40 @@ int main(void)
   MX_GPIO_Init();
 //  MX_TIM2_Init();
 //  MX_ADC1_Init();
-  initI2c();
+//  initI2c();
+//  initHumidTempSensor();
 #ifndef debugSingleI2cMsg
-  initScreen();
-  initHumidTempSensor();
+//  initScreen();
+  initUsart();
+
 #endif
   startSystemTimer();
   BSP_OS_TickEnable();
+	uint32_t prevTick = uwTick;
+	while (uwTick < prevTick + 500) {}
+
    while (1)
   {
 	   if (i2cSec100DebugMsgPending != 0){
 
 		   i2cSec100DebugMsgPending = 0;
 		   uint8_t  arr [1]; UNUSED(arr);
-		  arr[0]=0xbb;
-//		  sendI2cByteArray(0x11,arr,0);
-		uint8_t stri [] = {0x00, 0x38,0x32};
-			   sendI2cByteArray(0x3c,stri, 2);
+//		  arr[0]=0xbb;
+////		  sendI2cByteArray(0x11,arr,0);
+//		uint8_t stri [] = {0x00, 0x38,0x32};
+//			   sendI2cByteArray(0x3c,stri, 2);
 
+
+		   sendI2cByteArray(0x44,arr, 0);
 	   }
-	   if (sec11Event == 1)  {
-		   	  sec11Event = 0;
-		   	  sec11Tick();
+	   if (sec1msEvent == 1)  {
+		   	  sec1msEvent = 0;
+		   	  sec1msTick();
 	   }
-	   if (humidTempRequired == 1)   {
-		   humidTempRequired= 0;
-		   humidTempTick();
-	   }
+//	   if (humidTempRequired == 1)   {
+//		   humidTempRequired= 0;
+//		   humidTempTick();
+//	   }
 	   if (i2cMessageReceived != 0)  {
 		   if (i2cMessageReceived == 1) {
 

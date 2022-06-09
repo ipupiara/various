@@ -8,7 +8,7 @@
 #ifndef INC_HUMIDTEMPSENSOR_H_
 #define INC_HUMIDTEMPSENSOR_H_
 
-void humidTempTick();
+//void humidTempTick();
 
 void initHumidTempSensor();
 
