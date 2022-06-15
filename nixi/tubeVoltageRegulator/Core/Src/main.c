@@ -66,7 +66,7 @@ void sec1msTick()
 //	triggerAdc1();
 
 #ifndef debugSingleI2cMsg
-//	  screenS1msTimer();
+	  screenS1msTimer();
 #else
 
 	if (sec100Cnt >= 50)  {
@@ -136,10 +136,10 @@ int main(void)
   MX_GPIO_Init();
 //  MX_TIM2_Init();
 //  MX_ADC1_Init();
-//  initI2c();
+  initI2c();
 //  initHumidTempSensor();
 #ifndef debugSingleI2cMsg
-//  initScreen();
+  initScreen();
   initUsart();
 
 #endif
@@ -194,6 +194,12 @@ int main(void)
 		 debugTrigger = 0;
 
 		 setDebugScreenJob();
+	   }
+	   if (dataReceivedUart1 == 1)  {
+		   dataReceivedUart1 = 0;
+		   if (onDataReceivedUart1IsValid() == 1){
+			   // display...
+		   }
 	   }
 
   }

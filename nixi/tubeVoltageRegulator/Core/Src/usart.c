@@ -5,11 +5,167 @@
  *      Author: peetz
  */
 #include <usart.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_def.h"
 
 UART_HandleTypeDef huart1;
 GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+
+/////////////   USART  ///////////////////
+
+
+#define startChar 0x40
+#define stopChar   0x24
+#define amtChars  66
+#define rxBufferSz  100
+char rxBuffer [rxBufferSz];
+
+uint8_t dataReceivedUart1;
+uint8_t hygrosenseMsgCnt;
+
+enum rxStates {
+	rxIdle,
+	rxReceiving,
+	rxReceived,
+};
+
+uint8_t  rxState;
+uint8_t  rxCurrentPos;
+uint16_t amtCharRcvd;
+uint16_t errMsgCnt;
+
+floatType   latestTemperature;
+floatType   latestHumidity;
+
+
+void enaRXIntUsart1()
+{
+//	UCSR1B   |= (1 << RXCIE1);
+}
+
+void disaRXIntUsart1()
+{
+//	UCSR1B   &= ~(1 << RXCIE1);  so far n ot needed in stm32F103
+}
+
+
+void getLatestClimateValues(floatType* pTemp,floatType* pHum)    // interface to hygrosense, called by user functions
+{
+	*pTemp = latestTemperature;
+	*pHum  = latestHumidity;
+}
+
+
+floatType getCurrentTemperature()
+{
+	return latestTemperature;
+}
+
+floatType getCurrentHumidity()
+{
+	return latestHumidity;
+}
+
+
+char * reallyWorkingStrstr(const char *inStr, const char *subStr)
+{
+	char firstSubChar;
+	size_t len;
+	firstSubChar = *subStr++;
+	if (!firstSubChar)
+	return (char *) inStr;	// Trivial empty string case
+
+	len = strlen(subStr);
+	do {
+		char currentInChar;
+
+		do {
+			currentInChar = *inStr++;
+			if (!currentInChar)
+			return (char *) 0;
+		} while (currentInChar != firstSubChar);
+	} while (strncmp(inStr, subStr, len) != 0);
+
+	return (char *) (inStr - 1);
+}
+
+
+
+
+uint8_t onDataReceivedUart1IsValid()        // called by main application thread to calculate the latest data
+{
+	char tempS [5];
+	char hydS [5];
+	uint8_t validMsg = 0;
+
+	char * v01Pos = (char *) 0;
+	char * v02Pos = (char *) 0;
+
+
+	memset (tempS,0,sizeof(tempS));
+	memset (hydS,0,sizeof(hydS));
+
+	//cli();
+	disaRXIntUsart1();   // just stop the receiver, triac continues
+//		info_printf("amtChars %i\n",amtCharRcvd);
+		if ((rxState = rxReceived) && ( amtCharRcvd == amtChars))  {      // some valid message check
+			validMsg = 1;
+			if (v01Pos == 0) {
+				v01Pos = reallyWorkingStrstr((char* )&rxBuffer,"V01");
+			}
+			if (v02Pos == 0) {
+				v02Pos = reallyWorkingStrstr((char*)&rxBuffer,"V02");
+			}
+			++hygrosenseMsgCnt;
+			strncpy(tempS,v01Pos+3,4);
+			strncpy(hydS,v02Pos+3,4);
+			rxState = rxIdle;
+		}  else  {
+			++ errMsgCnt;
+		}
+	enaRXIntUsart1();
+	//sei();
+	if (validMsg != 0)  {
+		char* endP = tempS+3;
+		floatType temp = strtoul(tempS ,&endP,0x10) ;
+		temp = temp / 100;
+		endP = hydS + 3;
+		floatType hyd = strtoul(hydS ,&endP,0x10) ;
+		hyd = hyd / 200;
+
+		latestTemperature = temp;
+		latestHumidity = hyd;
+#ifdef controlheating
+		controlTemperature(&temp);
+#endif
+	}
+	return validMsg;
+}
+
+
+void receiveUartByte(uint8_t rxCh)
+{
+	if (rxCh == startChar)  {
+		amtCharRcvd = 0;
+		dataReceivedUart1 = 0;
+		rxBuffer [amtCharRcvd] = rxCh;
+		rxState = rxReceiving;
+	} else
+	if (rxState == rxReceiving)  {
+		++ amtCharRcvd;
+		if (amtCharRcvd < rxBufferSz) {
+			rxBuffer [amtCharRcvd] = rxCh;
+		}
+		if (rxCh == stopChar) {   // no  chars lost
+			rxState = rxReceived;
+			dataReceivedUart1 = 1;
+		}
+	}
+}
 
 
 
@@ -19,6 +175,16 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 void initUsart()
 {
+
+	rxState = rxIdle;
+	dataReceivedUart1 = 0;
+	amtCharRcvd = 0;
+	errMsgCnt = 0;
+	latestTemperature = 0.00;
+	latestHumidity  = 0.00;
+	hygrosenseMsgCnt = 0;
+
+
 	__HAL_RCC_USART1_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
@@ -57,10 +223,6 @@ void initUsart()
 
 }
 
-void receiveUartByte(uint8_t by)
-{
-
-}
 
 uint8_t  getNextByte(uint8_t * bt)
 {
@@ -78,7 +240,7 @@ void USART1_IRQHandler(void)
 //	  uint32_t dmarequest = 0x00U;
 
 
-	  errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE | USART_SR_NE));
+	  errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE)); // | USART_SR_NE));
 	  if (errorflags == 0)
 	  {
 	    if ((isrflags & USART_SR_RXNE) != 0)
@@ -110,7 +272,7 @@ void USART1_IRQHandler(void)
 	    // UART Over-Run interrupt occurred --------------------------------------
 	    if ((isrflags & USART_SR_ORE) != 0)
 	    {
-
+	    	READ_REG(huart1.Instance->DR);
 	    }
 
 
