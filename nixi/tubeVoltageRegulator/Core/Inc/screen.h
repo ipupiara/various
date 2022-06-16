@@ -17,4 +17,6 @@ void paintCanScreen();
 void initScreen();
 void setDebugScreenJob();
 
+void displayFatalError();
+
 #endif /* INC_SCREEN_H_ */

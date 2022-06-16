@@ -349,6 +349,11 @@ void setHelloPaintJob()
 }
 
 
+void displayFatalError()
+{
+
+}
+
 void initScreen()
 {
 	currentScreenJob = NULL;

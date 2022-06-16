@@ -25,6 +25,9 @@
 #include <screen.h>
 #include <humidTempSensor.h>
 #include <usart.h>
+#include <TriacDefines.h>
+#include <StateClass.h>
+#include <TriacIntr.h>
 
 
 #define useDebugPort
@@ -111,6 +114,8 @@ void stopHvPwm()
 
 void initVariables()
 {
+	initDefines();
+
 	i2cMessageReceived = 0;
 	i2cMessageSent = 0;
 	lastADCResult = 0;
@@ -127,6 +132,7 @@ int main(void)
 {
 	initVariables();
 
+
 	HAL_Init();
 
 
@@ -134,12 +140,14 @@ int main(void)
 
 
   MX_GPIO_Init();
+  initHW();
 //  MX_TIM2_Init();
 //  MX_ADC1_Init();
   initI2c();
 //  initHumidTempSensor();
 #ifndef debugSingleI2cMsg
   initScreen();
+  startStateCharts();
   initUsart();
 
 #endif
