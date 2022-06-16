@@ -6,8 +6,8 @@
 #include <main.h>
 //#include "TriacDefines.h"
 
-//TStatechart	 STriacHumidityChart;
-//TStatechart* PTriacHumidityChart;
+extern TStatechart	 STriacHumidityChart;
+extern TStatechart* PTriacHumidityChart;
 //
 //TStatechart	 SGrowboxI2CChart;
 //TStatechart* PGrowboxI2CChart;

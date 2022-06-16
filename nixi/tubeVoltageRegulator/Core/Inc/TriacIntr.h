@@ -6,7 +6,7 @@
 
 #include "TriacDefines.h"
 
-//#define controlheating   // only was used when heating and humidifying needed same relais-port
+#define controlheating
 
 //#define adcRefVoltage5   5.0
 //#define adcRefVoltad2d5  2.56
@@ -22,13 +22,13 @@ extern uint16_t secondsRemainingInDurationTimer;
 extern uint16_t secondsInDurationTimer;
 
 //uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
-extern int8_t relais1On;
+extern int8_t heaterRelaisOn;
 
 extern uint8_t minutesCounter;
 extern uint8_t secondsCounter;
 extern uint16_t hoursCounter;
 
-
+void secTimer();
 
 void startDurationTimer(int16_t secs);
 int16_t getSecondsRemainingInDurationTimer();

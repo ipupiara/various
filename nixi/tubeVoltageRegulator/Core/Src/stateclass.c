@@ -24,8 +24,8 @@ CGrowBoxEvent* currentEvent;
 TStatechart	 STriacHumidityChart;
 TStatechart* PTriacHumidityChart;
 
-TStatechart	 SGrowboxI2CChart;
-TStatechart* PGrowboxI2CChart;
+//TStatechart	 SGrowboxI2CChart;
+//TStatechart* PGrowboxI2CChart;
 
 
 // This defines and names the states the class has.

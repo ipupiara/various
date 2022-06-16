@@ -7,6 +7,11 @@
 
 #include "TriacIntr.h"
 #include "TriacDefines.h"
+#include <stm32f1xx.h>
+
+
+#include <main.h>
+
 //#include "triacPID.h"
 
 //int16_t remainingTriacTriggerDelayCounts;
@@ -24,19 +29,20 @@
 //void initOutUart0();
 
 uint8_t durationTimerReachead;
-uint8_t runningSecondsTick;
+
 uint8_t durationTimerReachedTwo;
 uint16_t secondsRemainingInDurationTimer;
 uint16_t secondsInDurationTimer;
 //uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
-int8_t relais1On;
+int8_t heaterRelaisOn;
+int8_t ventiRelaisOn;
 
 uint8_t minutesCounter;
 uint8_t secondsCounter;
 uint16_t hoursCounter;
 
 
-void initRelais1();
+void initRelais();
 
 void controlTemperature(float* temp);
 
@@ -362,7 +368,7 @@ uint32_t overallSeconds()
 }
 
 //ISR(TIMER1_COMPA_vect)
-void timer1()
+void secTimer()
 {
 	if (secondsCounter == 59) { 
 		++ minutesCounter;
@@ -384,10 +390,10 @@ void timer1()
 			durationTimerReachead = 1;
 		} 
 	}
-	runningSecondsTick = 1;
+
 }
 
-void initInterrupts()
+void initInterruptsNValues()
 {
 	
 ///////   0-x detector input pint INT7 on PE7  
@@ -401,7 +407,7 @@ void initInterrupts()
 
 // Timer 1 as Duration Timer
 	  
-		runningSecondsTick = 0;
+
 
 		//  use system sec timer
 	  
@@ -562,10 +568,10 @@ void initHW()
 //	initOutUart0();
 //#endif
 //
-//	initInterrupts();
+	initInterruptsNValues();
 //	initUsart1();
 //	startSecondTick();
-//	initRelais1();
+	initRelais();
 
     fatalErrorOccurred = 0;
 	
@@ -578,28 +584,59 @@ void initHW()
  
 // #define relais1PortDDR  DDRB
 // #define relais1PinDDR   DDB0
- #define relais1Port
+// #define ventiRrelais1Port
 //PORTB
- #define relais1Pin
+// #define relais1Pin     avr code
 //PB0
 
+#define heaterPin_Pin GPIO_PIN_15
+#define heaterPin_GPIO_Port GPIOC
+#define ventiPin_Pin GPIO_PIN_9
+#define ventiPin_GPIO_Port GPIOB
 
-
- void switchRelais1(uint8_t relaisNeedsOn)
+ void switchHeaterRelais(uint8_t relaisNeedsOn)
  {
-//	 if (relaisNeedsOn > 0) {
-//		 relais1Port |= (1 << relais1Pin);
-//		 relais1On= 1;
-//		 }  else   {
-//		 relais1Port &= ~(1 << relais1Pin);
-//		 relais1On = 0;
-//	 }
+	 if (relaisNeedsOn > 0) {
+		 HAL_GPIO_WritePin(heaterPin_GPIO_Port, heaterPin_Pin, GPIO_PIN_SET);
+		 heaterRelaisOn= 1;
+	 }  else   {
+		 HAL_GPIO_WritePin(heaterPin_GPIO_Port, heaterPin_Pin, GPIO_PIN_RESET);
+		 heaterRelaisOn = 0;
+	 }
+ }
+
+ void  switchVentiRelais(uint8_t relaisNeedsOn)
+ {
+	 if (relaisNeedsOn > 0) {
+		 HAL_GPIO_WritePin(ventiPin_GPIO_Port, ventiPin_Pin, GPIO_PIN_SET);
+		 ventiRelaisOn= 1;
+	 }  else   {
+		 HAL_GPIO_WritePin(ventiPin_GPIO_Port, ventiPin_Pin, GPIO_PIN_RESET);
+		 ventiRelaisOn = 0;
+	 }
  }
 
 
-
- void initRelais1()
+ void initRelais()
  {
+	 GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	   HAL_GPIO_WritePin(heaterPin_GPIO_Port, heaterPin_Pin, GPIO_PIN_RESET);
+	   GPIO_InitStruct.Pin = heaterPin_Pin;
+	   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	   GPIO_InitStruct.Pull = GPIO_NOPULL;
+	   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	   HAL_GPIO_Init(heaterPin_GPIO_Port, &GPIO_InitStruct);
+	   heaterRelaisOn = 0;
+
+
+	   HAL_GPIO_WritePin(ventiPin_GPIO_Port, ventiPin_Pin, GPIO_PIN_RESET);
+	   GPIO_InitStruct.Pin = ventiPin_Pin;
+	   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	   GPIO_InitStruct.Pull = GPIO_NOPULL;
+	   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	   HAL_GPIO_Init(ventiPin_GPIO_Port, &GPIO_InitStruct);
+	   ventiRelaisOn = 0;
 //	 relais1PortDDR |= (1 << relais1PinDDR);    // define as output
 //	 switchRelais1(0);
  }
@@ -609,10 +646,10 @@ void initHW()
  {
 #ifdef controlheating	
 	 if (*temp < HeatingLowerLimit)  {
-		 switchRelais1(1);
+		 switchHeaterRelais(1);
 	 }
 	 if (*temp > HeatingUpperLimit)  {
-		 switchRelais1(0);
+		 switchHeaterRelais(0);
 	 }
 #endif	 
  }
@@ -642,22 +679,22 @@ void startVentilator(uint8_t  on)
 
 void startVentilating()
 {
-	startVentilator(1);
+	switchVentiRelais(1);
 }
 
 void stopVentilating()
 {
-	startVentilator(0);	
+	switchVentiRelais(0);
 }
 
 void startDrying()
 {
-	startVentilator(1);	
+	switchVentiRelais(1);
 }
 
 void stopDrying()
 {
-	startVentilator(0);	
+	switchVentiRelais(0);
 }
 
 

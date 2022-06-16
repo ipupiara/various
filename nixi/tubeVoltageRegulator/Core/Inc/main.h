@@ -74,6 +74,7 @@ extern uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all oth
 
 extern uint8_t  sec1msEvent;
 extern uint8_t  humidTempRequired;
+extern uint8_t  secondTickValue;
 extern uint8_t  hvPwmState;
 
 /* USER CODE END EFP */

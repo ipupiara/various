@@ -132,14 +132,6 @@ void csv_printf(const char *emsg, ...);
 extern char lastFatalErrorString [20];
 extern int8_t fatalErrorOccurred;
 
-//extern uint8_t durationTimerReachead;
-//extern uint8_t runningSecondsTick;
-//extern uint8_t durationTimerReachedTwo;
-//extern uint16_t secondsRemainingInDurationTimer;
-//extern uint16_t secondsInDurationTimer;
-//
-////uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
-//extern int8_t relais1On;
 
 
 floatType  GetIdleVentilationDelayMinutes();

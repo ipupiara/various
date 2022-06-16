@@ -50,8 +50,9 @@ uint8_t  i2cMessageSent;		// 1 = ok, 0 = nothing received / sent, all other mean
 
 uint8_t  sec1msEvent;
 uint8_t  humidTempRequired;
+uint8_t  secondTickValue;
 uint8_t  hvPwmState;
-
+CGrowBoxEvent ev;
 
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
@@ -63,8 +64,12 @@ uint8_t sec100Cnt;
 
 //#define debugSingleI2cMsg
 
+void secondTick()
+{
+	secTimer();
+}
 
-void sec1msTick()
+void screen1msTick()
 {
 //	triggerAdc1();
 
@@ -115,7 +120,7 @@ void stopHvPwm()
 void initVariables()
 {
 	initDefines();
-
+	secondTickValue = 0;
 	i2cMessageReceived = 0;
 	i2cMessageSent = 0;
 	lastADCResult = 0;
@@ -124,6 +129,11 @@ void initVariables()
 	hvPwmState = hvPwmIdle;
 	sec1msEvent = 0;
 	humidTempRequired = 0;
+}
+
+void resetWatchDog()
+{
+
 }
 
 uint8_t debugTrigger;			// can be used for any needed kind of debugging
@@ -158,6 +168,7 @@ int main(void)
 
    while (1)
   {
+	   resetWatchDog();
 	   if (i2cSec100DebugMsgPending != 0){
 
 		   i2cSec100DebugMsgPending = 0;
@@ -172,7 +183,7 @@ int main(void)
 	   }
 	   if (sec1msEvent == 1)  {
 		   	  sec1msEvent = 0;
-		   	  sec1msTick();
+		   	  screen1msTick();
 	   }
 //	   if (humidTempRequired == 1)   {
 //		   humidTempRequired= 0;
@@ -206,8 +217,19 @@ int main(void)
 	   if (dataReceivedUart1 == 1)  {
 		   dataReceivedUart1 = 0;
 		   if (onDataReceivedUart1IsValid() == 1){
-			   // display...
+			ev.evType = eValueAssignement;
+			ev.humidity = getCurrentHumidity();
+			ev.temperature = getCurrentTemperature();
+			processTriacEvent(PTriacHumidityChart, &ev);
 		   }
+	   }
+	   if (secondTickValue == 1)   {
+		   secondTick();
+	   }
+	   if (durationTimerReachead == 1) {
+		   durationTimerReachead  = 0;
+		   ev.evType = eTimeOutDurationTimer;
+		   processTriacEvent(PTriacHumidityChart, &ev);
 	   }
 
   }

@@ -161,9 +161,12 @@ void SysTick_Handler(void)
 
   sec1msEvent = 1;
 
-  if ((uwTick % 31) == 0)   { //       3203) == 0)
-	  humidTempRequired = 1;
-  }
+//  if ((uwTick % 31) == 0)   { //       3203) == 0)
+//	  humidTempRequired = 1;
+//  }
+  if ((uwTick % 1000) == 0)   { //       3203) == 0)
+	  secondTickValue = 1;
+    }
 }
 
 /******************************************************************************/

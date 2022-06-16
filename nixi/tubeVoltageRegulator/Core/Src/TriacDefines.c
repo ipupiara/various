@@ -15,15 +15,6 @@
 char lastFatalErrorString [20];
 int8_t fatalErrorOccurred;
 
-//uint8_t durationTimerReachead;
-//uint8_t runningSecondsTick;
-//uint8_t durationTimerReachedTwo;
-//uint16_t secondsRemainingInDurationTimer;
-//uint16_t secondsInDurationTimer;
-//
-////uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
-//int8_t relais1On;
-//
 
 void initTimerPorts();
 
