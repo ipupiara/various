@@ -121,8 +121,6 @@ screenJobType *  currentScreenJob;
 uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
-uint8_t waitCycleCounter;		//  variables used for debugging
-uint8_t useWaitCycleCounter;    //  variables used for debugging
 
 void setHelloPaintJob();
 
@@ -213,16 +211,6 @@ void screenS1msTimer ()
 			currentStepIndex = 0;
 			jobState = jobInactive;
 			CPU_IntEn();
-		}
-	}
-
-	if (useWaitCycleCounter == 1) {
-		if (waitCycleCounter == 50)  {
-			waitCycleCounter = 0;
-			useWaitCycleCounter = 0;
-			setHelloPaintJob();
-		} else  {
-			++ waitCycleCounter;
 		}
 	}
 }
@@ -348,6 +336,11 @@ void setHelloPaintJob()
 	setNextScreenJob(&halloPaint);
 }
 
+void setGrowboxScreen()
+{
+	setHelloPaintJob();
+}
+
 
 void displayFatalError()
 {
@@ -360,8 +353,6 @@ void initScreen()
 	currentStepIndex = 0;
 	jobState = jobInactive;
 	currentWaitCycle = 0;
-	waitCycleCounter = 0;
-	useWaitCycleCounter = 0;
 	clear(&byteBuffer);
 	setNextScreenJob(&initJob);
 }

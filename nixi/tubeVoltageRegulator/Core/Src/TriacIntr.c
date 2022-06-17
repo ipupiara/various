@@ -30,7 +30,7 @@
 
 uint8_t durationTimerReachead;
 
-uint8_t durationTimerReachedTwo;
+//uint8_t durationTimerReachedTwo;
 uint16_t secondsRemainingInDurationTimer;
 uint16_t secondsInDurationTimer;
 //uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
@@ -382,9 +382,9 @@ void secTimer()
 	if (secondsRemainingInDurationTimer > 0) {
 		secondsRemainingInDurationTimer --;
 		secondsInDurationTimer ++;
-		if (secondsInDurationTimer == 2) {
-			durationTimerReachedTwo = 1;
-		}
+//		if (secondsInDurationTimer == 2) {
+//			durationTimerReachedTwo = 1;
+//		}
 		if (secondsRemainingInDurationTimer == 0) {
 			stopDurationTimer();
 			durationTimerReachead = 1;
@@ -617,8 +617,22 @@ void initHW()
  }
 
 
+ void testRelais()
+ {
+	 uint8_t cnt;
+	 for (cnt = 0; cnt < 3; ++ cnt)  {
+		 switchHeaterRelais(1);
+		 switchVentiRelais(1);
+		 switchVentiRelais(0);
+		 switchHeaterRelais(0);
+	 }
+ }
+
+
  void initRelais()
  {
+	 __HAL_RCC_GPIOB_CLK_ENABLE();
+	 __HAL_RCC_GPIOC_CLK_ENABLE();
 	 GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 	   HAL_GPIO_WritePin(heaterPin_GPIO_Port, heaterPin_Pin, GPIO_PIN_RESET);
@@ -637,21 +651,19 @@ void initHW()
 	   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	   HAL_GPIO_Init(ventiPin_GPIO_Port, &GPIO_InitStruct);
 	   ventiRelaisOn = 0;
-//	 relais1PortDDR |= (1 << relais1PinDDR);    // define as output
-//	 switchRelais1(0);
+
+//	   testRelais();
  }
 
 
  void controlTemperature(float* temp)
  {
-#ifdef controlheating	
 	 if (*temp < HeatingLowerLimit)  {
 		 switchHeaterRelais(1);
 	 }
 	 if (*temp > HeatingUpperLimit)  {
 		 switchHeaterRelais(0);
 	 }
-#endif	 
  }
 
 void startHumidifying()
@@ -666,15 +678,13 @@ void stopHumidifying()
 
 void startVentilator(uint8_t  on)
 {
-#ifndef controlheating	
 	if (on == 1)   {
-		switchRelais1(1);
+		switchVentiRelais(1);
 //		 while (1){} //  was used to test watchdog, so that something sounds a bit, worked well with asm code in "wdt_enable(val );"
 	}  else
 	{
-		switchRelais1(0);	
+		switchVentiRelais(0);
 	}
-#endif	
 }
 
 void startVentilating()

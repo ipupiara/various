@@ -67,6 +67,8 @@ uint8_t sec100Cnt;
 void secondTick()
 {
 	secTimer();
+	ev.evType = eSecondsTick;
+	processTriacEvent(PTriacHumidityChart, &ev);
 }
 
 void screen1msTick()
@@ -169,18 +171,18 @@ int main(void)
    while (1)
   {
 	   resetWatchDog();
-	   if (i2cSec100DebugMsgPending != 0){
-
-		   i2cSec100DebugMsgPending = 0;
-		   uint8_t  arr [1]; UNUSED(arr);
+//	   if (i2cSec100DebugMsgPending != 0){
+//
+//		   i2cSec100DebugMsgPending = 0;
+//		   uint8_t  arr [1]; UNUSED(arr);
 //		  arr[0]=0xbb;
 ////		  sendI2cByteArray(0x11,arr,0);
 //		uint8_t stri [] = {0x00, 0x38,0x32};
 //			   sendI2cByteArray(0x3c,stri, 2);
 
 
-		   sendI2cByteArray(0x44,arr, 0);
-	   }
+//		   sendI2cByteArray(0x44,arr, 0);
+//	   }
 	   if (sec1msEvent == 1)  {
 		   	  sec1msEvent = 0;
 		   	  screen1msTick();
@@ -224,6 +226,7 @@ int main(void)
 		   }
 	   }
 	   if (secondTickValue == 1)   {
+		   secondTickValue = 0;
 		   secondTick();
 	   }
 	   if (durationTimerReachead == 1) {

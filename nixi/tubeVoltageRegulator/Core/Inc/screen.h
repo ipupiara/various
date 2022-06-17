@@ -17,6 +17,8 @@ void paintCanScreen();
 void initScreen();
 void setDebugScreenJob();
 
+void setGrowboxScreen();
+
 void displayFatalError();
 
 #endif /* INC_SCREEN_H_ */

@@ -114,6 +114,22 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 		return (uStIntHandlingDone);
 	}
 
+	if (currentEvent->evType == eSecondsTick)
+		{
+		//	setGrowboxScreen();
+			initScreen();
+	//		++ i2cSecondCounter;
+	//		if (i2cSecondCounter >= 3)  {
+	//			snprintf((char *)&i2cStateString,sizeof(i2cStateString),"i2c err to");
+	//
+	//			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CIdleError );
+	////			No event action.
+	//			END_EVENT_HANDLER(PGrowboxI2CChart );
+	//			return (uStIntHandlingDone);
+	//		}
+	//
+		}
+
 	return (uStIntNoMatch);
 }
 

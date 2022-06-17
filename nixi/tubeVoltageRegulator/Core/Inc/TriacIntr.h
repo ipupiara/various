@@ -6,7 +6,7 @@
 
 #include "TriacDefines.h"
 
-#define controlheating
+
 
 //#define adcRefVoltage5   5.0
 //#define adcRefVoltad2d5  2.56
@@ -15,7 +15,7 @@
 
 extern uint8_t durationTimerReachead;
 extern uint8_t runningSecondsTick;
-extern uint8_t durationTimerReachedTwo;
+//extern uint8_t durationTimerReachedTwo;
 
 extern uint16_t secondsRemainingInDurationTimer;
 
