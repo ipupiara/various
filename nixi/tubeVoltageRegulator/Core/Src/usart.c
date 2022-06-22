@@ -25,7 +25,7 @@ GPIO_InitTypeDef GPIO_InitStruct = {0};
 char rxBuffer [rxBufferSz];
 
 uint8_t dataReceivedUart1;
-uint8_t hygrosenseMsgCnt;
+uint32_t hygrosenseMsgCnt;
 
 enum rxStates {
 	rxIdle,

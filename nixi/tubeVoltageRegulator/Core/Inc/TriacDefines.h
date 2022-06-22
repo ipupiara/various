@@ -20,13 +20,13 @@
 	#define maxSecsPossible  0xFFFF
 	
 	
-	#define IdleVentilationDelayMinutes   2 // 17
-	#define IdleVentilationMinutes  1   //  3
+	#define IdleVentilationDelayMinutes   10 // 17
+	#define IdleVentilationMinutes  2   //  3
 
 	#define HumidifyingLowerLimit   70.0
 	#define HumidifyingUpperLimit  75.0
-	#define DryingUpperLimit	101.5
-	#define DryingLowerLimit	101.0
+	#define DryingUpperLimit	105.0
+	#define DryingLowerLimit	104.5
 
 
 	#define HeatingLowerLimit	27.0
@@ -125,7 +125,7 @@ void csv_printf(const char *emsg, ...);
 
 //void delayEmptyProc ();
 
-//uint8_t  hygrosenseMsgCnt;
+//uint32_t  hygrosenseMsgCnt;
 
 //void delay6pnt2d5us(unsigned int n);   // description in TriacDefines.c
 
