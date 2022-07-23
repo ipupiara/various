@@ -21,6 +21,7 @@
 #include <cpu.h>
 #include <string.h>
 #include "main.h"
+#include <stm32f1xx_hal_wwdg.h>
 #include <nixi_i2c.h>
 #include <screen.h>
 #include <humidTempSensor.h>
@@ -39,6 +40,7 @@ uint16_t lastADCResult;
 TIM_HandleTypeDef htim2;
 //TIM_HandleTypeDef htim3;
 
+WWDG_HandleTypeDef hwwdg;
 
 #ifdef useDebugPort
 #define debugPin1_Pin GPIO_PIN_13
@@ -61,6 +63,15 @@ void MX_TIM2_Init(void);
 
 uint8_t i2cSec100DebugMsgPending;
 uint8_t sec100Cnt;
+
+void Error_Handler(void)
+{
+  __disable_irq();
+  while (1)
+  {
+  }
+}
+
 
 //#define debugSingleI2cMsg
 
@@ -133,9 +144,45 @@ void initVariables()
 	humidTempRequired = 0;
 }
 
-void resetWatchDog()
+void WWDG_IRQHandler(void)
 {
 
+//  HAL_WWDG_IRQHandler(&hwwdg);
+
+}
+
+static void MWWDG_Init(void)
+{
+
+	__HAL_RCC_WWDG_CLK_ENABLE();
+
+  hwwdg.Instance = WWDG;
+  hwwdg.Init.Prescaler = WWDG_PRESCALER_2;
+  hwwdg.Init.Window = 0x6F;
+  hwwdg.Init.Counter = 0x7F;
+  hwwdg.Init.EWIMode = WWDG_EWI_ENABLE;
+  if (HAL_WWDG_Init(&hwwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+	HAL_NVIC_SetPriority(WWDG_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(WWDG_IRQn);
+}
+
+uint8_t  isCouterInWindow()
+{
+	uint8_t res = 0;
+	uint32_t cnt = (hwwdg.Instance->CR & 0x7F);
+	uint32_t tresh = ( hwwdg.Instance->CFR  & 0x7f);
+	res = ((cnt < tresh) &&(cnt > 0x3F));
+	return res;
+}
+
+void resetWatchDog()
+{
+	if (isCouterInWindow())  {
+		HAL_WWDG_Refresh(&hwwdg);
+	}
 }
 
 uint8_t debugTrigger;			// can be used for any needed kind of debugging
@@ -167,7 +214,7 @@ int main(void)
   BSP_OS_TickEnable();
 	uint32_t prevTick = uwTick;
 	while (uwTick < prevTick + 500) {}
-
+	MWWDG_Init();
    while (1)
   {
 	   resetWatchDog();
@@ -532,24 +579,6 @@ void MX_GPIO_Init(void)
 #endif
 }
 
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
 
 #ifdef  USE_FULL_ASSERT
 /**

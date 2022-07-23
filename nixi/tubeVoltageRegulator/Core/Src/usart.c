@@ -212,7 +212,7 @@ void initUsart()
 	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
 	if (HAL_UART_Init(&huart1) != HAL_OK)
 	{
-	//Error_Handler();
+		Error_Handler();
 	}
 
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
