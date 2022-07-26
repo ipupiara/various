@@ -32,6 +32,7 @@
 
 
 #define useDebugPort
+#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -146,8 +147,10 @@ void initVariables()
 
 void WWDG_IRQHandler(void)
 {
-
 //  HAL_WWDG_IRQHandler(&hwwdg);
+	if (__HAL_WWDG_GET_FLAG(&hwwdg, WWDG_FLAG_EWIF) != RESET)  {
+		__HAL_WWDG_CLEAR_FLAG(&hwwdg, WWDG_FLAG_EWIF);
+	}
 
 }
 
@@ -157,7 +160,7 @@ static void MWWDG_Init(void)
 	__HAL_RCC_WWDG_CLK_ENABLE();
 
   hwwdg.Instance = WWDG;
-  hwwdg.Init.Prescaler = WWDG_PRESCALER_2;
+  hwwdg.Init.Prescaler = WWDG_PRESCALER_8;
   hwwdg.Init.Window = 0x6F;
   hwwdg.Init.Counter = 0x7F;
   hwwdg.Init.EWIMode = WWDG_EWI_ENABLE;
@@ -178,10 +181,13 @@ uint8_t  isCouterInWindow()
 	return res;
 }
 
+uint32_t wwdgCnt;
+
 void resetWatchDog()
 {
 	if (isCouterInWindow())  {
 		HAL_WWDG_Refresh(&hwwdg);
+		++wwdgCnt;
 	}
 }
 
@@ -190,7 +196,7 @@ uint8_t debugTrigger;			// can be used for any needed kind of debugging
 int main(void)
 {
 	initVariables();
-
+	wwdgCnt = 0;
 
 	HAL_Init();
 
@@ -214,10 +220,14 @@ int main(void)
   BSP_OS_TickEnable();
 	uint32_t prevTick = uwTick;
 	while (uwTick < prevTick + 500) {}
+#ifdef useWWDG
 	MWWDG_Init();
+#endif
    while (1)
   {
+#ifdef useWWDG
 	   resetWatchDog();
+#endif
 //	   if (i2cSec100DebugMsgPending != 0){
 //
 //		   i2cSec100DebugMsgPending = 0;
