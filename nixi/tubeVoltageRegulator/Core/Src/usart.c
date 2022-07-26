@@ -171,11 +171,11 @@ void receiveUartByte(uint8_t rxCh)
 
 
 
-
+uint32_t usartCnt;
 
 void initUsart()
 {
-
+	usartCnt = 0;
 	rxState = rxIdle;
 	dataReceivedUart1 = 0;
 	amtCharRcvd = 0;
@@ -218,8 +218,8 @@ void initUsart()
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+//    __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);
+//    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 
 }
 
@@ -231,6 +231,8 @@ uint8_t  getNextByte(uint8_t * bt)
 	return res;
 }
 
+
+
 void USART1_IRQHandler(void)
 {
 	  uint32_t isrflags   = READ_REG(huart1.Instance->SR);
@@ -239,7 +241,7 @@ void USART1_IRQHandler(void)
 	  uint32_t errorflags = 0x00U;
 //	  uint32_t dmarequest = 0x00U;
 
-
+++ usartCnt;
 	  errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE)); // | USART_SR_NE));
 	  if (errorflags == 0)
 	  {

@@ -32,7 +32,7 @@
 
 
 #define useDebugPort
-#define useWWDG
+//#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -64,6 +64,7 @@ void MX_TIM2_Init(void);
 
 uint8_t i2cSec100DebugMsgPending;
 uint8_t sec100Cnt;
+uint16_t msTickCnt;
 
 void Error_Handler(void)
 {
@@ -83,12 +84,17 @@ void secondTick()
 	processTriacEvent(PTriacHumidityChart, &ev);
 }
 
-void screen1msTick()
+void main1msTick()
 {
 //	triggerAdc1();
 
+		++ msTickCnt;
+	 if (msTickCnt >= 1000)    { //       3203) == 0)
+		 msTickCnt = 0;
+		  secondTickValue = 1;
+	 }
 #ifndef debugSingleI2cMsg
-	  screenS1msTimer();
+//	  screenS1msTimer();
 #else
 
 	if (sec100Cnt >= 50)  {
@@ -143,6 +149,7 @@ void initVariables()
 	hvPwmState = hvPwmIdle;
 	sec1msEvent = 0;
 	humidTempRequired = 0;
+	msTickCnt = 0;
 }
 
 void WWDG_IRQHandler(void)
@@ -242,37 +249,37 @@ int main(void)
 //	   }
 	   if (sec1msEvent == 1)  {
 		   	  sec1msEvent = 0;
-		   	  screen1msTick();
+		   	  main1msTick();
 	   }
 //	   if (humidTempRequired == 1)   {
 //		   humidTempRequired= 0;
 //		   humidTempTick();
 //	   }
-	   if (i2cMessageReceived != 0)  {
-		   if (i2cMessageReceived == 1) {
-
-		   }  else {
-
-		   }
-		   i2cMessageReceived = 0;
-	   }
-	   if (i2cInitNeeded == 1) {
-	   		   i2cInitNeeded = 0;
-	   		   i2cReInitAfterFailure();
-	   }
-	   if (i2cMessageSent != 0)  {
-		   if (i2cMessageSent == 1) {
-
-		   }  else {
-
-		   }
-		   i2cMessageSent = 0;
-	   }
-	   if (debugTrigger == 1) {
-		 debugTrigger = 0;
-
-		 setDebugScreenJob();
-	   }
+//	   if (i2cMessageReceived != 0)  {
+//		   if (i2cMessageReceived == 1) {
+//
+//		   }  else {
+//
+//		   }
+//		   i2cMessageReceived = 0;
+//	   }
+//	   if (i2cInitNeeded == 1) {
+//	   		   i2cInitNeeded = 0;
+//	   		   i2cReInitAfterFailure();
+//	   }
+//	   if (i2cMessageSent != 0)  {
+//		   if (i2cMessageSent == 1) {
+//
+//		   }  else {
+//
+//		   }
+//		   i2cMessageSent = 0;
+//	   }
+//	   if (debugTrigger == 1) {
+//		 debugTrigger = 0;
+//
+//		 setDebugScreenJob();
+//	   }
 	   if (dataReceivedUart1 == 1)  {
 		   dataReceivedUart1 = 0;
 		   if (onDataReceivedUart1IsValid() == 1){
