@@ -32,7 +32,7 @@
 
 
 #define useDebugPort
-//#define useWWDG
+#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -88,11 +88,11 @@ void main1msTick()
 {
 //	triggerAdc1();
 
-		++ msTickCnt;
-	 if (msTickCnt >= 1000)    { //       3203) == 0)
-		 msTickCnt = 0;
-		  secondTickValue = 1;
-	 }
+	++ msTickCnt;
+	if (msTickCnt >= 1000)    { //       3203) == 0)
+	 msTickCnt = 0;
+	  secondTickValue = 1;
+	}
 #ifndef debugSingleI2cMsg
 //	  screenS1msTimer();
 #else
