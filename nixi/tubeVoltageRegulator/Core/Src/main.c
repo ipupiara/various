@@ -32,7 +32,7 @@
 
 
 #define useDebugPort
-#define useWWDG
+//#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -65,6 +65,7 @@ void MX_TIM2_Init(void);
 uint8_t i2cSec100DebugMsgPending;
 uint8_t sec100Cnt;
 uint16_t msTickCnt;
+uint16_t screenTickCnt;
 
 void Error_Handler(void)
 {
@@ -88,13 +89,17 @@ void main1msTick()
 {
 //	triggerAdc1();
 
+	++   screenTickCnt;
 	++ msTickCnt;
 	if (msTickCnt >= 1000)    { //       3203) == 0)
 	 msTickCnt = 0;
 	  secondTickValue = 1;
 	}
 #ifndef debugSingleI2cMsg
-//	  screenS1msTimer();
+	if (screenTickCnt >= 10)  {
+		screenCentiSecTimer();
+		screenTickCnt = 0;
+	}
 #else
 
 	if (sec100Cnt >= 50)  {
@@ -218,15 +223,17 @@ int main(void)
   initI2c();
 //  initHumidTempSensor();
 #ifndef debugSingleI2cMsg
+	uint32_t prevTick = uwTick;
+	while (uwTick < prevTick + 300) {}
   initScreen();
   startStateCharts();
-  initUsart();
+  initUart();
 
 #endif
   startSystemTimer();
   BSP_OS_TickEnable();
-	uint32_t prevTick = uwTick;
-	while (uwTick < prevTick + 500) {}
+	prevTick = uwTick;
+	while (uwTick < prevTick + 100) {}
 #ifdef useWWDG
 	MWWDG_Init();
 #endif
@@ -235,22 +242,25 @@ int main(void)
 #ifdef useWWDG
 	   resetWatchDog();
 #endif
-//	   if (i2cSec100DebugMsgPending != 0){
-//
-//		   i2cSec100DebugMsgPending = 0;
-//		   uint8_t  arr [1]; UNUSED(arr);
-//		  arr[0]=0xbb;
-////		  sendI2cByteArray(0x11,arr,0);
-//		uint8_t stri [] = {0x00, 0x38,0x32};
-//			   sendI2cByteArray(0x3c,stri, 2);
+#ifdef debugSingleI2cMsg
+	   if (i2cSec100DebugMsgPending != 0){
+
+		   i2cSec100DebugMsgPending = 0;
+		   uint8_t  arr [1]; UNUSED(arr);
+		  arr[0]=0xbb;
+//		  sendI2cByteArray(0x11,arr,0);
+		uint8_t stri [] = {0x00, 0x38,0x32};
+			   sendI2cByteArray(0x3c,stri, 2);
 
 
-//		   sendI2cByteArray(0x44,arr, 0);
-//	   }
+		   sendI2cByteArray(0x44,arr, 0);
+	   }
+#else
 	   if (sec1msEvent == 1)  {
 		   	  sec1msEvent = 0;
 		   	  main1msTick();
 	   }
+
 //	   if (humidTempRequired == 1)   {
 //		   humidTempRequired= 0;
 //		   humidTempTick();
@@ -298,7 +308,7 @@ int main(void)
 		   ev.evType = eTimeOutDurationTimer;
 		   processTriacEvent(PTriacHumidityChart, &ev);
 	   }
-
+#endif
   }
 
 }
@@ -335,8 +345,8 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {

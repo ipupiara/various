@@ -12,7 +12,7 @@
 
 extern uint8_t dataReceivedUart1;
 
-void initUsart();
+void initUart();
 void USART1_IRQHandler(void);
 uint8_t onDataReceivedUart1IsValid();
 

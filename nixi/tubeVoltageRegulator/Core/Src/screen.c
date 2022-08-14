@@ -61,7 +61,7 @@
 
 #define waitShortCs   	20
 #define waitMediumCs		50
-#define waitLongCs		1200
+#define waitLongCs		120
 
 #define byteArrayMaxSz   80
 
@@ -191,7 +191,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 	}
 }
 
-void screenS1msTimer ()
+void screenCentiSecTimer ()
 {
 	screenJobType*  screenJob = NULL;
 

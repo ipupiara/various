@@ -11,7 +11,7 @@
 #define INC_SCREEN_H_
 
 
-void screenS1msTimer ();
+void screenCentiSecTimer ();
 
 void paintCanScreen();
 void initScreen();

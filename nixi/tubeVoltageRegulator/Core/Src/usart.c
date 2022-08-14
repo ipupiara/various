@@ -173,7 +173,7 @@ void receiveUartByte(uint8_t rxCh)
 
 uint32_t usartCnt;
 
-void initUsart()
+void initUart()
 {
 	usartCnt = 0;
 	rxState = rxIdle;
