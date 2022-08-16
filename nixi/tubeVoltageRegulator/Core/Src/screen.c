@@ -1,8 +1,10 @@
 
+#include <stdio.h>
 #include <screen.h>
 #include <cpu.h>
 #include <main.h>
 #include <string.h>
+#include <usart.h>     //  todo added temporarely,  tobe erased later
 #include <nixi_i2c.h>
 
 //    wip   work in progress     ,    entry on own risk :-)
@@ -59,9 +61,9 @@
 #define LCD_AsciiControlByte		0x40
 #define LCD_CommandControlByte      0x00
 
-#define waitShortCs   	20
-#define waitMediumCs		50
-#define waitLongCs		120
+#define waitShortCs   	1
+#define waitMediumCs		2
+#define waitLongCs		3
 
 #define byteArrayMaxSz   80
 
@@ -185,6 +187,11 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 			sendI2cScreenCommand();
 		}
 		++ currentWaitCycle;
+		if (currentWaitCycle == waitTime) {
+			if (currentWaitCycle != waitTime) {
+				sendI2cScreenCommand();
+			}
+		}
 	} else {
 		currentWaitCycle = 0;
 		++ currentStepIndex;
@@ -307,18 +314,30 @@ void paintCanScr()
 
 }
 
-screenJobType  initJob = {6, {{waitLongCs,0,0,initScreenFuntionSet}, {waitShortCs,0,0, initDisplayControl},
-								{waitShortCs,0,0, clearDisplay},{waitShortCs,0,0, initEntryModeSet},
-								{waitShortCs,0,0,returnHome},{waitShortCs,0,0, paintHello}}};
+void displayTemperatureLine()
+{
+	double   tmp;
+	double   hyd;
+	char buffer [20+1];
+	tmp = getCurrentTemperature();
+	hyd = getCurrentHumidity();
+	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
+	addToByteArray(&byteBuffer, sizeof(buffer) , (uint8_t*) buffer);
+}
+
+
+screenJobType  initJob = {6, {{waitLongCs,0,0,initScreenFuntionSet}, {waitLongCs,0,0, initDisplayControl},
+								{waitShortCs,0,0, clearDisplay},{waitLongCs,0,0, initEntryModeSet},
+								{waitShortCs,0,0,returnHome},{waitLongCs,0,0, paintHello}}};
 
 screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
 							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
 							, {waitShortCs,3,1,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,4,1,setCursor}, {waitShortCs,0,0, paintHello}}};
+							, {waitShortCs,4,1,setCursor}, {waitLongCs,0,0, paintHello}}};
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType canScreen = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,paintCanScr}}};
+screenJobType canScreen = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,displayTemperatureLine}}};
 
 
 void paintCanScreen()

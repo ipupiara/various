@@ -503,6 +503,10 @@ void I2C1_EV_IRQHandler(void)
 			}
 			receiveNextI2CByte();
 		}
+		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)   {
+			setCr1Bit(I2C_CR1_PE );  // just write something into cr1 for stop reset, strange reset anyhow...
+
+		}
 //#endif
 	}
 }
@@ -576,7 +580,9 @@ void init_i2c1_hw(void)
 	Error_Handler();
 	}
 
-
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_BUF);
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_EVT);
+	__HAL_I2C_ENABLE_IT(&hi2c1,I2C_IT_ERR);
 
 	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);

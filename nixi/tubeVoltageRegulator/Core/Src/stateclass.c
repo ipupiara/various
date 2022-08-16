@@ -117,7 +117,7 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 	if (currentEvent->evType == eSecondsTick)
 		{
 		//	setGrowboxScreen();
-			initScreen();
+	//		initScreen();
 	//		++ i2cSecondCounter;
 	//		if (i2cSecondCounter >= 3)  {
 	//			snprintf((char *)&i2cStateString,sizeof(i2cStateString),"i2c err to");
