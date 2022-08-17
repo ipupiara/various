@@ -694,8 +694,19 @@ void startVentilating()
 
 void stopVentilating()
 {
+	switchHeaterRelais(0);
+}
+
+void startHeating()
+{
+	switchHeaterRelais(1);
+}
+
+void stopHeating()
+{
 	switchVentiRelais(0);
 }
+
 
 void startDrying()
 {

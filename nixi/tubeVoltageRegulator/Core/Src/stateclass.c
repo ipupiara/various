@@ -116,7 +116,7 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 
 	if (currentEvent->evType == eSecondsTick)
 		{
-		//	setGrowboxScreen();
+			setGrowboxScreen();
 	//		initScreen();
 	//		++ i2cSecondCounter;
 	//		if (i2cSecondCounter >= 3)  {

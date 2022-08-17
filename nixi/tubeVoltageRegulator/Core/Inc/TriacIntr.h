@@ -74,6 +74,8 @@ void stopVentilating();
 void startDrying();
 void stopDrying();
 
+void controlTemperature(float* temp);
+
 //uint16_t addToOutUart0(char* txt, uint16_t len);
 
 #endif

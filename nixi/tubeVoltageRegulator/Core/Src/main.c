@@ -224,8 +224,9 @@ int main(void)
 //  initHumidTempSensor();
 #ifndef debugSingleI2cMsg
 	uint32_t prevTick = uwTick;
-	while (uwTick < prevTick + 300) {}
+	while (uwTick < prevTick + 100) {}
   initScreen();
+  while (uwTick < prevTick + 100) {}
   startStateCharts();
   initUart();
 
@@ -233,7 +234,7 @@ int main(void)
   startSystemTimer();
   BSP_OS_TickEnable();
 	prevTick = uwTick;
-	while (uwTick < prevTick + 100) {}
+	while (uwTick < prevTick + 300) {}
 #ifdef useWWDG
 	MWWDG_Init();
 #endif

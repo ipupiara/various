@@ -10,6 +10,7 @@
 
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_def.h"
+#include <TriacIntr.h>
 
 UART_HandleTypeDef huart1;
 GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -139,9 +140,9 @@ uint8_t onDataReceivedUart1IsValid()        // called by main application thread
 
 		latestTemperature = temp;
 		latestHumidity = hyd;
-#ifdef controlheating
+
 		controlTemperature(&temp);
-#endif
+
 	}
 	return validMsg;
 }

@@ -227,7 +227,7 @@ uint8_t lines [4] = {0x00, 0x40, 0x14, 0x54};
 uint8_t getDdramAdr(uint8_t xPos, uint8_t yPos)
 {
 	uint8_t res = lines [yPos - 1];
-	res += xPos - 1;
+	res += xPos -1;
 	return res;
 }
 
@@ -321,8 +321,10 @@ void displayTemperatureLine()
 	char buffer [20+1];
 	tmp = getCurrentTemperature();
 	hyd = getCurrentHumidity();
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
 	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
-	addToByteArray(&byteBuffer, sizeof(buffer) , (uint8_t*) buffer);
+	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
 
@@ -337,13 +339,13 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType canScreen = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,displayTemperatureLine}}};
+screenJobType growboxScreenPaint = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,displayTemperatureLine}}};
 
 
-void paintCanScreen()
-{
-	setNextScreenJob(&canScreen);
-}
+//void paintCanScreen()
+//{
+//	setNextScreenJob(&canScreen);
+//}
 
 void setDebugScreenJob()
 {
@@ -357,7 +359,7 @@ void setHelloPaintJob()
 
 void setGrowboxScreen()
 {
-	setHelloPaintJob();
+	setNextScreenJob(&growboxScreenPaint);
 }
 
 
