@@ -12,6 +12,8 @@
 
 extern uint8_t dataReceivedUart1;
 
+extern uint32_t hygrosenseMsgCnt;
+
 void initUart();
 void USART1_IRQHandler(void);
 uint8_t onDataReceivedUart1IsValid();

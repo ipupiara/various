@@ -6,6 +6,7 @@
 #include <string.h>
 #include <usart.h>     //  todo added temporarely,  tobe erased later
 #include <nixi_i2c.h>
+#include <TriacIntr.h>
 
 //    wip   work in progress     ,    entry on own risk :-)
 /////////////////////////////  work in progress ,  access on on risk
@@ -327,10 +328,49 @@ void displayTemperatureLine()
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
+void displayTimeLine()
+{
+	uint8_t secs;
+	uint8_t mins;
+	uint16_t hrs;
+	char buffer [20+1];
+	getTimeValues(&hrs, &mins, &secs);
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
+	snprintf(buffer, sizeof(buffer), "%4i:%02i.%02i / %5i",hrs,mins,secs,hygrosenseMsgCnt);
+	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+}
 
-screenJobType  initJob = {6, {{waitLongCs,0,0,initScreenFuntionSet}, {waitLongCs,0,0, initDisplayControl},
+void displayStatechartLine()
+{
+	double   tmp;
+	double   hyd;
+	char buffer [20+1];
+	tmp = getCurrentTemperature();
+	hyd = getCurrentHumidity();
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
+	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
+	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+}
+
+void displayErrorStateLine()
+{
+	double   tmp;
+	double   hyd;
+	char buffer [20+1];
+	tmp = getCurrentTemperature();
+	hyd = getCurrentHumidity();
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
+	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
+	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+}
+
+
+screenJobType  initJob = {5, {{waitLongCs,0,0,initScreenFuntionSet}, {waitLongCs,0,0, initDisplayControl},
 								{waitShortCs,0,0, clearDisplay},{waitLongCs,0,0, initEntryModeSet},
-								{waitShortCs,0,0,returnHome},{waitLongCs,0,0, paintHello}}};
+								{waitShortCs,0,0,returnHome}}};
 
 screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
 							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
@@ -339,7 +379,10 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType growboxScreenPaint = {3, {{waitShortCs,0,0, clearDisplay},{waitShortCs,1,1,setCursor},{waitShortCs,1,1,displayTemperatureLine}}};
+screenJobType growboxScreenPaint = {8, {{waitShortCs,1,1,setCursor},{waitLongCs,1,1,displayTemperatureLine},
+										{waitShortCs,1,2,setCursor},{waitLongCs,1,1,displayTimeLine},
+										{waitShortCs,1,3,setCursor},{waitLongCs,1,1,displayStatechartLine},
+										{waitShortCs,1,4,setCursor},{waitLongCs,1,1,displayErrorStateLine}}};
 
 
 //void paintCanScreen()
