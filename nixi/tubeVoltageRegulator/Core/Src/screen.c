@@ -337,7 +337,8 @@ void displayTimeLine()
 	getTimeValues(&hrs, &mins, &secs);
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	snprintf(buffer, sizeof(buffer), "%4i:%02i.%02i / %5i",hrs,mins,secs,hygrosenseMsgCnt);
+	float cntf = hygrosenseMsgCnt;
+	snprintf(buffer, sizeof(buffer), "%4i:%02i.%02i / %7.0f",hrs,mins,secs,cntf);
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
