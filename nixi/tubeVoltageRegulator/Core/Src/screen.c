@@ -124,6 +124,16 @@ screenJobType *  currentScreenJob;
 uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
+#define maxStateNameLen  12
+char  stateName[maxStateNameLen];
+
+void setStateName(uint8_t * stName)
+{
+	memset(stateName,0,maxStateNameLen);
+	strncpy((char*)stateName,(char*) stName,maxStateNameLen);
+}
+
+
 
 void setHelloPaintJob();
 
@@ -338,21 +348,18 @@ void displayTimeLine()
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
 	float cntf = hygrosenseMsgCnt;
-	snprintf(buffer, sizeof(buffer), "%4i:%02i.%02i / %7.0f",hrs,mins,secs,cntf);
+	snprintf(buffer, sizeof(buffer), "%4i:%02i.%02i/%7.0f",hrs,mins,secs,cntf);
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
 void displayStatechartLine()
 {
-	double   tmp;
-	double   hyd;
-	char buffer [20+1];
-	tmp = getCurrentTemperature();
-	hyd = getCurrentHumidity();
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
-	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+	addToByteArray(&byteBuffer, strlen(stateName),  stateName);
+//	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
+//	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+
 }
 
 void displayErrorStateLine()
@@ -380,10 +387,10 @@ screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, pa
 
 screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType growboxScreenPaint = {8, {{waitShortCs,1,1,setCursor},{waitLongCs,1,1,displayTemperatureLine},
-										{waitShortCs,1,2,setCursor},{waitLongCs,1,1,displayTimeLine},
-										{waitShortCs,1,3,setCursor},{waitLongCs,1,1,displayStatechartLine},
-										{waitShortCs,1,4,setCursor},{waitLongCs,1,1,displayErrorStateLine}}};
+screenJobType growboxScreenPaint = {6, {{waitShortCs,1,1,setCursor},{waitLongCs,1,1,displayTemperatureLine},
+										{waitShortCs,1,2,setCursor},{waitLongCs,1,1,displayTimeLine} ,
+										{waitShortCs,1,3,setCursor},{waitLongCs,1,1,displayStatechartLine}}};
+//										{waitShortCs,1,4,setCursor},{waitLongCs,1,1,displayErrorStateLine}}};
 
 
 //void paintCanScreen()

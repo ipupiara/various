@@ -4,6 +4,8 @@
 //#include <iostream.h>
 //#include <assert.h>
 
+
+#include <screen.h>
 #include "tstatechart.h"
 #include "StateClass.h"
 #include "TriacDefines.h"
@@ -59,6 +61,7 @@ uStInt evFatalErrorChecker(void)
 
 void entryFatalErrorState(void)
 {
+	setStateName((uint8_t*)"fatalError");
 	info_printf("entry FatalError\n");
 	info_printf("**************fatal Error: %s *************************\n",lastFatalErrorString);
 	displayFatalError();
@@ -199,6 +202,7 @@ uStInt evStateHumidifying(void)
 
 void entryStateHumidifying(void)
 {
+	setStateName((uint8_t*)"humidify");
 	info_printf("CHumidityStateClass::entryStateHumidifying\n");
 	startHumidifying();
 }
@@ -279,6 +283,7 @@ uStInt evStateNonVentilating(void)
 
 void entryStateNonVentilating(void)
 {
+	setStateName((uint8_t*)"idleNoVent");
 	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
 	startDurationTimer(GetIdleVentilationDelayMinutes() * 60);
 }
@@ -314,6 +319,7 @@ uStInt evStateVentilating(void)
 
 void entryStateVentilating(void)
 {
+	setStateName((uint8_t*)"idleVent");
 	info_printf("CHumidityStateClass::entryStateVentilating\n");
 	startVentilating();
 	startDurationTimer(GetIdleVentilationMinutes() * 60);
@@ -347,6 +353,7 @@ uStInt evStateDrying(void)
 
 void entryStateDrying(void)
 {
+	setStateName((uint8_t*)"Drying");
 	info_printf("CHumidityStateClass::entryStateDrying\n");
 	startDrying();
 }
