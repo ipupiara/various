@@ -42,6 +42,9 @@ void initHW();
 //void startTriacRun();
 //void stopTriacRun();
 
+void startHeating();
+void stopHeating();
+
 void getLatestClimateValues(floatType* pTemp,floatType* pHum);    // interface to hygrosense, called by user functions
 floatType getCurrentTemperature();
 floatType getCurrentHumidity();

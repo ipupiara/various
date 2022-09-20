@@ -7,6 +7,7 @@
 
 #include "TriacIntr.h"
 #include "TriacDefines.h"
+#include <screen.h>
 #include <stm32f1xx.h>
 
 
@@ -659,10 +660,10 @@ void initHW()
  void controlTemperature(float* temp)
  {
 	 if (*temp < HeatingLowerLimit)  {
-		 switchHeaterRelais(1);
+		 startHeating();
 	 }
 	 if (*temp > HeatingUpperLimit)  {
-		 switchHeaterRelais(0);
+		 stopHeating();
 	 }
  }
 
@@ -676,17 +677,6 @@ void stopHumidifying()
 	
 }
 
-void startVentilator(uint8_t  on)
-{
-	if (on == 1)   {
-		switchVentiRelais(1);
-//		 while (1){} //  was used to test watchdog, so that something sounds a bit, worked well with asm code in "wdt_enable(val );"
-	}  else
-	{
-		switchVentiRelais(0);
-	}
-}
-
 void startVentilating()
 {
 	switchVentiRelais(1);
@@ -694,17 +684,19 @@ void startVentilating()
 
 void stopVentilating()
 {
-	switchHeaterRelais(0);
+	switchVentiRelais(0);
 }
 
 void startHeating()
 {
 	switchHeaterRelais(1);
+	appendStateName("/heat");
 }
 
 void stopHeating()
 {
-	switchVentiRelais(0);
+	switchHeaterRelais(0);
+	appendStateName("/noHeat");
 }
 
 

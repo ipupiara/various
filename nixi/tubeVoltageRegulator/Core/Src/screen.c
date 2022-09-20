@@ -124,15 +124,21 @@ screenJobType *  currentScreenJob;
 uint8_t  currentStepIndex;
 uint8_t  currentWaitCycle;
 
-#define maxStateNameLen  12
-char  stateName[maxStateNameLen];
+#define maxStateNameLen  20
+char  stateName[maxStateNameLen+1];
+char  appStateName[maxStateNameLen+1];
 
-void setStateName(uint8_t * stName)
+void setStateName(uint8_t* stName)
 {
 	memset(stateName,0,maxStateNameLen);
 	strncpy((char*)stateName,(char*) stName,maxStateNameLen);
 }
 
+void appendStateName(uint8_t* stName)
+{
+	memset(appStateName,0,maxStateNameLen);
+	strncpy(appStateName,(char*)stName,maxStateNameLen);
+}
 
 
 void setHelloPaintJob();
@@ -356,7 +362,18 @@ void displayStatechartLine()
 {
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	addToByteArray(&byteBuffer, strlen(stateName),  stateName);
+	uint8_t stLen = strlen(stateName);
+	uint8_t appLen = strlen(appStateName);
+	addToByteArray(&byteBuffer, stLen, (uint8_t*) stateName);
+	uint8_t maxLen = maxStateNameLen -stLen;
+	if(appLen < maxLen) { maxLen = appLen; }
+	addToByteArray(&byteBuffer, maxLen, (uint8_t*) appStateName);
+	char* spc = " ";
+	for(uint8_t i1= stLen + appLen; i1 < 20 ; ++ i1 ) {
+		addToByteArray(&byteBuffer,1,(uint8_t*)spc);
+	}
+
+
 //	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
 //	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 

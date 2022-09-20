@@ -11,6 +11,7 @@
 #define INC_SCREEN_H_
 
 void setStateName(uint8_t * stName);
+void appendStateName(uint8_t* stName);
 void screenCentiSecTimer ();
 
 void paintCanScreen();
