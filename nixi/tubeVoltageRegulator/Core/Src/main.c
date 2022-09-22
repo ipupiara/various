@@ -32,7 +32,7 @@
 
 
 #define useDebugPort
-//#define useWWDG
+#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -97,6 +97,7 @@ void main1msTick()
 	}
 #ifndef debugSingleI2cMsg
 	if (screenTickCnt >= 10)  {
+		screenTickCnt = 0;
 		screenCentiSecTimer();
 		screenTickCnt = 0;
 	}
