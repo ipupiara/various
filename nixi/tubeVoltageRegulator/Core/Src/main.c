@@ -241,6 +241,7 @@ int main(void)
 #endif
    while (1)
   {
+	   // while (1) {}  // for testing watchdog
 #ifdef useWWDG
 	   resetWatchDog();
 #endif

@@ -643,7 +643,7 @@ void initHW()
 	   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	   HAL_GPIO_Init(heaterPin_GPIO_Port, &GPIO_InitStruct);
 	   heaterRelaisOn = 0;
-
+	   appendStateName((uint8_t*) "/noHeat");
 
 	   HAL_GPIO_WritePin(ventiPin_GPIO_Port, ventiPin_Pin, GPIO_PIN_RESET);
 	   GPIO_InitStruct.Pin = ventiPin_Pin;
@@ -690,13 +690,13 @@ void stopVentilating()
 void startHeating()
 {
 	switchHeaterRelais(1);
-	appendStateName("/heat");
+	appendStateName((uint8_t*) "/heat");
 }
 
 void stopHeating()
 {
 	switchHeaterRelais(0);
-	appendStateName("/noHeat");
+	appendStateName((uint8_t*) "/noHeat");
 }
 
 
