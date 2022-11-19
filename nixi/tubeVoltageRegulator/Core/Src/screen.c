@@ -11,7 +11,9 @@
 //    wip   work in progress     ,    entry on own risk :-)
 /////////////////////////////  work in progress ,  access on on risk
 #define screenI2cAddress 0x3c
+#define attinyAdr   0x10
 
+#define msgDummyByte 0xa5
 
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -78,6 +80,7 @@ typedef void(*t_fPar)(void* pCmdLine);
 
 typedef struct {
 	uint16_t waitS1ms;
+	uint8_t  i2cAdr;
 	uint8_t xPos;
 	uint8_t yPos;
 	t_fvoid  stepMethod ;
@@ -85,6 +88,7 @@ typedef struct {
 
 typedef struct {
 	uint16_t waitS1ms;
+	uint8_t  i2cAdr;
 	union {
 		struct {
 			uint8_t xPos;
@@ -176,6 +180,15 @@ uint8_t sendI2cScreenCommand()
 	return res;
 }
 
+
+uint8_t sendI2cCommand(uint8_t adr)
+{
+	uint8_t res = 0;
+	res = sendI2cByteArray(adr,byteBuffer.buffer ,byteBuffer.len);
+	return res;
+}
+
+
 uint8_t setNextScreenJob(screenJobType* sJob)
 {
 	uint8_t res = 0;  // todo  check that used inside privileged code, else no effect of method
@@ -201,6 +214,7 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 		if (currentWaitCycle == 0) {
 			clear(&byteBuffer);
 			sJob [currentStepIndex].stepMethod();
+			sendI2cCommand(sJob[currentStepIndex].i2cAdr);
 			sendI2cScreenCommand();
 		}
 		++ currentWaitCycle;
@@ -392,22 +406,29 @@ void displayErrorStateLine()
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
+void setMessageToAttiny()
+{
+	commandLineType cmd = {msgDummyByte};
+	addToByteArray(&byteBuffer, 1, cmd);
+}
 
-screenJobType  initJob = {5, {{waitLongCs,0,0,initScreenFuntionSet}, {waitLongCs,0,0, initDisplayControl},
-								{waitShortCs,0,0, clearDisplay},{waitLongCs,0,0, initEntryModeSet},
-								{waitShortCs,0,0,returnHome}}};
 
-screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,3,1,setCursor}, {waitShortCs,0,0, paintHello}
-							, {waitShortCs,4,1,setCursor}, {waitLongCs,0,0, paintHello}}};
+screenJobType  initJob = {5, {{waitLongCs,screenI2cAddress,0,0,initScreenFuntionSet}, {waitLongCs,screenI2cAddress,0,0, initDisplayControl},
+								{waitShortCs,screenI2cAddress,0,0, clearDisplay},{waitLongCs,screenI2cAddress,0,0, initEntryModeSet},
+								{waitShortCs,screenI2cAddress,0,0,returnHome}}};
 
-screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
+//screenJobType testPaint = {8, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}
+//							, {waitShortCs,2,1,setCursor}, {waitShortCs,0,0, paintHello}
+//							, {waitShortCs,3,1,setCursor}, {waitShortCs,0,0, paintHello}
+//							, {waitShortCs,4,1,setCursor}, {waitLongCs,0,0, paintHello}}};
+//
+//screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType growboxScreenPaint = {6, {{waitShortCs,1,1,setCursor},{waitLongCs,1,1,displayTemperatureLine},
-										{waitShortCs,1,2,setCursor},{waitLongCs,1,1,displayTimeLine} ,
-										{waitShortCs,1,3,setCursor},{waitLongCs,1,1,displayStatechartLine}}};
-//										{waitShortCs,1,4,setCursor},{waitLongCs,1,1,displayErrorStateLine}}};
+screenJobType growboxScreenPaint = {7, {{waitShortCs,screenI2cAddress,1,1,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTemperatureLine},
+										{waitShortCs,screenI2cAddress,1,2,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTimeLine} ,
+										{waitShortCs,screenI2cAddress,1,3,setCursor},{waitLongCs,screenI2cAddress,1,1,displayStatechartLine},
+										{waitShortCs, attinyAdr,1,1,setMessageToAttiny}}};
+//										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine}}};
 
 
 //void paintCanScreen()
@@ -415,15 +436,15 @@ screenJobType growboxScreenPaint = {6, {{waitShortCs,1,1,setCursor},{waitLongCs,
 //	setNextScreenJob(&canScreen);
 //}
 
-void setDebugScreenJob()
-{
-	setNextScreenJob(&testPaint);
-}
+//void setDebugScreenJob()
+//{
+//	setNextScreenJob(&testPaint);
+//}
 
-void setHelloPaintJob()
-{
-	setNextScreenJob(&halloPaint);
-}
+//void setHelloPaintJob()
+//{
+//	setNextScreenJob(&halloPaint);
+//}
 
 void setGrowboxScreen()
 {

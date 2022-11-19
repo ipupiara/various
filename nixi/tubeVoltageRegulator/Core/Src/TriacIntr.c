@@ -267,7 +267,6 @@ void setTriacFireDuration(uint16_t durationTcnt)
 	////sei();
 //}
 
-#warning "0-x signal is currently compared on 311 comparator at VCC, which is an unprecise common voltage value, should be changed to a lower voltage range"
 #if defined( useTimer3) || defined( useTimer0)
 // int7 on port PE7
 ISR(INT7_vect)
