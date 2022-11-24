@@ -31,8 +31,8 @@
 #include <TriacIntr.h>
 
 
-#define useDebugPort
-#define useWWDG
+//#define useDebugPort
+//#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -41,7 +41,9 @@ uint16_t lastADCResult;
 TIM_HandleTypeDef htim2;
 //TIM_HandleTypeDef htim3;
 
+#ifdef hwwdg
 WWDG_HandleTypeDef hwwdg;
+#endif
 
 #ifdef useDebugPort
 #define debugPin1_Pin GPIO_PIN_13
@@ -158,6 +160,10 @@ void initVariables()
 	msTickCnt = 0;
 }
 
+
+
+#ifdef hwwdg
+
 void WWDG_IRQHandler(void)
 {
 //  HAL_WWDG_IRQHandler(&hwwdg);
@@ -169,6 +175,7 @@ void WWDG_IRQHandler(void)
 
 static void MWWDG_Init(void)
 {
+	wwdgCnt = 0;
 
 	__HAL_RCC_WWDG_CLK_ENABLE();
 
@@ -203,17 +210,15 @@ void resetWatchDog()
 		++wwdgCnt;
 	}
 }
+#endif
 
 uint8_t debugTrigger;			// can be used for any needed kind of debugging
 
 int main(void)
 {
 	initVariables();
-	wwdgCnt = 0;
 
 	HAL_Init();
-
-
   SystemClock_Config();
 
 

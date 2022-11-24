@@ -13,6 +13,8 @@
 //  todo receive handling of result string not yet implemented, just send for screen used so far
 
 //#define i2cUseDma
+//#define useErrorLine
+
 #define I2C_FLAG_NACKF  I2C_FLAG_AF
 #define isJobBusy  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
 #define isInReceiveJob(__HANDLE__) ( (__HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0) && (isJobBusy))
@@ -29,12 +31,16 @@ uint32_t errTotalCnt;
 	uint8_t i2cErrorString  [i2cErrorStringLength];
 	void addToErrorString(char* stri )
 	{
+#ifdef useErrorLine
 		uint8_t pos;
 		uint8_t lenAdd = strlen((char*) stri);
 		for (pos = 0; (pos < lenAdd) && (strlen((char*) i2cErrorString) < (i2cErrorStringLength -1)) ; ++ pos)  {
 			i2cErrorString[strlen((char*) i2cErrorString)] = stri[pos];
 		}
+#endif
 	}
+
+
 #else
 #define addToErrorString( stri ) UNUSED( stri)
 #endif
@@ -94,7 +100,7 @@ void disableI2c()
 
 void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
-	setCr1Bit( I2C_CR1_STOP );
+//	setCr1Bit( I2C_CR1_STOP );
 	__HAL_I2C_DISABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
 
 }
@@ -121,12 +127,11 @@ void i2cFinishedOk()
 void i2cError(uint8_t err)
 {
 	i2cStopTransmission(&hi2c1);
-	disableI2c();
-	++errTotalCnt;
-	i2cInitNeeded = 1;
-	i2cInitialized = 0;
+//	disableI2c();
+//	++errTotalCnt;
+//	i2cInitNeeded = 1;
+//	i2cInitialized = 0;
 	i2cSetDataIdle();
-	++errTotalCnt;
 }
 
 void initErrorHandling()
@@ -475,9 +480,9 @@ void I2C1_EV_IRQHandler(void)
 		}
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)!= 0) {
 			__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
-			if (isCurrentByteLastByte()) {
-				i2cFinishedOk();
-			}
+//			if (isCurrentByteLastByte()) {
+//				i2cFinishedOk();
+//			}
 		}
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_TXE) != 0)   {
 			if (isCurrentByteLastByte()) {

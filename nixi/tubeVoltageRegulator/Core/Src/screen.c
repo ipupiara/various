@@ -176,7 +176,9 @@ byteArrayT byteBuffer;
 uint8_t sendI2cScreenCommand()
 {
 	uint8_t res = 0;
-	res = sendI2cByteArray(screenI2cAddress,byteBuffer.buffer ,byteBuffer.len);
+	if (byteBuffer.len > 0)  {
+		res = sendI2cByteArray(screenI2cAddress,byteBuffer.buffer ,byteBuffer.len);
+	}
 	return res;
 }
 
@@ -395,16 +397,18 @@ void displayStatechartLine()
 
 void displayErrorStateLine()
 {
+#ifdef useErrorLine
 	char buffer [20+1];
 	uint8_t strln;
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	if ((strln = strlen(i2cErrorString)) <= 20) {
-		strncpy(buffer,i2cErrorString,20);
+	if ((strln = strlen((char*)i2cErrorString)) <= 20) {
+		strncpy(buffer,(char*)i2cErrorString,strln);
 	} else {
-		strncpy(buffer,i2cErrorString[strln-20],20);
+		strncpy(buffer,(char*)&i2cErrorString[strln-20],20);
 	}
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+#endif
 }
 
 void setMessageToAttiny()
