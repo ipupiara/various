@@ -12,7 +12,6 @@
 #define debugging
 
 extern uint8_t i2cErrorString  [i2cErrorStringLength];
-extern uint8_t  i2cTransmitErrorCollectorInt8u;
 extern uint8_t i2cInitialized;
 extern uint8_t i2cInitNeeded;
 

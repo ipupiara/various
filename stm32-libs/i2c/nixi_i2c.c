@@ -5,6 +5,7 @@
  *      Author: Brigitte
  */
 
+
 #include <main.h>
 #include <string.h>
 #include <nixi_i2c.h>
@@ -13,22 +14,36 @@
 
 //#define i2cUseDma
 #define I2C_FLAG_NACKF  I2C_FLAG_AF
-
+#define isJobBusy  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
+#define isInReceiveJob(__HANDLE__) ( (__HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0) && (isJobBusy))
 
 I2C_HandleTypeDef hi2c1;
 
-uint8_t i2cErrorString  [i2cErrorStringLength];
-uint8_t  i2cTransmitErrorCollectorInt8u;
+
 uint8_t i2cInitialized;
 uint8_t i2cInitNeeded;
 
+uint32_t errTotalCnt;
+
+#ifdef debugging
+	uint8_t i2cErrorString  [i2cErrorStringLength];
+	void addToErrorString(char* stri )
+	{
+		uint8_t pos;
+		uint8_t lenAdd = strlen((char*) stri);
+		for (pos = 0; (pos < lenAdd) && (strlen((char*) i2cErrorString) < (i2cErrorStringLength -1)) ; ++ pos)  {
+			i2cErrorString[strlen((char*) i2cErrorString)] = stri[pos];
+		}
+	}
+#else
+#define addToErrorString( stri ) UNUSED( stri)
+#endif
 
 
 #ifdef i2cUseDma
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
 #endif
-
 
 typedef enum  {
 	sendI2c = 0,
@@ -48,19 +63,6 @@ typedef struct
 
 
 i2cJobDataType i2cJobData;
-
-#ifdef debugging
-void addToErrorString(char* stri )
-{
-	uint8_t pos;
-	uint8_t len = strlen((char*) stri);
-	for (pos = 0; (pos < len) && (strlen((char*) i2cErrorString) < (i2cErrorStringLength -1)) ; ++ pos)  {
-		i2cErrorString[strlen((char*) i2cErrorString)] = stri[pos];
-	}
-}
-#else
-#define addToErrorString( stri ) UNUSED( stri)
-#endif
 
 void setCr1Bit(uint16_t bitMask)
 {
@@ -94,7 +96,7 @@ void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
 	setCr1Bit( I2C_CR1_STOP );
 	__HAL_I2C_DISABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
-//	disableI2c();
+
 }
 
 void i2cSetDataIdle()
@@ -102,9 +104,6 @@ void i2cSetDataIdle()
 	i2cJobData.jobType = idleI2c;
 }
 
-#define isJobBusy  __HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BUSY)
-#define isInReceiveJob(__HANDLE__) ( (__HAL_I2C_GET_FLAG((__HANDLE__),I2C_FLAG_TRA) == 0) && (isJobBusy))
-//  todo  receive so far not yet tested pn, 18 mar 22)
 
 void i2cFinishedOk()
 {
@@ -116,18 +115,27 @@ void i2cFinishedOk()
 	if (i2cJobData.jobType == receiveI2c)  {
 		i2cMessageReceived = 1;
 	}
-
 	i2cSetDataIdle();
 }
 
 void i2cError(uint8_t err)
 {
-	i2cTransmitErrorCollectorInt8u = err;
-//	i2cStopTransmission(&hi2c1);
+	i2cStopTransmission(&hi2c1);
 	disableI2c();
+	++errTotalCnt;
 	i2cInitNeeded = 1;
+	i2cInitialized = 0;
 	i2cSetDataIdle();
-	 //log error
+	++errTotalCnt;
+}
+
+void initErrorHandling()
+{
+	errTotalCnt = 0;
+#ifdef debugging
+	memset(i2cErrorString,0,i2cErrorStringLength);
+#endif
+
 }
 
 uint8_t isI2cBusy()
@@ -192,8 +200,6 @@ void i2cSendStop(I2C_HandleTypeDef *hi2c)
 	setCr1Bit( I2C_CR1_STOP);
 }
 
-
-
 void writeAddressToDR()
 {
 	hi2c1.Instance->DR = (i2cJobData.address << 1);
@@ -234,17 +240,6 @@ uint8_t establishContactAndRun()
 
 	    return 1;
 	  }
-
-
-
-//	 uint8_t  arr [1];
-//				  arr[0]=0xbb;
-//	HAL_I2C_Master_Transmit_IT(&hi2c1, 0xaa, arr, 1);
-//
-
-	// enable ack
-//	setCr1Bit( I2C_CR1_ACK);
-//	i2cSendStart(&hi2c1);
 	return res;
 }
 
@@ -254,8 +249,6 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 	uint8_t res = 0x00;
 
 	if ((i2cInitialized == 1) && (! isI2cBusy()) && (i2cJobData.jobType == idleI2c) ) {          //&& (OSIntNesting > 0u))
-           		i2cTransmitErrorCollectorInt8u = 0;
-		memset(i2cErrorString,0,i2cErrorStringLength);
 		i2cJobData.buffer = pResultString;
 		i2cJobData.amtChars = amtChars;
 		i2cJobData.bufferCnt = 0;
@@ -476,13 +469,10 @@ void I2C1_EV_IRQHandler(void)
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ADDR) != 0){
 			__HAL_I2C_CLEAR_ADDRFLAG(&hi2c1);
 			if ((isCurrentByteSecondLastByte()) && (isInReceiveJob(&hi2c1)) )   {
-				// todo tested sending, not tested yet in receiving
 				CLEAR_BIT(hi2c1.Instance->CR1, I2C_CR1_ACK );
 				setCr1Bit(I2C_CR1_STOP );
 			}
 		}
-//#ifndef i2cUseDma    // todo dma maybe needs also active sending of stop
-
 		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BTF)!= 0) {
 			__HAL_I2C_CLEAR_FLAG(&hi2c1,I2C_FLAG_BTF);
 			if (isCurrentByteLastByte()) {
@@ -503,11 +493,11 @@ void I2C1_EV_IRQHandler(void)
 			}
 			receiveNextI2CByte();
 		}
+//#endif
 		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)   {
 			setCr1Bit(I2C_CR1_PE );  // just write something into cr1 for stop reset, strange reset anyhow...
-
 		}
-//#endif
+
 	}
 }
 
@@ -516,38 +506,35 @@ void I2C1_ER_IRQHandler(void)
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
-	    addToErrorString("BERR");
+	    addToErrorString("BR");
 	    i2cError(0x51);
 	  }  else
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
-	    addToErrorString("OVR");
+	    addToErrorString("OV");
 	    i2cError(0x52);
 	  } else
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
-	    addToErrorString("ARRLO");
+	    addToErrorString("AL");
 	    i2cError(0x53);
 	  }  else
-	  //  todo implement refined error message with above details....
-
-	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {   //  should actually be named I2C_FLAG_NACKF. how this name ?
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {
 		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
-		  addToErrorString("NACK");
+		  addToErrorString("NK");
 		  i2cError(0x69);
-	  }  else {   //  should actually be named I2C_FLAG_NACKF. how this name ?
-//		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
-		  addToErrorString("ER other");
+	  }  else {
+		  addToErrorString("Eo");
 		  i2cError(0x54);
 	  }
 
-//	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
-//		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
-//		  addToErrorString("STOP");
-//		  i2cError(0x96);
-//	  }
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
+		  addToErrorString("SP");
+		  i2cError(0x96);
+	  }
 }
 
 void init_i2c1_hw(void)
@@ -595,17 +582,28 @@ void initI2c()
 {
 	i2cInitNeeded = 0;
 	i2cSetDataIdle();
-//	memset(i2cErrorString,0,i2cErrorStringLength);
+	initErrorHandling();
 	init_i2c1_hw();
 	i2cInitialized = 1;
 }
 
 void i2cReInitAfterFailure()
 {
+	i2cInitialized = 0;
 	disableI2c();
+	char buff[10];
+	snprintf(buff,sizeof(buff),"%lu",errTotalCnt);
+	addToErrorString(buff);
+
+	uint32_t cnt = uwTick;
+	while (uwTick < cnt +5 ) {}  // just in emergency....
 	hi2c1.Instance->CR1 |= I2C_CR1_SWRST;
+	cnt = uwTick;
+	while (uwTick < cnt +3 ) {}  // just in emergency....
 	hi2c1.Instance->CR1 &= ~I2C_CR1_SWRST;
 	enableI2c();
 
-	initI2c();
+	i2cSetDataIdle();
+	init_i2c1_hw();
+	i2cInitialized = 1;
 }

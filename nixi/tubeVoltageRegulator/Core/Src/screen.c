@@ -395,14 +395,15 @@ void displayStatechartLine()
 
 void displayErrorStateLine()
 {
-	double   tmp;
-	double   hyd;
 	char buffer [20+1];
-	tmp = getCurrentTemperature();
-	hyd = getCurrentHumidity();
+	uint8_t strln;
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
+	if ((strln = strlen(i2cErrorString)) <= 20) {
+		strncpy(buffer,i2cErrorString,20);
+	} else {
+		strncpy(buffer,i2cErrorString[strln-20],20);
+	}
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 }
 
@@ -424,9 +425,10 @@ screenJobType  initJob = {5, {{waitLongCs,screenI2cAddress,0,0,initScreenFuntion
 //
 //screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType growboxScreenPaint = {7, {{waitShortCs,screenI2cAddress,1,1,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTemperatureLine},
+screenJobType growboxScreenPaint = {9, {{waitShortCs,screenI2cAddress,1,1,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTemperatureLine},
 										{waitShortCs,screenI2cAddress,1,2,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTimeLine} ,
 										{waitShortCs,screenI2cAddress,1,3,setCursor},{waitLongCs,screenI2cAddress,1,1,displayStatechartLine},
+										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine},
 										{waitShortCs, attinyAdr,1,1,setMessageToAttiny}}};
 //										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine}}};
 

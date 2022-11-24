@@ -239,8 +239,9 @@ int main(void)
 #ifdef useWWDG
 	MWWDG_Init();
 #endif
-   while (1)
-  {
+
+	while (1)
+	{
 	   // while (1) {}  // for testing watchdog
 #ifdef useWWDG
 	   resetWatchDog();
@@ -276,10 +277,10 @@ int main(void)
 //		   }
 //		   i2cMessageReceived = 0;
 //	   }
-//	   if (i2cInitNeeded == 1) {
-//	   		   i2cInitNeeded = 0;
-//	   		   i2cReInitAfterFailure();
-//	   }
+	   if (i2cInitNeeded == 1) {
+	   		   i2cInitNeeded = 0;
+	   		   i2cReInitAfterFailure();
+	   }
 //	   if (i2cMessageSent != 0)  {
 //		   if (i2cMessageSent == 1) {
 //
