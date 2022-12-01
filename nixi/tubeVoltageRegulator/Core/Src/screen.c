@@ -404,10 +404,11 @@ void displayErrorStateLine()
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 #else
 	char buffer [20+1];
-	uint8_t strln;
+//	uint8_t strln;
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	snprintf(buffer, sizeof(buffer), "%6i", i2cInitNeededCnt);
+	memset(&buffer,0,sizeof(buffer));
+	snprintf(buffer, sizeof(buffer), "%6lu", i2cInitNeededCnt);
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 #endif
 
