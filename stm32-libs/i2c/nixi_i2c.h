@@ -14,6 +14,7 @@
 extern uint8_t i2cErrorString  [i2cErrorStringLength];
 extern uint8_t i2cInitialized;
 extern uint8_t i2cInitNeeded;
+extern uint32_t i2cInitNeededCnt;
 
 
 uint8_t isI2cBusy();

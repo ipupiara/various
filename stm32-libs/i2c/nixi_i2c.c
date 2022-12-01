@@ -24,8 +24,10 @@ I2C_HandleTypeDef hi2c1;
 
 uint8_t i2cInitialized;
 uint8_t i2cInitNeeded;
+uint32_t i2cInitNeededCnt;
 
 uint32_t errTotalCnt;
+uint8_t busyCnt;
 
 #ifdef debugging
 	uint8_t i2cErrorString  [i2cErrorStringLength];
@@ -100,7 +102,7 @@ void disableI2c()
 
 void i2cStopTransmission(I2C_HandleTypeDef *hi2c)
 {
-//	setCr1Bit( I2C_CR1_STOP );
+	setCr1Bit( I2C_CR1_STOP );
 	__HAL_I2C_DISABLE_IT(&hi2c1, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR);
 
 }
@@ -137,6 +139,7 @@ void i2cError(uint8_t err)
 void initErrorHandling()
 {
 	errTotalCnt = 0;
+	busyCnt = 0;
 #ifdef debugging
 	memset(i2cErrorString,0,i2cErrorStringLength);
 #endif
@@ -254,6 +257,7 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 	uint8_t res = 0x00;
 
 	if ((i2cInitialized == 1) && (! isI2cBusy()) && (i2cJobData.jobType == idleI2c) ) {          //&& (OSIntNesting > 0u))
+		busyCnt = 0;
 		i2cJobData.buffer = pResultString;
 		i2cJobData.amtChars = amtChars;
 		i2cJobData.bufferCnt = 0;
@@ -268,6 +272,11 @@ uint8_t transmitI2cByteArray(uint8_t adr,uint8_t* pResultString,uint8_t amtChars
 		}
 		establishContactAndRun();
 		res = 1;
+	}  else {
+		++ busyCnt;
+		if (busyCnt > 30) {
+			i2cInitNeeded = 1;
+		}
 	}
 
 	return res;
@@ -502,30 +511,35 @@ void I2C1_EV_IRQHandler(void)
 		if (__HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_STOPF) != 0)   {
 			setCr1Bit(I2C_CR1_PE );  // just write something into cr1 for stop reset, strange reset anyhow...
 		}
+		if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
+		}
 
 	}
 }
 
 void I2C1_ER_IRQHandler(void)
 {
-	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0)
-	  {
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_BERR) != 0) 	  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BERR);
 	    addToErrorString("BR");
 	    i2cError(0x51);
 	  }  else
-	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)
-	  {
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_OVR) != 0)  {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_OVR);
 	    addToErrorString("OV");
 	    i2cError(0x52);
 	  } else
-	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0)
-	  {
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_ARLO) != 0) {
 	    __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_ARLO);
 	    addToErrorString("AL");
 	    i2cError(0x53);
 	  }  else
+	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
+		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
+		  addToErrorString("SP");
+		  i2cError(0x96);
+	  }
 	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_NACKF) != 0) {
 		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_NACKF);
 		  addToErrorString("NK");
@@ -535,15 +549,12 @@ void I2C1_ER_IRQHandler(void)
 		  i2cError(0x54);
 	  }
 
-	  if (__HAL_I2C_GET_FLAG(&hi2c1,I2C_FLAG_STOPF) != 0) {
-		  __HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_STOPF);
-		  addToErrorString("SP");
-		  i2cError(0x96);
-	  }
+
 }
 
 void init_i2c1_hw(void)
 {
+	i2cSetDataIdle();
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -585,6 +596,8 @@ void init_i2c1_hw(void)
 
 void initI2c()
 {
+	i2cInitNeededCnt = 0;
+
 	i2cInitNeeded = 0;
 	i2cSetDataIdle();
 	initErrorHandling();
@@ -595,10 +608,11 @@ void initI2c()
 void i2cReInitAfterFailure()
 {
 	i2cInitialized = 0;
+	++i2cInitNeededCnt;
 	disableI2c();
-	char buff[10];
-	snprintf(buff,sizeof(buff),"%lu",errTotalCnt);
-	addToErrorString(buff);
+//	char buff[10];
+//	snprintf(buff,sizeof(buff),"%lu",errTotalCnt);
+//	addToErrorString(buff);
 
 	uint32_t cnt = uwTick;
 	while (uwTick < cnt +5 ) {}  // just in emergency....

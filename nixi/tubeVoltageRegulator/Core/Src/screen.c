@@ -217,14 +217,8 @@ void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 			clear(&byteBuffer);
 			sJob [currentStepIndex].stepMethod();
 			sendI2cCommand(sJob[currentStepIndex].i2cAdr);
-			sendI2cScreenCommand();
 		}
 		++ currentWaitCycle;
-		if (currentWaitCycle == waitTime) {
-			if (currentWaitCycle != waitTime) {
-				sendI2cScreenCommand();
-			}
-		}
 	} else {
 		currentWaitCycle = 0;
 		++ currentStepIndex;
@@ -408,7 +402,15 @@ void displayErrorStateLine()
 		strncpy(buffer,(char*)&i2cErrorString[strln-20],20);
 	}
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
+#else
+	char buffer [20+1];
+	uint8_t strln;
+	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
+	addToByteArray(&byteBuffer, 1, cmd);
+	snprintf(buffer, sizeof(buffer), "%6i", i2cInitNeededCnt);
+	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 #endif
+
 }
 
 void setMessageToAttiny()
@@ -429,11 +431,11 @@ screenJobType  initJob = {5, {{waitLongCs,screenI2cAddress,0,0,initScreenFuntion
 //
 //screenJobType halloPaint = {2, {{waitShortCs,1,1,setCursor}, {waitShortCs,0,0, paintHello}}};
 
-screenJobType growboxScreenPaint = {9, {{waitShortCs,screenI2cAddress,1,1,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTemperatureLine},
+screenJobType growboxScreenPaint = {8, {{waitShortCs,screenI2cAddress,1,1,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTemperatureLine},
 										{waitShortCs,screenI2cAddress,1,2,setCursor},{waitLongCs,screenI2cAddress,1,1,displayTimeLine} ,
 										{waitShortCs,screenI2cAddress,1,3,setCursor},{waitLongCs,screenI2cAddress,1,1,displayStatechartLine},
-										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine},
-										{waitShortCs, attinyAdr,1,1,setMessageToAttiny}}};
+										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine}}};
+//										{waitShortCs, attinyAdr,1,1,setMessageToAttiny}}};
 //										{waitShortCs,screenI2cAddress,1,4,setCursor},{waitLongCs,screenI2cAddress,1,1,displayErrorStateLine}}};
 
 
