@@ -407,7 +407,7 @@ void displayErrorStateLine()
 //	uint8_t strln;
 	commandLineType cmd = {LCD_LastControlByte + LCD_AsciiControlByte};
 	addToByteArray(&byteBuffer, 1, cmd);
-	memset(&buffer,0,sizeof(buffer));
+	memset(&buffer,0,sizeof(buffer));  //  todo  &  tobe tested
 	snprintf(buffer, sizeof(buffer), "%6lu", i2cInitNeededCnt);
 	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
 #endif

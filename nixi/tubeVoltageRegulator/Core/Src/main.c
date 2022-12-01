@@ -32,7 +32,7 @@
 
 
 //#define useDebugPort
-//#define useWWDG
+#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -41,7 +41,7 @@ uint16_t lastADCResult;
 TIM_HandleTypeDef htim2;
 //TIM_HandleTypeDef htim3;
 
-#ifdef hwwdg
+#ifdef useWWDG
 WWDG_HandleTypeDef hwwdg;
 #endif
 
@@ -162,7 +162,7 @@ void initVariables()
 
 
 
-#ifdef hwwdg
+#ifdef useWWDG
 
 void WWDG_IRQHandler(void)
 {
@@ -175,8 +175,6 @@ void WWDG_IRQHandler(void)
 
 static void MWWDG_Init(void)
 {
-	wwdgCnt = 0;
-
 	__HAL_RCC_WWDG_CLK_ENABLE();
 
   hwwdg.Instance = WWDG;
