@@ -9,6 +9,7 @@
 #include <main.h>
 #include <string.h>
 #include <nixi_i2c.h>
+#include <screen.h>
 
 //  todo receive handling of result string not yet implemented, just send for screen used so far
 
@@ -624,5 +625,6 @@ void i2cReInitAfterFailure()
 
 	i2cSetDataIdle();
 	init_i2c1_hw();
+	initScreen();
 	i2cInitialized = 1;
 }
