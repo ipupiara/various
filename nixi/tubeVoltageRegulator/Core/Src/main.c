@@ -32,7 +32,7 @@
 
 
 //#define useDebugPort
-#define useWWDG
+//#define useWWDG
 
 
 ADC_HandleTypeDef hadc1;
@@ -243,6 +243,11 @@ int main(void)
 	MWWDG_Init();
 #endif
 
+//	while (1)  {
+//		 startDrying();
+//		 stopVentilating();
+//	}
+//
 	while (1)
 	{
 	   // while (1) {}  // for testing watchdog

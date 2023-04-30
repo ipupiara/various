@@ -20,20 +20,23 @@
 	#define maxSecsPossible  0xFFFF
 	
 	
-	#define IdleVentilationDelayMinutes   18 // 17
-	#define IdleVentilationMinutes  2   //  3
+	#define IdleVentilationDelayMinutes   29.25  // 17
+	#define IdleVentilationMinutes  0.75   //  3
 
-	#define HumidifyingLowerLimit   70.0
-	#define HumidifyingUpperLimit  75.0
+	#define HumidifyingLowerLimit   10.0
+	#define HumidifyingUpperLimit  15.0
 	#define DryingUpperLimit	105.0
 	#define DryingLowerLimit	104.5
 
 
-	#define HeatingLowerLimit	27.0
-	#define HeatingUpperLimit	27.5
+//	#define HeatingLowerLimit	27.0
+//	#define HeatingUpperLimit	27.5
 
 //	#define HeatingLowerLimit	23.75
 //	#define HeatingUpperLimit	24.25
+
+	#define HeatingLowerLimit	24.75
+	#define HeatingUpperLimit	25.00
 
 	#define CoolingLowerLimit	29.0
 	#define CoolingUpperLimit	30.0

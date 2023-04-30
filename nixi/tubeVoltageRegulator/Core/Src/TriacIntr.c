@@ -7,6 +7,7 @@
 
 #include "TriacIntr.h"
 #include "TriacDefines.h"
+#include <nixi_i2c.h>
 #include <screen.h>
 #include <stm32f1xx.h>
 
@@ -373,9 +374,10 @@ void secTimer()
 	if (secondsCounter == 59) { 
 		++ minutesCounter;
 		secondsCounter = 0;
-		if (minutesCounter == 59) {
+		if (minutesCounter == 60) {
 			++ hoursCounter;
 			minutesCounter = 0;
+			i2cInitNeeded = 1;  // for debugging temporarly
 		}
 	} else { ++ secondsCounter; }
 	
