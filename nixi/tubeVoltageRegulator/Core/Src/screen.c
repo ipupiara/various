@@ -379,14 +379,14 @@ void displayStatechartLine()
 	if(appLen < maxLen) { maxLen = appLen; }
 	addToByteArray(&byteBuffer, maxLen, (uint8_t*) appStateName);
 	char* spc = " ";
-	for(uint8_t i1= stLen + appLen; i1 < 20 ; ++ i1 ) {
+	for(uint8_t i1= stLen + appLen; i1 < 19 ; ++ i1 ) {
 		addToByteArray(&byteBuffer,1,(uint8_t*)spc);
 	}
-
-
-//	snprintf(buffer, sizeof(buffer), "T %6.2f H %6.2f",tmp, hyd);
-//	addToByteArray(&byteBuffer, strlen(buffer) , (uint8_t*) buffer);
-
+	if (heatLevel == heatLevelLow) {
+		addToByteArray(&byteBuffer,1,(uint8_t*)'L');
+	}  else {
+		addToByteArray(&byteBuffer,1,(uint8_t*)'H');
+	}
 }
 
 void displayErrorStateLine()

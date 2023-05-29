@@ -15,6 +15,9 @@
 char lastFatalErrorString [20];
 int8_t fatalErrorOccurred;
 
+float heatUpperLimit;
+float heatLowerLimit;
+heatLevelEnum  heatLevel;
 
 void initTimerPorts();
 
@@ -235,6 +238,15 @@ uint8_t ix;
 
 void initDefines()
 {
+	if (getHeatLevelFromPin() == heatLevelLow)  {
+		heatLowerLimit = LowHeatingLowerLimit;
+		heatUpperLimit =  LowHeatingUpperLimit;
+		heatLevel = heatLevelLow;
+	}  else  {
+		heatLowerLimit = HighHeatingLowerLimit;
+		heatUpperLimit = HighHeatingUpperLimit;
+		heatLevel = heatLevelHigh;
+	}
 
 }
 

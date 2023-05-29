@@ -595,6 +595,8 @@ void initHW()
 #define heaterPin_GPIO_Port GPIOC
 #define ventiPin_Pin GPIO_PIN_9
 #define ventiPin_GPIO_Port GPIOB
+#define heatLevelPin GPIO_PIN_14
+#define heatLevelPort GPIOC
 
  void switchHeaterRelais(uint8_t relaisNeedsOn)
  {
@@ -660,10 +662,10 @@ void initHW()
 
  void controlTemperature(float* temp)
  {
-	 if (*temp < HeatingLowerLimit)  {
+	 if (*temp < heatLowerLimit)  {
 		 startHeating();
 	 }
-	 if (*temp > HeatingUpperLimit)  {
+	 if (*temp > heatUpperLimit)  {
 		 stopHeating();
 	 }
  }
@@ -709,6 +711,18 @@ void startDrying()
 void stopDrying()
 {
 	switchVentiRelais(0);
+}
+
+heatLevelEnum getHeatLevelFromPin()
+{
+	heatLevelEnum  res;
+	if (HAL_GPIO_ReadPin(heatLevelPort, heatLevelPin) == GPIO_PIN_RESET) {
+		res = heatLevelLow;
+	}
+	else {
+		res = heatLevelHigh;
+	}
+	return res;
 }
 
 

@@ -42,6 +42,8 @@ void initHW();
 //void startTriacRun();
 //void stopTriacRun();
 
+heatLevelEnum getHeatLevelFromPin();
+
 void startHeating();
 void stopHeating();
 

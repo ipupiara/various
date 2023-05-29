@@ -19,6 +19,12 @@
 	
 	#define maxSecsPossible  0xFFFF
 	
+	typedef enum {
+		heatLevelLow,
+		heatLevelHigh
+	} heatLevelEnum;
+
+	extern heatLevelEnum  heatLevel;
 	
 	#define IdleVentilationDelayMinutes   29.25  // 17
 	#define IdleVentilationMinutes  0.75   //  3
@@ -35,8 +41,12 @@
 //	#define HeatingLowerLimit	23.75
 //	#define HeatingUpperLimit	24.25
 
-	#define HeatingLowerLimit	24.75
-	#define HeatingUpperLimit	25.00
+	#define LowHeatingLowerLimit	24.75
+	#define LowHeatingUpperLimit	25.00
+
+	#define HighHeatingLowerLimit	26.75
+	#define HighHeatingUpperLimit	27.00
+
 
 	#define CoolingLowerLimit	29.0
 	#define CoolingUpperLimit	30.0
@@ -135,6 +145,8 @@ void csv_printf(const char *emsg, ...);
 extern char lastFatalErrorString [20];
 extern int8_t fatalErrorOccurred;
 
+extern float heatUpperLimit;
+extern float heatLowerLimit;
 
 
 floatType  GetIdleVentilationDelayMinutes();
