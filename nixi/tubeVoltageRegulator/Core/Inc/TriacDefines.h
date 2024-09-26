@@ -41,8 +41,8 @@
 //	#define HeatingLowerLimit	23.75
 //	#define HeatingUpperLimit	24.25
 
-	#define LowHeatingLowerLimit	24.75
-	#define LowHeatingUpperLimit	25.00
+	#define LowHeatingLowerLimit	24.25
+	#define LowHeatingUpperLimit	24.50
 
 	#define HighHeatingLowerLimit	26.75
 	#define HighHeatingUpperLimit	27.00
@@ -157,6 +157,7 @@ floatType  GetDryingUpperLimit();
 floatType  GetDryingLowerLimit();
 
 void initDefines();
+
 
 //#define amtOnOffIntervalsPerTimerPort   4
 //#define amtOnOffTimerPorts				2       // light and fictive intofridge-ventilation,

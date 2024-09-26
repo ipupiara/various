@@ -44,7 +44,8 @@ uint8_t secondsCounter;
 uint16_t hoursCounter;
 
 
-void initRelais();
+void initGpio();
+void initHeatLevel();
 
 void controlTemperature(float* temp);
 
@@ -573,8 +574,8 @@ void initHW()
 	initInterruptsNValues();
 //	initUsart1();
 //	startSecondTick();
-	initRelais();
-
+	initGpio();
+	initHeatLevel();
     fatalErrorOccurred = 0;
 	
 }
@@ -595,8 +596,8 @@ void initHW()
 #define heaterPin_GPIO_Port GPIOC
 #define ventiPin_Pin GPIO_PIN_9
 #define ventiPin_GPIO_Port GPIOB
-#define heatLevelPin GPIO_PIN_14
-#define heatLevelPort GPIOC
+#define heatLevelPin GPIO_PIN_1
+#define heatLevelPort GPIOB
 
  void switchHeaterRelais(uint8_t relaisNeedsOn)
  {
@@ -632,8 +633,21 @@ void initHW()
 	 }
  }
 
+ void initHeatLevel()
+ {
+ 	if (getHeatLevelFromPin() == heatLevelLow)  {
+ 		heatLowerLimit = LowHeatingLowerLimit;
+ 		heatUpperLimit =  LowHeatingUpperLimit;
+ 		heatLevel = heatLevelLow;
+ 	}  else  {
+ 		heatLowerLimit = HighHeatingLowerLimit;
+ 		heatUpperLimit = HighHeatingUpperLimit;
+ 		heatLevel = heatLevelHigh;
+ 	}
+ }
 
- void initRelais()
+
+ void initGpio()
  {
 	 __HAL_RCC_GPIOB_CLK_ENABLE();
 	 __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -656,12 +670,20 @@ void initHW()
 	   HAL_GPIO_Init(ventiPin_GPIO_Port, &GPIO_InitStruct);
 	   ventiRelaisOn = 0;
 
+
+	   GPIO_InitStruct.Pin = heatLevelPin;
+	   GPIO_InitStruct.Mode = GPIO_MODE_INPUT ;
+	   GPIO_InitStruct.Pull = GPIO_PULLUP;
+	   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	   HAL_GPIO_Init(heatLevelPort, &GPIO_InitStruct);
+
 //	   testRelais();
  }
 
 
  void controlTemperature(float* temp)
  {
+	 initHeatLevel();
 	 if (*temp < heatLowerLimit)  {
 		 startHeating();
 	 }

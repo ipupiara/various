@@ -236,17 +236,9 @@ uint8_t ix;
 #pragma GCC diagnostic pop
 */
 
+
 void initDefines()
 {
-	if (getHeatLevelFromPin() == heatLevelLow)  {
-		heatLowerLimit = LowHeatingLowerLimit;
-		heatUpperLimit =  LowHeatingUpperLimit;
-		heatLevel = heatLevelLow;
-	}  else  {
-		heatLowerLimit = HighHeatingLowerLimit;
-		heatUpperLimit = HighHeatingUpperLimit;
-		heatLevel = heatLevelHigh;
-	}
 
 }
 

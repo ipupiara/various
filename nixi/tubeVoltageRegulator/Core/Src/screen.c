@@ -209,6 +209,7 @@ uint8_t setNextScreenJob(screenJobType* sJob)
 	return res;
 }
 
+
 void  screenCentiStepExecution( uint8_t sz, screenJobStepType  sJob [sz] )
 {
 	uint16_t waitTime = sJob[currentStepIndex].waitS1ms;
@@ -383,9 +384,9 @@ void displayStatechartLine()
 		addToByteArray(&byteBuffer,1,(uint8_t*)spc);
 	}
 	if (heatLevel == heatLevelLow) {
-		addToByteArray(&byteBuffer,1,(uint8_t*)'L');
+		addToByteArray(&byteBuffer,1,(uint8_t*)"L");
 	}  else {
-		addToByteArray(&byteBuffer,1,(uint8_t*)'H');
+		addToByteArray(&byteBuffer,1,(uint8_t*)"H");
 	}
 }
 

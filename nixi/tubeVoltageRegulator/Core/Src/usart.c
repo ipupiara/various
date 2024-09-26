@@ -110,6 +110,7 @@ uint8_t onDataReceivedUart1IsValid()        // called by main application thread
 	memset (tempS,0,sizeof(tempS));
 	memset (hydS,0,sizeof(hydS));
 
+
 	//cli();
 	disaRXIntUsart1();   // just stop the receiver, triac continues
 //		info_printf("amtChars %i\n",amtCharRcvd);
@@ -208,7 +209,7 @@ void initUart()
 	huart1.Init.WordLength = UART_WORDLENGTH_8B;
 	huart1.Init.StopBits = UART_STOPBITS_1;
 	huart1.Init.Parity = UART_PARITY_NONE;
-	huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.Mode = UART_MODE_RX;
 	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
 	if (HAL_UART_Init(&huart1) != HAL_OK)
@@ -219,7 +220,7 @@ void initUart()
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-//    __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);
+//    __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);   // valid only for DMAR  see processor datasheet
 //    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 
 }
@@ -243,7 +244,7 @@ void USART1_IRQHandler(void)
 //	  uint32_t dmarequest = 0x00U;
 
 ++ usartCnt;
-	  errorflags = (isrflags & (uint32_t)(USART_SR_PE | USART_SR_FE | USART_SR_ORE)); // | USART_SR_NE));
+	  errorflags = (isrflags & ((uint32_t)(USART_SR_ORE | USART_SR_NE)));  // USART_SR_PE | USART_SR_FE |
 	  if (errorflags == 0)
 	  {
 	    if ((isrflags & USART_SR_RXNE) != 0)
@@ -255,52 +256,50 @@ void USART1_IRQHandler(void)
 	  if (errorflags != 0)
 	  {
 	    // UART parity error interrupt occurred ----------------------------------
-	    if ((isrflags & USART_SR_PE) != 0)
-	    {
-
-	    }
+//	    if ((isrflags & USART_SR_PE) != 0)
+//	    {
+//	    	READ_REG(huart1.Instance->DR);  // tobe reworked see processor datasheet
+//	    }
 
 	    // UART noise error interrupt occurred -----------------------------------
 	    if ((isrflags & USART_SR_NE) != 0)
 	    {
-
+	    	READ_REG(huart1.Instance->DR);
 	    }
 
 	    // UART frame error interrupt occurred -----------------------------------
-	    if ((isrflags & USART_SR_FE) != 0)
-	    {
-
-	    }
+//	    if ((isrflags & USART_SR_FE) != 0)
+//	    {
+//	    	READ_REG(huart1.Instance->DR);
+//	    }
 
 	    // UART Over-Run interrupt occurred --------------------------------------
 	    if ((isrflags & USART_SR_ORE) != 0)
 	    {
 	    	READ_REG(huart1.Instance->DR);
 	    }
-
-
 	  }
 
 	  // UART in mode Transmitter ------------------------------------------------
-	   if ((isrflags & USART_SR_TXE) != 0)
-	   {
-//		   uint8_t bt;
-//		   uint8_t res;
-//		   res= getNextByte(&bt);
-//		   if (res != 0) {
-//			   WRITE_REG(huart1.Instance->DR,bt);
-//		   }
+//	   if ((isrflags & USART_SR_TXE) != 0)
+//	   {
+////		   uint8_t bt;
+////		   uint8_t res;
+////		   res= getNextByte(&bt);
+////		   if (res != 0) {
+////			   WRITE_REG(huart1.Instance->DR,bt);
+////		   }
+//
+////	     UART_Transmit_IT(huart);
+//	   }
 
-//	     UART_Transmit_IT(huart);
-	   }
-
-	   // UART in mode Transmitter end --------------------------------------------
-	   if ((isrflags & USART_SR_TC) != 0)
-	   {
-		   // transmitter is idle, important if later also transmit would be needed
-//	     UART_EndTransmit_IT(huart);
-
-	   }
+//	   // UART in mode Transmitter end --------------------------------------------
+//	   if ((isrflags & USART_SR_TC) != 0)
+//	   {
+//		   // transmitter is idle, important if later also transmit would be needed
+////	     UART_EndTransmit_IT(huart);
+//
+//	   }
 
 
 //  HAL_UART_IRQHandler(&huart1);
